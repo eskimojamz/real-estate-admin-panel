@@ -1,34 +1,41 @@
-const express = require("express");
-const { graphqlHTTP } = require("express-graphql");
-import { schema } from "./Schema";
-const cors = require("cors");
-const { createConnection } = require("typeorm");
-import { Users } from "./Entities/Users";
+import "reflect-metadata";
+import {createConnection} from "typeorm";
+import express from "express"
+import {User} from "./entity/User";
+import {ApolloServer} from "apollo-server-express"
 
-const main = async() => {
-    await createConnection({
-        type: "mysql",
-        database: "Horizon",
-        username: "admin",
-        password: "password",
-        logging: true,
-        synchronize: false,
-        entities: [Users],
+
+// lambda fn, calling itself
+(async() => {
+    const app = express();
+    app.get('/', (_req, res) => res.send('hello'))
+    
+    const apolloServer = new ApolloServer({
+
     })
 
-    const app = express()
-    app.use(cors())
-    app.use(express.json())
-    app.use("/graphql", graphqlHTTP({
-        schema, 
-        graphiql: true
-    }))
+    apolloServer.applyMiddleware({ app });
 
-    app.listen(3001, () => {
-        console.log("Server running on port 3001")
+    app.listen(4000, () => {
+        console.log("express server started")
     })
-}
+})()
 
-main().catch((err) => {
-    console.log(err)
-})
+
+// createConnection().then(async connection => {
+
+//     console.log("Inserting a new user into the database...");
+//     const user = new User();
+//     user.firstName = "Timber";
+//     user.lastName = "Saw";
+//     user.age = 25;
+//     await connection.manager.save(user);
+//     console.log("Saved a new user with id: " + user.id);
+
+//     console.log("Loading users from the database...");
+//     const users = await connection.manager.find(User);
+//     console.log("Loaded users: ", users);
+
+//     console.log("Here you can setup and run express/koa/any other framework.");
+
+// }).catch(error => console.log(error));
