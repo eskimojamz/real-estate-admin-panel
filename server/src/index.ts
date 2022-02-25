@@ -1,19 +1,58 @@
 import "reflect-metadata";
-import {createConnection} from "typeorm";
-import express from "express"
-import {User} from "./entity/User";
-import {ApolloServer} from "apollo-server-express"
-
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import { UserResolver } from "./UserResolver";
+import { createConnection } from "typeorm";
+import cookieParser from "cookie-parser"
+import { verify } from "jsonwebtoken"
+import { User } from "./entity/User"
+import { createAccessToken } from "./auth";
 
 // lambda fn, calling itself
 (async() => {
     const app = express();
-    app.get('/', (_req, res) => res.send('hello'))
+    app.use(cookieParser())
+    app.get('/', (_req, res) => res.send('hello'));
     
-    const apolloServer = new ApolloServer({
+    app.post("/refresh_token", async (req, res) => {
+        // refresh token from cookies
+        const token = req.cookies.jid
+        if (!token) {
+            return res.send({ ok: false, accessToken: "" })
+        }
 
+        let payload: any = null;
+        try {
+            // jsonwebtoken verify if token is valid, get payload
+            payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
+        } catch(err) {
+            console.log(err)
+            return res.send({ ok: false, accessToken: "" })
+        }
+
+        // refresh token is valid 
+        
+        // get user and send back a new access token
+        const user = await User.findOne({ id: payload.userId })
+
+        if (!user) {
+            return res.send({ ok: false, accessToken: "" })
+        }
+
+        return res.send({ ok: true, accessToken: createAccessToken(user) })
     })
 
+    await createConnection();
+
+    const apolloServer = new ApolloServer({ 
+        schema: await buildSchema({
+            resolvers: [UserResolver],
+        }),
+        context: ({ req, res }) => ({ req, res })
+    })
+
+    await apolloServer.start();
     apolloServer.applyMiddleware({ app });
 
     app.listen(4000, () => {
