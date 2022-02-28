@@ -7,7 +7,7 @@ import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser"
 import { verify } from "jsonwebtoken"
 import { User } from "./entity/User"
-import { createAccessToken } from "./auth";
+import { createAccessToken, createRefreshToken } from "./auth";
 
 // lambda fn, calling itself
 (async() => {
@@ -33,13 +33,23 @@ import { createAccessToken } from "./auth";
 
         // refresh token is valid 
         
-        // get user and send back a new access token
+        // get user and send back new refresh & access tokens
         const user = await User.findOne({ id: payload.userId })
 
         if (!user) {
             return res.send({ ok: false, accessToken: "" })
         }
 
+        // if tokenVersion doesn't match, don't send refresh or access token
+        if (user.tokenVersion !== payload.tokenVersion) {
+            return res.send({ ok: false, accessToken: "" })
+        }
+
+        // create new refresh token
+        res.cookie("jid", createRefreshToken(user), {
+            httpOnly: true,
+        })
+        // create new access token
         return res.send({ ok: true, accessToken: createAccessToken(user) })
     })
 
