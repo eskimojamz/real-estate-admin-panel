@@ -1,11 +1,5 @@
-import { ArgsType, InputType, Resolver, Query, Mutation, UseMiddleware, Arg, Field, Ctx } from "type-graphql"
-// import { hash, compare } from "bcryptjs";
+import { ArgsType, InputType, Resolver, Query, Mutation, UseMiddleware, Arg, Field } from "type-graphql"
 import { Listing } from "../entity/Listings";
-import { MyContext } from "../MyContext";
-// import { createAccessToken, createRefreshToken } from "../auth";
-// import { sendRefreshToken } from "../sendRefreshToken";
-// import { getConnection } from "typeorm";
-// import { verify } from "jsonwebtoken";
 import { isAuth } from "../isAuth";
 
 
@@ -20,27 +14,27 @@ import { isAuth } from "../isAuth";
 @ArgsType()
 
 @InputType()
-class ListingInput implements Partial<Listing> {
+class ListingInput {
 
-  @Field()
+  @Field(() => String, {nullable: true})
   address1: string;
 		
-	@Field()
+	@Field({nullable: true})
   address2: string;
 		
-	@Field()
+	@Field({nullable: true})
   price: number;
 
-  @Field()
+  @Field({nullable: true})
   beds: number;
 
-  @Field()
+  @Field({nullable: true})
   baths: number;
 
-  @Field()
+  @Field({nullable: true})
   squareFt: number;
 
-  @Field()
+  @Field({nullable: true})
   description: string;
 }
 
@@ -77,14 +71,17 @@ export class ListingResolver {
     @UseMiddleware(isAuth)
     // Edit listing
     async edit(
-      @Arg("listingId") listingId: number,
-      @Arg("data") listingData: ListingInput
+      @Arg("listingId") listingId: string,
+      @Arg("data", () => ListingInput) data: ListingInput
       ) {
         try {
-          return await Listing.update(listingId, listingData)
+          await Listing.update(listingId, data)
+
+          return await Listing.findOne(listingId)
         } catch(err) {
           console.log(err)
-          throw new Error("Listing could not be edited.")
+          throw new Error("Error Editing Listing")
         }
+        
     }
 }
