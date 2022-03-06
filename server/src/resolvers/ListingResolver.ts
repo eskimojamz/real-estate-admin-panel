@@ -82,6 +82,18 @@ export class ListingResolver {
           console.log(err)
           throw new Error("Error Editing Listing")
         }
-        
+    }
+
+    @Mutation(() => Boolean, { nullable: true })
+    @UseMiddleware(isAuth)
+    // Delete listing
+    async delete(@Arg("listingId") listingId: string) {
+        try {
+          await Listing.delete(listingId)
+          return true
+        } catch(err) {
+          console.log(err)
+          throw new Error("Error Deleting Listing")
+        }
     }
 }
