@@ -25,17 +25,22 @@ export class UserResolver {
 
     @Query(() => User, { nullable: true })
     displayUser(@Ctx() context: MyContext) {
+      // get auth header
       const authorization = context.req.headers["authorization"];
-  
+      // if not authorized, return null
       if (!authorization) {
         return null;
       }
   
       try {
+        // get token from auth header
         const token = authorization.split(" ")[1];
+        // verify token and set to payload const
         const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        // get the User with payload.userId
         return User.findOne(payload.userId);
       } catch (err) {
+        // return null if error
         console.log(err);
         return null;
       }
@@ -47,7 +52,8 @@ export class UserResolver {
   
       return true;
     }
-  
+    
+    // revoke refresh token for invalid users
     @Mutation(() => Boolean)
     async revokeRefreshTokensForUser(@Arg("userId", () => Int) userId: number) {
       await getConnection()

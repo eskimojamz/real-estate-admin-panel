@@ -14,17 +14,18 @@ import cors from "cors"
 // lambda fn, calling itself
 (async() => {
     const app = express();
+
     app.use(
         cors({
           origin: "http://localhost:3000",
           credentials: true
         })
       );
+    
     app.use(cookieParser())
-    app.get('/', (_req, res) => res.send('hello'));
     
     app.post("/refresh_token", async (req, res) => {
-        // refresh token from cookies
+        // grab refresh token from cookies
         const token = req.cookies.jid
         if (!token) {
             return res.send({ ok: false, accessToken: "" })
@@ -32,7 +33,7 @@ import cors from "cors"
 
         let payload: any = null;
         try {
-            // jsonwebtoken verify if token is valid, get payload
+            // jsonwebtoken verify if refresh token is valid, get payload
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
         } catch(err) {
             console.log(err)
@@ -49,15 +50,16 @@ import cors from "cors"
         }
 
         // if tokenVersion doesn't match, don't send refresh or access token
+        // used for blocking invalid logins
         if (user.tokenVersion !== payload.tokenVersion) {
             return res.send({ ok: false, accessToken: "" })
         }
 
-        // create new refresh token
+        // create new refresh token and set to cookies
         res.cookie("jid", createRefreshToken(user), {
             httpOnly: true,
         })
-        // create new access token
+        // create new access token and send to apollo client
         return res.send({ ok: true, accessToken: createAccessToken(user) })
     })
 

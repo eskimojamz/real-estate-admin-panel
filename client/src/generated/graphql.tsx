@@ -15,6 +15,42 @@ export type Scalars = {
   Float: number;
 };
 
+export type Listing = {
+  __typename?: 'Listing';
+  address1: Scalars['String'];
+  address2: Scalars['String'];
+  baths: Scalars['Float'];
+  beds: Scalars['Float'];
+  dateCreated: Scalars['String'];
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  image1: Scalars['String'];
+  image2: Scalars['String'];
+  image3: Scalars['String'];
+  image4: Scalars['String'];
+  image5: Scalars['String'];
+  lastEdited?: Maybe<Scalars['String']>;
+  price: Scalars['Float'];
+  squareFt: Scalars['Float'];
+};
+
+export type ListingInput = {
+  address1?: InputMaybe<Scalars['String']>;
+  address2?: InputMaybe<Scalars['String']>;
+  baths?: InputMaybe<Scalars['Float']>;
+  beds?: InputMaybe<Scalars['Float']>;
+  dateCreated?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+  image1?: InputMaybe<Scalars['String']>;
+  image2?: InputMaybe<Scalars['String']>;
+  image3?: InputMaybe<Scalars['String']>;
+  image4?: InputMaybe<Scalars['String']>;
+  image5?: InputMaybe<Scalars['String']>;
+  lastEdited?: InputMaybe<Scalars['String']>;
+  price?: InputMaybe<Scalars['Float']>;
+  squareFt?: InputMaybe<Scalars['Float']>;
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
@@ -23,10 +59,30 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  create?: Maybe<Listing>;
+  delete?: Maybe<Scalars['Boolean']>;
+  edit?: Maybe<Listing>;
   login: LoginResponse;
   logout: Scalars['Boolean'];
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
+  signS3: S3Response;
+};
+
+
+export type MutationCreateArgs = {
+  data: ListingInput;
+};
+
+
+export type MutationDeleteArgs = {
+  listingId: Scalars['String'];
+};
+
+
+export type MutationEditArgs = {
+  data: ListingInput;
+  listingId: Scalars['String'];
 };
 
 
@@ -46,10 +102,29 @@ export type MutationRevokeRefreshTokensForUserArgs = {
   userId: Scalars['Int'];
 };
 
+
+export type MutationSignS3Args = {
+  filename: Scalars['String'];
+  filetype: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  allListings: Array<Listing>;
   allUsers: Array<User>;
+  displayListing?: Maybe<Listing>;
   displayUser?: Maybe<User>;
+};
+
+
+export type QueryDisplayListingArgs = {
+  listingId: Scalars['Float'];
+};
+
+export type S3Response = {
+  __typename?: 'S3Response';
+  signedRequest: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export type User = {
@@ -83,6 +158,14 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: boolean };
+
+export type SignS3MutationVariables = Exact<{
+  filename: Scalars['String'];
+  filetype: Scalars['String'];
+}>;
+
+
+export type SignS3Mutation = { __typename?: 'Mutation', signS3: { __typename?: 'S3Response', signedRequest: string, url: string } };
 
 
 export const DisplayUserDocument = gql`
@@ -220,3 +303,38 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SignS3Document = gql`
+    mutation SignS3($filename: String!, $filetype: String!) {
+  signS3(filename: $filename, filetype: $filetype) {
+    signedRequest
+    url
+  }
+}
+    `;
+export type SignS3MutationFn = Apollo.MutationFunction<SignS3Mutation, SignS3MutationVariables>;
+
+/**
+ * __useSignS3Mutation__
+ *
+ * To run a mutation, you first call `useSignS3Mutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignS3Mutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signS3Mutation, { data, loading, error }] = useSignS3Mutation({
+ *   variables: {
+ *      filename: // value for 'filename'
+ *      filetype: // value for 'filetype'
+ *   },
+ * });
+ */
+export function useSignS3Mutation(baseOptions?: Apollo.MutationHookOptions<SignS3Mutation, SignS3MutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignS3Mutation, SignS3MutationVariables>(SignS3Document, options);
+      }
+export type SignS3MutationHookResult = ReturnType<typeof useSignS3Mutation>;
+export type SignS3MutationResult = Apollo.MutationResult<SignS3Mutation>;
+export type SignS3MutationOptions = Apollo.BaseMutationOptions<SignS3Mutation, SignS3MutationVariables>;

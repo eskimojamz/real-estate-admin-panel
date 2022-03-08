@@ -5,7 +5,7 @@ import { ObjectType, Field, ID } from "type-graphql"
 @Entity("listings")
 export class Listing extends BaseEntity {
     @Field(() => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Field()
@@ -35,4 +35,32 @@ export class Listing extends BaseEntity {
     @Field()
     @Column("text")
     description: string;
+
+    @Field()
+    @Column()
+    dateCreated: string;
+
+    @Field({nullable: true})
+    @Column()
+    lastEdited: string;
+
+    @Field()
+    @Column()
+    image1: string;
+
+    @Field()
+    @Column()
+    image2: string;
+
+    @Field()
+    @Column()
+    image3: string;
+
+    @Field()
+    @Column()
+    image4: string;
+
+    @Field()
+    @Column()
+    image5: string;
 }

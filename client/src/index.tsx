@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import { getAccessToken, setAccessToken } from "./accessToken";
+import { getAccessToken, setAccessToken } from "./utils/accessToken";
 import { App } from "./App";
 import {
   ApolloClient,
@@ -13,8 +13,11 @@ import { onError } from "@apollo/client/link/error";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
 
+// define cache
 const cache = new InMemoryCache({});
 
+// Apollo Link to set the accessToken 
+// to http authorization header for every request
 const requestLink = new ApolloLink(
   (operation, forward) =>
     new Observable(observer => {
@@ -45,19 +48,24 @@ const requestLink = new ApolloLink(
     })
 );
 
+// Check for expired tokens; link to get and set new refresh token and access token
 const tokenRefreshLink: any = new TokenRefreshLink({
   accessTokenField: "accessToken",
+  // check if token is valid or undefined
   isTokenValidOrUndefined: () => {
+    // get token
     const token = getAccessToken();
-
+    // if no token, then undefined so true
     if (!token) {
       return true;
     }
-
+    // is token expired?
     try {
+      // decode the token, get its expiration
       const { expiration }: any = jwtDecode(token) as {
-        exp: number;
+        expiration: number;
       };
+      // compare to current date, if greater, then it's expired
       if (Date.now() >= expiration * 1000) {
         return false;
       } else {
@@ -67,22 +75,27 @@ const tokenRefreshLink: any = new TokenRefreshLink({
       return false;
     }
   },
+  // method to fetch access token, get and set refresh token to cookies
   fetchAccessToken: () => {
     return fetch("http://localhost:4000/refresh_token", {
       method: "POST",
       credentials: "include"
     });
   },
+  // after fetch, set the accessToken
   handleFetch: accessToken => {
     setAccessToken(accessToken);
   },
+  // error handler
   handleError: err => {
     console.warn("Your refresh token is invalid. Try to relogin");
     console.error(err);
   }
 });
 
+// ApolloClient parameters (link, cache)
 const client = new ApolloClient({
+  // links to GraphQL server for req, res
   link: ApolloLink.from([
     tokenRefreshLink,
     onError(({ graphQLErrors, networkError }) => {
@@ -95,9 +108,11 @@ const client = new ApolloClient({
       credentials: "include"
     })
   ]),
+  // GraphQL InMemoryCache
   cache
 });
 
+// render Virtual DOM to DOM
 ReactDOM.render(
   <ApolloProvider client={client}>
     <App />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Router } from "./Router";
-import { setAccessToken } from "./accessToken";
+import { setAccessToken } from "./utils/accessToken";
 
 interface Props {}
 
