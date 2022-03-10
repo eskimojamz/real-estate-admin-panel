@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
+import "./App.css"
 
 interface Props {}
 
 export const App: React.FC<Props> = () => {
-  const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     fetch("http://localhost:4000/refresh_token", {
@@ -14,13 +15,10 @@ export const App: React.FC<Props> = () => {
     }).then(async x => {
       const { accessToken } = await x.json();
       setAccessToken(accessToken);
-      setLoading(false);
     });
   }, []);
 
-  if (loading) {
-    return <div>loading...</div>;
-  }
+  
 
   return <Router />;
 };

@@ -1,0 +1,264 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+body {
+    background: linear-gradient(rgba(255, 85, 85, 0.3), rgba(252, 167, 3, 0.3));
+}
+
+button {
+    font-family: 'Source Sans Pro', sans-serif;
+    transition: opacity 0.2s;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.5;
+}
+
+button:focus {
+    opacity: 1.25;
+}
+
+:root {
+    --primary: rgba(252, 176, 28, 1);
+    --primary-light: rgba(255, 233, 191, 0.75);
+    --highlight: rgba(252, 176, 28, 0.5);
+    --secondary: rgba(255, 85, 85, 1);
+}
+
+::selection {
+    background: var(--highlight); /* WebKit/Blink Browsers */
+  }
+::-moz-selection {
+    background: var(--highlight); /* Gecko Browsers */
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    width: 100vw;
+}
+
+.login-container {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.login-wrapper {
+    /* Glass-effect */
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    height: 500px;
+    width: 500px;
+    margin: 0 auto;
+}
+
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 3rem auto 0 auto;
+}
+
+.login-header-logo {
+    transform: scale(100%);
+}
+
+.login-header-text h3 {
+    font-style: bold;
+    font-size: 32px;
+    margin: 32px 0 16px 0;
+}
+
+.login-header-text h6 {
+    font-size: 16px;
+    font-weight: 300;
+    margin: 16px 0 32px 0;
+    color:rgb(131, 130, 130);
+}
+
+.login-header-text {
+    text-align: center;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+    text-align: left;
+}
+
+.login-form label {
+    align-self: flex-start;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.login-form input {
+    height: 35px;
+    width: 184px;
+    margin: 8px 0;
+    padding: 0 0.5rem;
+    border-radius: 5px;
+    border: 1px solid rgba(71, 71, 71, 0.3);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.75);
+}
+
+input {
+    font-family: inherit;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: 1px solid var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.login-form-error {
+    height: 20px;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--secondary);
+}
+
+.login-form button {
+    height: 35px;
+    width: 202px;
+    margin: 8px 0 8px 0;
+    padding: 0;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+    background: var(--primary);
+}
+
+.dashboard-wrapper {
+    height: 855px;
+    width: 1365px;
+    margin: 4rem auto 0 auto;
+    box-sizing: border-box;
+
+    /* Glass-effect */
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    width: 100%;
+}
+
+.dashboard-header-text {
+    display: flex;
+}
+
+.dashboard-header-text h3:first-child {
+    margin-right: 1rem;
+}
+
+.dashboard-header-text h3:nth-child(2) {
+    color:rgb(131, 130, 130);
+}
+
+.dashboard-header-buttons-wrapper {
+    display: flex;
+    gap: 1rem;
+}
+
+.dashboard-header-buttons-wrapper .filter-btn {
+    height: 35px;
+    width: 80px;
+    background: none;
+    color: rgb(131, 130, 130);
+    border: 1px solid rgb(131, 130, 130);
+    border-radius: 5px;
+}
+
+.dashboard-header-buttons-wrapper .create-btn {
+    height: 35px;
+    width: 100px;
+    background: var(--primary);
+    color: white;
+    border: 1px solid var(--primary);
+    border-radius: 5px;
+}
+
+/* Table */
+table {
+    border-collapse: collapse;
+    border-style: hidden;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 0 2px white;
+}
+
+thead {
+    height: 40px;
+    width: 100%;
+    background-color: var(--primary-light);
+    border-radius: 5px;
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.address1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: black;
+    margin: 0 0 1px 0;
+}
+
+.address2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgb(131, 130, 130);
+    margin: 1px 0 0 0;
+}
+
+.td-p-bold {
+    font-size: 18px;
+    font-weight: 600;
+    color: black;
+    margin: 0;
+}
+
+.td-edit {
+    background: rgba(44, 103, 255, 1);
+    border: none;
+    border-radius: 5px;
+    height: 25px;
+    width: 50px;
+}
