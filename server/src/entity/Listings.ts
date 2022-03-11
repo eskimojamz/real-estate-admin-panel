@@ -34,6 +34,14 @@ export class Listing extends BaseEntity {
 
     @Field()
     @Column("text")
+    status: string;
+
+    @Field()
+    @Column("text")
+    area: string;
+
+    @Field()
+    @Column("text")
     description: string;
 
     @Field()
@@ -41,26 +49,26 @@ export class Listing extends BaseEntity {
     dateCreated: string;
 
     @Field({nullable: true})
-    @Column()
+    @Column({nullable: true})
     lastEdited: string;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     image1: string;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     image2: string;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     image3: string;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     image4: string;
 
-    @Field()
-    @Column()
+    @Field({nullable: true})
+    @Column({nullable: true})
     image5: string;
 }

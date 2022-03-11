@@ -19,6 +19,7 @@ export type Listing = {
   __typename?: 'Listing';
   address1: Scalars['String'];
   address2: Scalars['String'];
+  area: Scalars['String'];
   baths: Scalars['Float'];
   beds: Scalars['Float'];
   dateCreated: Scalars['String'];
@@ -32,11 +33,13 @@ export type Listing = {
   lastEdited?: Maybe<Scalars['String']>;
   price: Scalars['Float'];
   squareFt: Scalars['Float'];
+  status: Scalars['String'];
 };
 
 export type ListingInput = {
   address1?: InputMaybe<Scalars['String']>;
   address2?: InputMaybe<Scalars['String']>;
+  area?: InputMaybe<Scalars['String']>;
   baths?: InputMaybe<Scalars['Float']>;
   beds?: InputMaybe<Scalars['Float']>;
   dateCreated?: InputMaybe<Scalars['String']>;
@@ -49,6 +52,7 @@ export type ListingInput = {
   lastEdited?: InputMaybe<Scalars['String']>;
   price?: InputMaybe<Scalars['Float']>;
   squareFt?: InputMaybe<Scalars['Float']>;
+  status?: InputMaybe<Scalars['String']>;
 };
 
 export type LoginResponse = {
@@ -136,7 +140,7 @@ export type User = {
 export type AllListingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, description: string, dateCreated: string, lastEdited?: string | null, image1: string, image2: string, image3: string, image4: string, image5: string }> };
+export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1: string, image2: string, image3: string, image4: string, image5: string }> };
 
 export type DisplayUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -183,6 +187,8 @@ export const AllListingsDocument = gql`
     beds
     baths
     squareFt
+    status
+    area
     description
     dateCreated
     lastEdited

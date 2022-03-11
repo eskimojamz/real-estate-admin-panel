@@ -35,24 +35,30 @@ class ListingInput {
   description: string;
 
   @Field({nullable: true})
+  status: string;
+
+  @Field({nullable: true})
+  area: string;
+
+  @Field({nullable: true})
   dateCreated: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   lastEdited: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   image1: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   image2: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   image3: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   image4: string;
 
-  @Field({nullable: true})
+  @Field({nullable: true, defaultValue: null})
   image5: string;
 }
 

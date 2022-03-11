@@ -1,74 +1,25 @@
-function Table() {
-    const listings = [
-        {
-            "id": "23432-fdsf-4343",
-            "address1": "100 St",
-            "address2": "Bayside, NY 11237",
-            "price": 500000,
-            "beds": 2,
-            "baths": 2,
-            "squareFt": 3500,
-            "description": "Great house",
-            "dateCreated": "",
-            "lastEdited": "",
-            "image1": "",
-            "image2": "",
-            "image3": "",
-            "image4": "",
-            "image5": ""
-          },
-          {
-            "id": "544dea2f-0b87-47c9-b1b7-0872ba7c58fc",
-            "address1": "Happy St",
-            "address2": "Bayside, NY 11237",
-            "price": 500000,
-            "beds": 2,
-            "baths": 2,
-            "squareFt": 3500,
-            "description": "Great house",
-            "dateCreated": "",
-            "lastEdited": "",
-            "image1": "",
-            "image2": "",
-            "image3": "",
-            "image4": "",
-            "image5": ""
-          },
-          {
-            "id": "23-sdf43-434fdsf",
-            "address1": "100 St",
-            "address2": "Bayside, NY 11237",
-            "price": 500000,
-            "beds": 2,
-            "baths": 2,
-            "squareFt": 3500,
-            "description": "Great house",
-            "dateCreated": "",
-            "lastEdited": "",
-            "image1": "",
-            "image2": "",
-            "image3": "",
-            "image4": "",
-            "image5": ""
-          },
-          {
-            "id": "544dea2f-0b87-47c9-b1b7-0872ba7c58fc",
-            "address1": "Happy St",
-            "address2": "Bayside, NY 11237",
-            "price": 500000,
-            "beds": 2,
-            "baths": 2,
-            "squareFt": 3500,
-            "description": "Great house",
-            "dateCreated": "",
-            "lastEdited": "",
-            "image1": "abc",
-            "image2": "",
-            "image3": "",
-            "image4": "",
-            "image5": ""
-          }
-    ]
+interface listing {
+    id: string,
+    address1: string
+    address2: string,
+    price: number,
+    beds: number,
+    baths: number,
+    squareFt: number,
+    status: string,
+    area: string,
+    description: string,
+    dateCreated: string,
+    lastEdited: string,
+    image1: string,
+    image2: string,
+    image3: string,
+    image4: string,
+    image5: string,
+  }
+
+function Table({listings}:any) {
+
     return (
         <>
         <table>
@@ -81,40 +32,42 @@ function Table() {
                     <th>Price</th>
                     <th>Bedrooms</th>
                     <th>Bathrooms</th>
-                    <th>Created</th>
                     <th>Status</th>
                     <th>Area</th>
+                    <th>Created</th>
+                    <th>Edited</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <br></br>
             <tbody>
-                {listings?.map(listing => {
+                {listings?.map((listing:listing) => {
                     const listingId = listing.id
 
                     return (
                     <>
                     <tr>
-                        <td>{Object.values(listing)[10]}</td>
+                        <td><img src={listing.image1}/></td>
                         <td>
-                            <p className="address1">{Object.values(listing)[1]}</p>
-                            <p className="address2">{Object.values(listing)[2]}</p>
+                            <p className="address1">{listing.address1}</p>
+                            <p className="address2">{listing.address2}</p>
                         </td>
                         <td>
-                            <p className="td-p-bold">$ {Object.values(listing)[3]}</p>
+                            <p className="td-p-bold">$ {listing.price}</p>
                         </td>
                         <td>
-                            <p className="td-p-bold">{Object.values(listing)[4]}</p>
+                            <p className="td-p-bold">{listing.beds}</p>
                         </td>
                         <td>
-                            <p className="td-p-bold">{Object.values(listing)[5]}</p>
+                            <p className="td-p-bold">{listing.baths}</p>
                         </td>
-                        <td>{Object.values(listing)[8]}</td>
-                        <td>Status</td>
-                        <td>Area</td>
+                        <td><p className={`td-p-bold ${listing.status == "Active" ? "td-p-active" : "td-p-sold"}`}>{listing.status}</p></td>
+                        <td><p className="td-p-bold">{listing.area}</p></td>
+                        <td><p className="td-p-bold">{listing.dateCreated}</p></td>
+                        <td><p className="td-p-bold">{listing.lastEdited}</p></td>
                         <td>
                             <button id={listingId} className="td-edit">Edit</button>
-                            <button id={listingId}>View</button>
+                            <button id={listingId} className="td-view">View</button>
                         </td>
                     </tr>
                     <br></br>

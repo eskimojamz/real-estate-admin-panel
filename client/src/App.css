@@ -179,6 +179,8 @@ input:focus {
 
 .dashboard-header-text {
     display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .dashboard-header-text h3:first-child {
@@ -229,6 +231,13 @@ thead {
     box-shadow: 0 0 0 2px var(--primary-light);
 }
 
+tbody img {
+    height: 50px;
+    width: 75px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
 td {
     text-align: center;
     vertical-align: middle;
@@ -255,10 +264,29 @@ td {
     margin: 0;
 }
 
+.td-p-active {
+    color: rgba(44, 177, 89, 1);
+}
+
+.td-p-sold {
+    color: rgba(255, 85, 85, 1);
+}
+
 .td-edit {
     background: rgba(44, 103, 255, 1);
+    color: white;
     border: none;
     border-radius: 5px;
     height: 25px;
     width: 50px;
+    margin-right: 5px;
+}
+
+.td-view {
+    background: none;
+    border: 1px solid rgb(131, 130, 130);
+    border-radius: 5px;
+    height: 25px;
+    width: 50px;
+    margin-left: 5px;
 }
