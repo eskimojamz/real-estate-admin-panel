@@ -16,7 +16,7 @@ interface listing {
     image3: string,
     image4: string,
     image5: string,
-  }
+}
 
 function Table({listings}:any) {
 
@@ -53,7 +53,7 @@ function Table({listings}:any) {
                             <p className="address2">{listing.address2}</p>
                         </td>
                         <td>
-                            <p className="td-p-bold">$ {listing.price}</p>
+                            <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
                         </td>
                         <td>
                             <p className="td-p-bold">{listing.beds}</p>
@@ -63,8 +63,8 @@ function Table({listings}:any) {
                         </td>
                         <td><p className={`td-p-bold ${listing.status == "Active" ? "td-p-active" : "td-p-sold"}`}>{listing.status}</p></td>
                         <td><p className="td-p-bold">{listing.area}</p></td>
-                        <td><p className="td-p-bold">{listing.dateCreated}</p></td>
-                        <td><p className="td-p-bold">{listing.lastEdited}</p></td>
+                        <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
+                        <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>
                         <td>
                             <button id={listingId} className="td-edit">Edit</button>
                             <button id={listingId} className="td-view">View</button>

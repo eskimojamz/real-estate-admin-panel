@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
 import Table from "../components/Table"
 import { useAllListingsQuery } from "../generated/graphql";
 
@@ -13,6 +14,8 @@ export const Home: React.FC = () => {
   }, [data])
 
   return (
+    <>
+    <Sidebar />
     <div className="dashboard-wrapper">
       <div className="dashboard-header">
         <div className="dashboard-header-text">
@@ -20,7 +23,8 @@ export const Home: React.FC = () => {
           <h3>{listings?.length}</h3>
         </div>
         <div className="dashboard-header-buttons-wrapper">
-          <button className="filter-btn">Filter</button>
+          <input></input>
+          <button className="filter-btn">Search</button>
           <button className="create-btn">Create Listing</button>
         </div>
       </div>
@@ -28,7 +32,7 @@ export const Home: React.FC = () => {
       ? <Table listings={listings}/>
       : null
       }
-      
     </div>
+    </>
   );
 };

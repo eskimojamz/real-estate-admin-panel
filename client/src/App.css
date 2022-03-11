@@ -151,6 +151,45 @@ input:focus {
     background: var(--primary);
 }
 
+.sidebar-wrapper {
+    height: 100vh;
+    width: 200px;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(255, 255, 255, 0.75);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-logo {
+    height: 43px;
+    width: 100%;
+}
+
+.sidebar-logo img {
+    height: 35px;
+    width: 133px;
+    margin: 0.5rem 0 0 0.5rem;
+}
+
+.sidebar-grid {
+    height: 100%;
+    display: grid;
+    padding: 2rem 1rem;
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-bottom {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: column;
+}
+
 .dashboard-wrapper {
     height: 855px;
     width: 1365px;
@@ -289,4 +328,24 @@ td {
     height: 25px;
     width: 50px;
     margin-left: 5px;
+}
+
+/* Create listing page*/
+
+.create-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-wrapper form {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropzone-wrapper {
+    cursor: pointer;
+}
+
+.dropzone {
+    background: white;
 }
