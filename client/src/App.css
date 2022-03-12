@@ -331,13 +331,22 @@ td {
 }
 
 /* Create listing page*/
+.create-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 
 .create-wrapper {
     display: flex;
-    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    justify-content: center;
 }
 
-.create-wrapper form {
+.create-wrapper section {
+    width: 30%;
+
     display: flex;
     flex-direction: column;
 }
@@ -358,4 +367,30 @@ td {
     height: 185px;
     width: 265px;
     object-fit: cover;
+}
+
+.form-col-1 {
+    gap: 1rem;
+}
+
+.form-col-1-bottom {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.form-col-2 form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-bottom-btns {
+    display: flex;
+    justify-content: center;
+}
+
+.form-bottom-btns-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
 }

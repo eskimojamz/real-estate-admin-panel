@@ -121,8 +121,47 @@ const Create: React.FC = () => {
     
     return (
         <>
+        <div className="create-container">
+        <h2>Create New Listing</h2>
+        <br></br>
         <div className="create-wrapper">
-            <h2>Create New Listing</h2>
+            
+            <section className="form-col-1">
+            <div className="dropzone-wrapper">
+                <div {...getRootProps({ className: 'dropzone' })}>
+                    <input {...getInputProps()} />
+                    <p>Drag and drop up to five (5) image files here, or click to select files</p>
+                    <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
+                </div>
+                <aside>
+                {imagePreviews}
+                </aside>
+            </div>
+            {(s3SignLoading || s3Uploading) && 
+            <p>Preparing images for upload...</p>
+            }
+            
+            <form className="form-col-1-bottom">
+                <label htmlFor="status">Status</label>
+                <select id="status" name="status">
+                    <option value="active">Active</option>
+                    <option value="sold">Sold</option>
+                </select>
+
+                <label htmlFor="area">Area</label>
+                <select id="area" name="area">
+                    <option value="Queens">Queens</option>
+                    <option value="Brooklyn">Brooklyn</option>
+                    <option value="Long Island">Long Island</option>
+                    <option value="Manhattan">Manhattan</option>
+                    <option value="Bronx">Bronx</option>
+                    <option value="New Jersey">New Jersey</option>
+                    <option value="Staten Island">Staten Island</option>
+                </select>
+            </form>
+            </section>
+
+            <section className="form-col-2">
             <form>
                 <label>Address</label>
                 <input placeholder="123 Street"></input>
@@ -153,43 +192,22 @@ const Create: React.FC = () => {
 
                 <label htmlFor="squareFt">Square Ft.</label>
                 <input id="squareFt" name="squareFt"></input>
-
-                <label htmlFor="status">Status</label>
-                <select id="status" name="status">
-                    <option value="active">Active</option>
-                    <option value="sold">Sold</option>
-                </select>
-
-                <label htmlFor="area">Area</label>
-                <select id="area" name="area">
-                    <option value="Queens">Queens</option>
-                    <option value="Brooklyn">Brooklyn</option>
-                    <option value="Long Island">Long Island</option>
-                    <option value="Manhattan">Manhattan</option>
-                    <option value="Bronx">Bronx</option>
-                    <option value="New Jersey">New Jersey</option>
-                    <option value="Staten Island">Staten Island</option>
-                </select>
-
-                <label htmlFor="description">Description</label>
-                <textarea name="description" id="description" cols={30} rows={10}></textarea>
-
-                <div className="dropzone-wrapper">
-                    <div {...getRootProps({ className: 'dropzone' })}>
-                        <input {...getInputProps()} />
-                        <p>Drag and drop up to five (5) image files here, or click to select files</p>
-                        <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
-                    </div>
-                </div>
-                {(s3SignLoading || s3Uploading) && 
-                <p>Preparing images for upload...</p>
-                }
-                <aside>
-                    {imagePreviews}
-                </aside>
-
-                <button type="submit" onClick={submit}>Submit</button>
             </form>
+            </section>
+
+            <section className="form-col-3">
+                <label htmlFor="description">Description</label>
+                <textarea name="description" id="description" cols={30} rows={20}></textarea>
+            </section>
+        </div>
+
+            <section className="form-buttom-btns">
+                <div className="form-bottom-btns-wrapper"> 
+                    <button type="submit" onClick={submit}>Submit</button>
+                    <button >Cancel</button>
+                </div>
+            </section>
+
         </div>
         </>
     )
