@@ -349,3 +349,13 @@ td {
 .dropzone {
     background: white;
 }
+
+.image-preview-aside {
+    display: flex;
+}
+
+.image-preview-img {
+    height: 185px;
+    width: 265px;
+    object-fit: cover;
+}

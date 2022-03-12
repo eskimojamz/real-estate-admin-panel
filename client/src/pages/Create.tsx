@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {useDropzone} from "react-dropzone"
 import { useSignS3Mutation } from "../generated/graphql";
+import s3Upload from "../utils/s3Upload"
 
 interface listing {
     id: string,
@@ -26,9 +27,15 @@ const Create: React.FC = () => {
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([] as any)
     const [s3Uploading, setS3Uploading] = useState(false as Boolean)
-    console.log(s3UploadData)
-    const onDrop:any = useCallback(async (acceptedFiles:[File]) => {
-        await setS3Uploading(true)
+    const [images, setImages] = useState([] as any)
+    // const [imageUrls, setImageUrls] = useState([] as any)
+   
+    const onDrop:any = useCallback((acceptedFiles:[File]) => {
+        setS3Uploading(true)
+        setImages(acceptedFiles)
+        console.log(acceptedFiles)
+        console.log(images)
+        const uploads = [] as any
 
         acceptedFiles.forEach(async (file:File) => {
             let fileName = file.name.replace(/\..+$/, "");
@@ -57,16 +64,28 @@ const Create: React.FC = () => {
 
             
 
-            await setS3UploadData([...s3UploadData, 
+            uploads.push(
                 {
                     signedRequest: s3SignedRequest?.data?.signS3?.signedRequest,
                     file: file,
                 }
-            ])
+            )
         })
-
-        return await setS3Uploading(false)
+        setS3UploadData(uploads)
+        setS3Uploading(false)
+        return
     }, [])
+    console.log(images)
+    // console.log(imageUrls)
+    const submit = async (e:any) => {
+        e.preventDefault()
+        await s3UploadData.forEach(async(data:any) => {
+            await s3Upload(data.signedRequest, data.file)
+            // await console.log(data)
+        })
+    }
+
+    
 
     const {
         getRootProps,
@@ -95,7 +114,11 @@ const Create: React.FC = () => {
           </ul>
         </li>
       )); 
-
+    
+    const imagePreviews = images.map((image:File) => (
+        <img className="image-preview-img" src={URL.createObjectURL(image)} />
+    ))
+    
     return (
         <>
         <div className="create-wrapper">
@@ -161,6 +184,11 @@ const Create: React.FC = () => {
                 {(s3SignLoading || s3Uploading) && 
                 <p>Preparing images for upload...</p>
                 }
+                <aside>
+                    {imagePreviews}
+                </aside>
+
+                <button type="submit" onClick={submit}>Submit</button>
             </form>
         </div>
         </>
