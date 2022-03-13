@@ -19,8 +19,8 @@ export const Home: React.FC = () => {
     <div className="dashboard-wrapper">
       <div className="dashboard-header">
         <div className="dashboard-header-text">
-          <h2>All Listings</h2>
-          <h3>{listings?.length}</h3>
+          <h3>All Listings</h3>
+          <h4>{listings?.length}</h4>
         </div>
         <div className="dashboard-header-buttons-wrapper">
           <input></input>

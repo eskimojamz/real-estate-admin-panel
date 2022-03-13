@@ -5,7 +5,7 @@ html, body {
 }
 
 body {
-    background: rgba(255, 246, 231, 1);
+    background: rgba(249, 249, 249, 1);
 }
 
 button {
@@ -27,7 +27,12 @@ button:focus {
     --primary-light: rgba(255, 233, 191, 0.75);
     --highlight: rgba(252, 176, 28, 0.5);
     --secondary: rgba(255, 85, 85, 1);
-    --bg: rgba(255, 246, 231, 1);
+    --bg: rgba(249, 249, 249, 1);
+    --dark-grey: rgba(115, 115, 115, 1);
+    --blue-primary: rgba(98, 142, 255, 1);
+    --blue-light: rgba(237, 242, 255, 1);
+    --red-primary: rgba(255, 85, 85, 1);
+    --red-light: rgba(255, 215, 215, 1);
 }
 
 ::selection {
@@ -124,7 +129,7 @@ button:focus {
 input {
     font-family: inherit;
     font-weight: 400;
-    font-size: 15px;
+    font-size: 13px;
 }
 
 input:focus {
@@ -155,9 +160,7 @@ input:focus {
 .sidebar-wrapper {
     height: 100vh;
     width: 200px;
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background: rgba(255, 255, 255, 0.75);
+    background: white;
 
     display: flex;
     flex-direction: column;
@@ -197,12 +200,8 @@ input:focus {
     margin: 4rem auto 0 auto;
     box-sizing: border-box;
 
-    /* Glass-effect */
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 12px;
-    border: 1px solid rgba(209, 213, 219, 0.3);
+    background: white;
+    border-radius: 15px;
 
     display: flex;
     flex-direction: column;
@@ -220,15 +219,11 @@ input:focus {
 .dashboard-header-text {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
-.dashboard-header-text h3:first-child {
-    margin-right: 1rem;
-}
-
-.dashboard-header-text h3:nth-child(2) {
-    color:rgb(131, 130, 130);
+.dashboard-header-text h4 {
+    color: var(--dark-grey);
 }
 
 .dashboard-header-buttons-wrapper {
@@ -266,9 +261,10 @@ table {
 thead {
     height: 40px;
     width: 100%;
-    background-color: var(--primary-light);
-    border-radius: 5px;
-    box-shadow: 0 0 0 2px var(--primary-light);
+    background: white;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--dark-grey);
 }
 
 tbody img {
@@ -312,23 +308,28 @@ td {
     color: rgba(255, 85, 85, 1);
 }
 
-.td-edit {
-    background: rgba(44, 103, 255, 1);
-    color: white;
+.td-delete {
+    background: var(--red-light);
+    color: var(--red-primary);
     border: none;
     border-radius: 5px;
-    height: 25px;
-    width: 50px;
+    height: 35px;
+    width: 65px;
     margin-right: 5px;
+    font-size: 13px;
+    font-weight: 700;
 }
 
-.td-view {
-    background: none;
-    border: 1px solid rgb(131, 130, 130);
+.td-edit {
+    background: var(--blue-light);
+    color: var(--blue-primary);
+    border: none;
     border-radius: 5px;
-    height: 25px;
-    width: 50px;
+    height: 35px;
+    width: 65px;
     margin-left: 5px;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 /* Create listing page*/
@@ -362,7 +363,8 @@ td {
     background: white;
     border-radius: 5px;
     border: 1px solid rgb(170, 170, 170);
-    font-size: 15px;
+    font-size: 13px;
+    font-weight: 400;
     padding: 0.5rem;
     width: min-content;
 }
@@ -379,7 +381,7 @@ td {
     background: none;
     border-style: dashed;
     border-width: 1px;
-    border-color:var(--primary);
+    border-color:var(--blue-light);
     border-radius: 15px;
     padding: 1rem;
     color: rgb(75, 75, 75);
@@ -424,6 +426,8 @@ td {
 
 label {
     color:rgb(170, 170, 170);
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .form-col-2 input {
@@ -444,11 +448,11 @@ label {
 }
 
 .submit-btn {
-    background: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: 5px;
-    color: white;
-    font-size: 18px;
+    background: var(--blue-primary);
+    border: none;
+    border-radius: 3px;
+    color: var(--blue-light);
+    font-size: 14px;
     padding: 0.25rem 0.5rem;
     width: 96px;
 }

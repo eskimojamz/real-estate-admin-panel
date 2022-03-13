@@ -28,15 +28,15 @@ function Table({listings}:any) {
                     {/* Image */}
                     <th></th>
                     {/*  */}
-                    <th>Address</th>
-                    <th>Price</th>
-                    <th>Bedrooms</th>
-                    <th>Bathrooms</th>
-                    <th>Status</th>
-                    <th>Area</th>
-                    <th>Created</th>
-                    <th>Edited</th>
-                    <th>Actions</th>
+                    <th>ADDRESS</th>
+                    <th>PRICE</th>
+                    <th>BEDS</th>
+                    <th>BATHS</th>
+                    <th>STATUS</th>
+                    <th>AREA</th>
+                    <th>CREATED</th>
+                    <th>EDITED</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <br></br>
@@ -66,8 +66,8 @@ function Table({listings}:any) {
                         <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
                         <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>
                         <td>
+                            <button id={listingId} className="td-delete">Delete</button>
                             <button id={listingId} className="td-edit">Edit</button>
-                            <button id={listingId} className="td-view">View</button>
                         </td>
                     </tr>
                     <br></br>

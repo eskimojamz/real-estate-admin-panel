@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {useDropzone} from "react-dropzone"
+import Sidebar from "../components/Sidebar";
 import { useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
 
@@ -121,6 +122,7 @@ const Create: React.FC = () => {
     
     return (
         <>
+        <Sidebar />
         <div className="create-container">
         <h2>Create New Listing</h2>
         <br></br>
