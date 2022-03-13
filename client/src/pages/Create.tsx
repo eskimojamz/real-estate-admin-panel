@@ -127,71 +127,81 @@ const Create: React.FC = () => {
         <div className="create-wrapper">
             
             <section className="form-col-1">
-            <div className="dropzone-wrapper">
-                <div {...getRootProps({ className: 'dropzone' })}>
-                    <input {...getInputProps()} />
-                    <p>Drag and drop up to five (5) image files here, or click to select files</p>
-                    <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
+                <div className="dropzone-wrapper">
+                    <div {...getRootProps({ className: 'dropzone' })}>
+                        <input {...getInputProps()} />
+                        <p>Drag and drop up to five (5) image files here, or click to select files</p>
+                        <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
+                    </div>
+                    <aside className="image-preview-aside">
+                    {imagePreviews}
+                    </aside>
                 </div>
-                <aside>
-                {imagePreviews}
-                </aside>
-            </div>
-            {(s3SignLoading || s3Uploading) && 
-            <p>Preparing images for upload...</p>
-            }
-            
-            <form className="form-col-1-bottom">
-                <label htmlFor="status">Status</label>
-                <select id="status" name="status">
-                    <option value="active">Active</option>
-                    <option value="sold">Sold</option>
-                </select>
+                {(s3SignLoading || s3Uploading) && 
+                <p>Preparing images for upload...</p>
+                }
+                
+                <form className="form-col-1-bottom">
+                    <label htmlFor="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="active">Active</option>
+                        <option value="sold">Sold</option>
+                    </select>
 
-                <label htmlFor="area">Area</label>
-                <select id="area" name="area">
-                    <option value="Queens">Queens</option>
-                    <option value="Brooklyn">Brooklyn</option>
-                    <option value="Long Island">Long Island</option>
-                    <option value="Manhattan">Manhattan</option>
-                    <option value="Bronx">Bronx</option>
-                    <option value="New Jersey">New Jersey</option>
-                    <option value="Staten Island">Staten Island</option>
-                </select>
-            </form>
+                    <label htmlFor="area">Area</label>
+                    <select id="area" name="area">
+                        <option value="Queens">Queens</option>
+                        <option value="Brooklyn">Brooklyn</option>
+                        <option value="Long Island">Long Island</option>
+                        <option value="Manhattan">Manhattan</option>
+                        <option value="Bronx">Bronx</option>
+                        <option value="New Jersey">New Jersey</option>
+                        <option value="Staten Island">Staten Island</option>
+                    </select>
+                </form>
             </section>
 
             <section className="form-col-2">
             <form>
-                <label>Address</label>
-                <input placeholder="123 Street"></input>
-                <input placeholder="Bayside, NY 11364"></input>
+                <div className="label-group">
+                    <label>Address</label>
+                    <input placeholder="123 Street"></input>
+                    <input placeholder="Bayside, NY 11364"></input>
+                </div>
 
-                <label>Price</label>
-                $ <input></input>
+                <div className="label-group">
+                    <label>Price</label>
+                    <span>$ <input></input></span>
+                </div>
 
-                <label htmlFor="beds">Beds</label>
-                <select id="beds" name="beds">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                </select>
+                <div className="label-group">
+                    <label htmlFor="beds">Beds</label>
+                    <select id="beds" name="beds">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
 
-                <label htmlFor="baths">Baths</label>
-                <select id="baths" name="baths">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                </select>
+                <div className="label-group">
+                    <label htmlFor="baths">Baths</label>
+                    <select id="baths" name="baths">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
 
-                <label htmlFor="squareFt">Square Ft.</label>
-                <input id="squareFt" name="squareFt"></input>
+                <div className="label-group">
+                    <label htmlFor="squareFt">Square Ft.</label>
+                    <input id="squareFt" name="squareFt"></input>
+                </div>
             </form>
             </section>
 
@@ -203,7 +213,7 @@ const Create: React.FC = () => {
 
             <section className="form-buttom-btns">
                 <div className="form-bottom-btns-wrapper"> 
-                    <button type="submit" onClick={submit}>Submit</button>
+                    <button className="submit-btn" onClick={submit}>Submit</button>
                     <button >Cancel</button>
                 </div>
             </section>
