@@ -49,7 +49,7 @@ function Table({listings}:any) {
 
                     return (
                     <>
-                    <tr>
+                    <tr id={listing.id}>
                         <td><img src={listing.image1}/></td>
                         <td>
                             <p className="address1">{listing.address1}</p>

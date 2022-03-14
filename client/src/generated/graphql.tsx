@@ -147,7 +147,7 @@ export type CreateMutationVariables = Exact<{
 }>;
 
 
-export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
+export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type DisplayUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -237,6 +237,7 @@ export type AllListingsQueryResult = Apollo.QueryResult<AllListingsQuery, AllLis
 export const CreateDocument = gql`
     mutation Create($data: ListingInput!) {
   create(data: $data) {
+    id
     address1
     address2
     price

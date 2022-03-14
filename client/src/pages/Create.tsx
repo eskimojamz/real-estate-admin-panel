@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"
 import {useDropzone} from "react-dropzone"
 import { useCreateMutation, useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
@@ -30,11 +31,15 @@ interface listing {
 // }
 
 const Create: React.FC = () => {
+    const navigate = useNavigate()
+
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([])
     const [s3Uploading, setS3Uploading] = useState(false as Boolean)
 
     const [create, {data: createData, error: createError, loading: createLoading}] = useCreateMutation()
+
+    const [loading, setLoading] = useState<boolean>(false)
 
     const [address1, setAddress1] = useState<string>()
     const [address2, setAddress2] = useState<string>()
@@ -102,7 +107,8 @@ const Create: React.FC = () => {
 
     const submit = async (e:any) => {
         e.preventDefault()
-        
+        setLoading(true)
+
         await create({
             variables: {
                 data: {
@@ -132,6 +138,9 @@ const Create: React.FC = () => {
             await s3Upload(data.signedRequest, data.file)
             // await console.log(data)
         })
+
+        setLoading(false)
+        return navigate(`/listings/:${createData?.create?.id}`)
     }
 
     

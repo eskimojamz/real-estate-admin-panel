@@ -1,5 +1,6 @@
 mutation Create($data: ListingInput!) {
   create(data: $data) {
+    id
     address1
     address2
     price

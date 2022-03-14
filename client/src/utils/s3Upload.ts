@@ -10,6 +10,10 @@ const s3Upload = async (signedRequest: string, file: File) => {
         .then(res => {
             console.log(res)
         })
+        .catch(err => {
+            console.log(err)
+            throw new Error(err)
+        })
 }
 
 export default s3Upload
