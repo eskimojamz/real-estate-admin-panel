@@ -360,6 +360,7 @@ thead {
     font-size: 13px;
     font-weight: 400;
     color: var(--grey-dark);
+    border-bottom: 1px solid var(--grey-light);
 }
 
 tbody img {
@@ -374,6 +375,11 @@ tbody img {
 tbody tr:hover {
     background: var(--grey-superlight);
     cursor: pointer;
+}
+
+tbody tr {
+    height: 65px;
+    border-bottom: 1px solid var(--grey-light);
 }
 
 td {
@@ -721,4 +727,9 @@ label {
     border: 1px solid var(--grey-light);
     background: var(--grey-superlight);
     padding: 0.5rem;
+}
+
+.error-div {
+    margin-top: 1rem;
+    color: var(--red-primary);
 }

@@ -23,9 +23,15 @@ interface listing {
     image5: string,
 }
 
+// interface s3UploadData {
+//     signedRequest: string,
+//     file: File,
+//     url: string,
+// }
+
 const Create: React.FC = () => {
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
-    const [s3UploadData, setS3UploadData] = useState([] as any)
+    const [s3UploadData, setS3UploadData] = useState([])
     const [s3Uploading, setS3Uploading] = useState(false as Boolean)
 
     const [create, {data: createData, error: createError, loading: createLoading}] = useCreateMutation()
@@ -39,12 +45,11 @@ const Create: React.FC = () => {
     const [status, setStatus] = useState<string>("Active")
     const [area, setArea] = useState<string>("Queens")
     const [description, setDescription] = useState<string>()
-
+    const [imageUrls, setImageUrls] = useState([] as any)
+    console.log(imageUrls)
     const [images, setImages] = useState([] as any)
-    // const [imageUrls, setImageUrls] = useState([] as any)
    
     const onDrop:any = useCallback((acceptedFiles:[File]) => {
-        setS3Uploading(true)
         setImages(acceptedFiles)
         console.log(acceptedFiles)
         console.log(images)
@@ -83,15 +88,21 @@ const Create: React.FC = () => {
                     file: file,
                 }
             )
+
+            console.log(s3SignedRequest.data?.signS3.url)
+
+            await setImageUrls((imageUrls:[]) => [...imageUrls, s3SignedRequest?.data?.signS3?.url])
         })
+        console.log(uploads)
         setS3UploadData(uploads)
-        setS3Uploading(false)
         return
     }, [])
     console.log(images)
     // console.log(imageUrls)
+
     const submit = async (e:any) => {
         e.preventDefault()
+        
         await create({
             variables: {
                 data: {
@@ -104,11 +115,11 @@ const Create: React.FC = () => {
                     status,
                     area,
                     description,
-                    // image1,
-                    // image2,
-                    // image3,
-                    // image4,
-                    // image5
+                    image1: imageUrls[0] || null,
+                    image2: imageUrls[1] || null,
+                    image3: imageUrls[2] || null,
+                    image4: imageUrls[3] || null,
+                    image5: imageUrls[4] || null,
                 }
             },
             onError: error => {
@@ -116,6 +127,7 @@ const Create: React.FC = () => {
                 throw new Error(error.toString())
             }
         })
+
         await s3UploadData.forEach(async(data:any) => {
             await s3Upload(data.signedRequest, data.file)
             // await console.log(data)
@@ -127,7 +139,6 @@ const Create: React.FC = () => {
     const {
         getRootProps,
         getInputProps,
-        acceptedFiles,
         fileRejections,
       } = useDropzone({
         accept: 'image/jpeg,image/png',
@@ -135,22 +146,16 @@ const Create: React.FC = () => {
         onDrop
       });
     
-      const acceptedFileItems = acceptedFiles.map((file:any) => (
+    const fileRejectionItems = fileRejections.map(({ file, errors }:any) => (
         <li key={file.path}>
-          {file.path} - {file.size} bytes
-        </li>
-      ));
-    
-      const fileRejectionItems = fileRejections.map(({ file, errors }:any) => (
-        <li key={file.path}>
-          {file.path} - {file.size} bytes
-          <ul>
+            {file.path} - {file.size} bytes
+            <ul>
             {errors.map((e:any) => (
-              <li key={e.code}>{e.message}</li>
+                <li key={e.code}>{e.message}</li>
             ))}
-          </ul>
+            </ul>
         </li>
-      )); 
+    )); 
     
     const imagePreviews = images.map((image:File) => (
         <img className="image-preview-img" src={URL.createObjectURL(image)} />
@@ -179,7 +184,8 @@ const Create: React.FC = () => {
                                 <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
                             </div>
                             <aside className="image-preview-aside">
-                            {imagePreviews}
+                                {imagePreviews}
+                                {fileRejections && fileRejectionItems}
                             </aside>
                         </div>
                     </section>
@@ -260,6 +266,11 @@ const Create: React.FC = () => {
                         <textarea className="description" id="description" onChange={e => setDescription(e.target.value)}></textarea>
                     </section>
                 </form>
+                {createError ?
+                <div className="error-div">
+                    <em>There was an error. Please input all required fields and try again.</em>
+                </div>
+                : null}
             </div>
         </div>
         </>

@@ -73,7 +73,6 @@ function Table({listings}:any) {
                             <button id={listingId} className="td-edit"><img src={editIcon}/></button>
                         </td>
                     </tr>
-                    <br></br>
                     </>
                     )
                 })}
