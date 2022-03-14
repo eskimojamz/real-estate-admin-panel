@@ -1,11 +1,14 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"
 import Table from "../components/Table"
 import { useAllListingsQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
 
 export const Home: React.FC = () => {
+  const navigate = useNavigate()
+
   const {data}:any = useAllListingsQuery()
   const [listings, setListings] = useState([] as any)
 
@@ -27,7 +30,7 @@ export const Home: React.FC = () => {
             <input className="search-input"></input>
             <span className="search-icon"><img src={searchLogo}/></span>
           </div>
-          <button className="create-btn">Create Listing</button>
+          <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
         </div>
       </div>
       { data 

@@ -25,11 +25,11 @@ export type Listing = {
   dateCreated: Scalars['String'];
   description: Scalars['String'];
   id: Scalars['ID'];
-  image1: Scalars['String'];
-  image2: Scalars['String'];
-  image3: Scalars['String'];
-  image4: Scalars['String'];
-  image5: Scalars['String'];
+  image1?: Maybe<Scalars['String']>;
+  image2?: Maybe<Scalars['String']>;
+  image3?: Maybe<Scalars['String']>;
+  image4?: Maybe<Scalars['String']>;
+  image5?: Maybe<Scalars['String']>;
   lastEdited?: Maybe<Scalars['String']>;
   price: Scalars['Float'];
   squareFt: Scalars['Float'];
@@ -140,7 +140,14 @@ export type User = {
 export type AllListingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1: string, image2: string, image3: string, image4: string, image5: string }> };
+export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null }> };
+
+export type CreateMutationVariables = Exact<{
+  data: ListingInput;
+}>;
+
+
+export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type DisplayUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -227,6 +234,54 @@ export function useAllListingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type AllListingsQueryHookResult = ReturnType<typeof useAllListingsQuery>;
 export type AllListingsLazyQueryHookResult = ReturnType<typeof useAllListingsLazyQuery>;
 export type AllListingsQueryResult = Apollo.QueryResult<AllListingsQuery, AllListingsQueryVariables>;
+export const CreateDocument = gql`
+    mutation Create($data: ListingInput!) {
+  create(data: $data) {
+    address1
+    address2
+    price
+    beds
+    baths
+    squareFt
+    status
+    area
+    description
+    dateCreated
+    lastEdited
+    image1
+    image2
+    image3
+    image4
+    image5
+  }
+}
+    `;
+export type CreateMutationFn = Apollo.MutationFunction<CreateMutation, CreateMutationVariables>;
+
+/**
+ * __useCreateMutation__
+ *
+ * To run a mutation, you first call `useCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMutation, { data, loading, error }] = useCreateMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateMutation(baseOptions?: Apollo.MutationHookOptions<CreateMutation, CreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMutation, CreateMutationVariables>(CreateDocument, options);
+      }
+export type CreateMutationHookResult = ReturnType<typeof useCreateMutation>;
+export type CreateMutationResult = Apollo.MutationResult<CreateMutation>;
+export type CreateMutationOptions = Apollo.BaseMutationOptions<CreateMutation, CreateMutationVariables>;
 export const DisplayUserDocument = gql`
     query displayUser {
   displayUser {

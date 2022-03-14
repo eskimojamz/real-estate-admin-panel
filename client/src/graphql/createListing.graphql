@@ -1,0 +1,20 @@
+mutation Create($data: ListingInput!) {
+  create(data: $data) {
+    address1
+    address2
+    price
+    beds
+    baths
+    squareFt
+    status
+    area
+    description
+    dateCreated
+    lastEdited
+    image1
+    image2
+    image3
+    image4
+    image5
+  }
+}

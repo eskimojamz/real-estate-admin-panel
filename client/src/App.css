@@ -130,13 +130,13 @@ button:focus {
     background: rgba(255, 255, 255, 0.75);
 }
 
-input {
+input, textarea {
     font-family: inherit;
     font-weight: 400;
     font-size: 13px;
 }
 
-input:focus {
+input:focus, textarea:focus{
     outline: none;
     border: 1px solid rgb(131, 130, 130) !important;
 }
@@ -371,7 +371,7 @@ tbody img {
     vertical-align: middle;
 }
 
-tr:hover {
+tbody tr:hover {
     background: var(--grey-superlight);
     cursor: pointer;
 }
@@ -547,6 +547,11 @@ td {
     flex-wrap: wrap;
     gap: 1rem;
     width: 100%;
+    margin-top: 2rem;
+}
+
+.image-preview-aside:hover {
+    cursor: pointer;
 }
 
 .image-preview-img {
@@ -679,8 +684,11 @@ label {
 
 .dollar-placeholder {
     position: absolute;
-    top: 31px;
-    left: 7px;
+    top: 34px;
+    left: 10px;
+    font-family: inherit;
+    font-weight: 400;
+    font-size: 13px;
 }
 
 .price-input {
@@ -705,4 +713,12 @@ label {
     font-size: 14px;
     padding: 0.25rem 0.5rem;
     width: 96px;
+}
+
+.description {
+    height: 100%;
+    border-radius: 5px;
+    border: 1px solid var(--grey-light);
+    background: var(--grey-superlight);
+    padding: 0.5rem;
 }

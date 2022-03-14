@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {useDropzone} from "react-dropzone"
-import { useSignS3Mutation } from "../generated/graphql";
+import { useCreateMutation, useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
 
 interface listing {
@@ -27,6 +27,19 @@ const Create: React.FC = () => {
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([] as any)
     const [s3Uploading, setS3Uploading] = useState(false as Boolean)
+
+    const [create, {data: createData, error: createError, loading: createLoading}] = useCreateMutation()
+
+    const [address1, setAddress1] = useState<string>()
+    const [address2, setAddress2] = useState<string>()
+    const [price, setPrice] = useState<number>()
+    const [squareFt, setSquareFt] = useState<number>()
+    const [beds, setBeds] = useState<number>(1)
+    const [baths, setBaths] = useState<number>(1)
+    const [status, setStatus] = useState<string>("Active")
+    const [area, setArea] = useState<string>("Queens")
+    const [description, setDescription] = useState<string>()
+
     const [images, setImages] = useState([] as any)
     // const [imageUrls, setImageUrls] = useState([] as any)
    
@@ -79,6 +92,30 @@ const Create: React.FC = () => {
     // console.log(imageUrls)
     const submit = async (e:any) => {
         e.preventDefault()
+        await create({
+            variables: {
+                data: {
+                    address1,
+                    address2,
+                    price,
+                    beds,
+                    baths,
+                    squareFt,
+                    status,
+                    area,
+                    description,
+                    // image1,
+                    // image2,
+                    // image3,
+                    // image4,
+                    // image5
+                }
+            },
+            onError: error => {
+                console.log(error)
+                throw new Error(error.toString())
+            }
+        })
         await s3UploadData.forEach(async(data:any) => {
             await s3Upload(data.signedRequest, data.file)
             // await console.log(data)
@@ -150,27 +187,27 @@ const Create: React.FC = () => {
                     <section className="form-col-2">
                         <div className="label-group">
                             <label>Address</label>
-                            <input className="input-mb" placeholder="123 Street"></input>
-                            <input placeholder="Bayside, NY 11364"></input>
+                            <input className="input-mb" placeholder="123 Street" onChange={e => setAddress1(e.target.value)}></input>
+                            <input placeholder="Bayside, NY 11364" onChange={e => setAddress2(e.target.value)}></input>
                         </div>
 
                         <div className="label-group-row">
                             <div className="label-group w-50 label-group-gap">
                                 <div className="label-input">
                                     <label>Price</label>
-                                    <span className="dollar-placeholder">$</span><input className="price-input"></input>
+                                    <span className="dollar-placeholder">$</span><input className="price-input" onChange={e => setPrice(parseInt(e.target.value))}></input>
                                 </div>
 
                                 <div className="label-input">
                                     <label htmlFor="squareFt">Square Ft.</label>
-                                    <input id="squareFt" name="squareFt"></input>
+                                    <input id="squareFt" name="squareFt" onChange={e => setSquareFt(parseInt(e.target.value))}></input>
                                 </div>
                             </div>
 
                             <div className="label-group w-50 label-group-gap">
                                 <div className="label-input">
                                     <label htmlFor="beds">Beds</label>
-                                    <select id="beds" name="beds">
+                                    <select id="beds" name="beds" value={beds} onChange={e => setBeds(parseInt(e.target.value))}>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -182,7 +219,7 @@ const Create: React.FC = () => {
 
                                 <div className="label-input">
                                     <label htmlFor="baths">Baths</label>
-                                    <select id="baths" name="baths">
+                                    <select id="baths" name="baths" value={baths} onChange={e => setBaths(parseInt(e.target.value))}>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -197,15 +234,15 @@ const Create: React.FC = () => {
                         <div className="label-group label-group-gap">
                             <div className="label-input">
                                 <label htmlFor="status">Status</label>
-                                <select id="status" name="status">
-                                    <option value="active">Active</option>
-                                    <option value="sold">Sold</option>
+                                <select id="status" name="status" value={status} onChange={e => setStatus(e.target.value)}>
+                                    <option value="Active">Active</option>
+                                    <option value="Sold">Sold</option>
                                 </select>
                             </div>
 
                             <div className="label-input">
                                 <label htmlFor="area">Area</label>
-                                <select id="area" name="area">
+                                <select id="area" name="area" value={area} onChange={e => setArea(e.target.value)}>
                                     <option value="Queens">Queens</option>
                                     <option value="Brooklyn">Brooklyn</option>
                                     <option value="Long Island">Long Island</option>
@@ -220,7 +257,7 @@ const Create: React.FC = () => {
 
                     <section className="form-col-3">
                         <label htmlFor="description">Description</label>
-                        <textarea name="description" id="description" cols={30} rows={20}></textarea>
+                        <textarea className="description" id="description" onChange={e => setDescription(e.target.value)}></textarea>
                     </section>
                 </form>
             </div>
