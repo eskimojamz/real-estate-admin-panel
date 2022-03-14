@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import {useDropzone} from "react-dropzone"
-import Sidebar from "../components/Sidebar";
 import { useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
 
@@ -122,104 +121,109 @@ const Create: React.FC = () => {
     
     return (
         <>
-        <Sidebar />
         <div className="create-container">
-        <h2>Create New Listing</h2>
-        <br></br>
-        <div className="create-wrapper">
-            
-            <section className="form-col-1">
-                <div className="dropzone-wrapper">
-                    <div {...getRootProps({ className: 'dropzone' })}>
-                        <input {...getInputProps()} />
-                        <p>Drag and drop up to five (5) image files here, or click to select files</p>
-                        <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
-                    </div>
-                    <aside className="image-preview-aside">
-                    {imagePreviews}
-                    </aside>
+            <div className="create-header">
+                <div className="create-header-text">
+                    <h2>Create New Listing</h2>
                 </div>
-                {(s3SignLoading || s3Uploading) && 
-                <p>Preparing images for upload...</p>
-                }
-                
-                <form className="form-col-1-bottom">
-                    <label htmlFor="status">Status</label>
-                    <select id="status" name="status">
-                        <option value="active">Active</option>
-                        <option value="sold">Sold</option>
-                    </select>
-
-                    <label htmlFor="area">Area</label>
-                    <select id="area" name="area">
-                        <option value="Queens">Queens</option>
-                        <option value="Brooklyn">Brooklyn</option>
-                        <option value="Long Island">Long Island</option>
-                        <option value="Manhattan">Manhattan</option>
-                        <option value="Bronx">Bronx</option>
-                        <option value="New Jersey">New Jersey</option>
-                        <option value="Staten Island">Staten Island</option>
-                    </select>
-                </form>
-            </section>
-
-            <section className="form-col-2">
-            <form>
-                <div className="label-group">
-                    <label>Address</label>
-                    <input placeholder="123 Street"></input>
-                    <input placeholder="Bayside, NY 11364"></input>
-                </div>
-
-                <div className="label-group">
-                    <label>Price</label>
-                    <span>$ <input></input></span>
-                </div>
-
-                <div className="label-group">
-                    <label htmlFor="beds">Beds</label>
-                    <select id="beds" name="beds">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-
-                <div className="label-group">
-                    <label htmlFor="baths">Baths</label>
-                    <select id="baths" name="baths">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-
-                <div className="label-group">
-                    <label htmlFor="squareFt">Square Ft.</label>
-                    <input id="squareFt" name="squareFt"></input>
-                </div>
-            </form>
-            </section>
-
-            <section className="form-col-3">
-                <label htmlFor="description">Description</label>
-                <textarea name="description" id="description" cols={30} rows={20}></textarea>
-            </section>
-        </div>
-
-            <section className="form-buttom-btns">
-                <div className="form-bottom-btns-wrapper"> 
+                <div className="create-header-btns"> 
+                    <button className="cancel-btn">Cancel</button>
                     <button className="submit-btn" onClick={submit}>Submit</button>
-                    <button >Cancel</button>
                 </div>
-            </section>
+            </div>
+            <div className="create-wrapper">
+                <form>
+                    <section className="form-col-1">
+                        <label>Images</label>
+                        <div className="dropzone-wrapper">
+                            <div {...getRootProps({ className: 'dropzone' })}>
+                                <input {...getInputProps()} />
+                                <p>Drag and drop up to five (5) image files here, or click to select files</p>
+                                <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
+                            </div>
+                            <aside className="image-preview-aside">
+                            {imagePreviews}
+                            </aside>
+                        </div>
+                    </section>
 
+                    <section className="form-col-2">
+                        <div className="label-group">
+                            <label>Address</label>
+                            <input className="input-mb" placeholder="123 Street"></input>
+                            <input placeholder="Bayside, NY 11364"></input>
+                        </div>
+
+                        <div className="label-group-row">
+                            <div className="label-group w-50 label-group-gap">
+                                <div className="label-input">
+                                    <label>Price</label>
+                                    <span className="dollar-placeholder">$</span><input className="price-input"></input>
+                                </div>
+
+                                <div className="label-input">
+                                    <label htmlFor="squareFt">Square Ft.</label>
+                                    <input id="squareFt" name="squareFt"></input>
+                                </div>
+                            </div>
+
+                            <div className="label-group w-50 label-group-gap">
+                                <div className="label-input">
+                                    <label htmlFor="beds">Beds</label>
+                                    <select id="beds" name="beds">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+
+                                <div className="label-input">
+                                    <label htmlFor="baths">Baths</label>
+                                    <select id="baths" name="baths">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="label-group label-group-gap">
+                            <div className="label-input">
+                                <label htmlFor="status">Status</label>
+                                <select id="status" name="status">
+                                    <option value="active">Active</option>
+                                    <option value="sold">Sold</option>
+                                </select>
+                            </div>
+
+                            <div className="label-input">
+                                <label htmlFor="area">Area</label>
+                                <select id="area" name="area">
+                                    <option value="Queens">Queens</option>
+                                    <option value="Brooklyn">Brooklyn</option>
+                                    <option value="Long Island">Long Island</option>
+                                    <option value="Manhattan">Manhattan</option>
+                                    <option value="Bronx">Bronx</option>
+                                    <option value="New Jersey">New Jersey</option>
+                                    <option value="Staten Island">Staten Island</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="form-col-3">
+                        <label htmlFor="description">Description</label>
+                        <textarea name="description" id="description" cols={30} rows={20}></textarea>
+                    </section>
+                </form>
+            </div>
         </div>
         </>
     )

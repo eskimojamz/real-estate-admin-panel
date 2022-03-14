@@ -1,3 +1,6 @@
+import deleteIcon from "../assets/deleteIcon.svg"
+import editIcon from "../assets/editIcon.svg"
+
 interface listing {
     id: string,
     address1: string
@@ -39,7 +42,7 @@ function Table({listings}:any) {
                     <th>ACTIONS</th>
                 </tr>
             </thead>
-            <br></br>
+            
             <tbody>
                 {listings?.map((listing:listing) => {
                     const listingId = listing.id
@@ -66,8 +69,8 @@ function Table({listings}:any) {
                         <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
                         <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>
                         <td>
-                            <button id={listingId} className="td-delete">Delete</button>
-                            <button id={listingId} className="td-edit">Edit</button>
+                            <button id={listingId} className="td-delete"><img src={deleteIcon}/></button>
+                            <button id={listingId} className="td-edit"><img src={editIcon}/></button>
                         </td>
                     </tr>
                     <br></br>

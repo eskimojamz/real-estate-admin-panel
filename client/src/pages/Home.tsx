@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
 import Table from "../components/Table"
 import { useAllListingsQuery } from "../generated/graphql";
+
+import searchLogo from "../assets/search.svg"
 
 export const Home: React.FC = () => {
   const {data}:any = useAllListingsQuery()
@@ -15,7 +16,6 @@ export const Home: React.FC = () => {
 
   return (
     <>
-    <Sidebar />
     <div className="dashboard-wrapper">
       <div className="dashboard-header">
         <div className="dashboard-header-text">
@@ -23,8 +23,10 @@ export const Home: React.FC = () => {
           <h4>{listings?.length}</h4>
         </div>
         <div className="dashboard-header-buttons-wrapper">
-          <input></input>
-          <button className="filter-btn">Search</button>
+          <div className="search">
+            <input className="search-input"></input>
+            <span className="search-icon"><img src={searchLogo}/></span>
+          </div>
           <button className="create-btn">Create Listing</button>
         </div>
       </div>
