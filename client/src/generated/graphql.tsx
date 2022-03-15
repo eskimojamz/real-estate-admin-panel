@@ -44,6 +44,7 @@ export type ListingInput = {
   beds?: InputMaybe<Scalars['Float']>;
   dateCreated?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['String']>;
   image1?: InputMaybe<Scalars['String']>;
   image2?: InputMaybe<Scalars['String']>;
   image3?: InputMaybe<Scalars['String']>;
@@ -64,7 +65,7 @@ export type LoginResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   create?: Maybe<Listing>;
-  delete?: Maybe<Scalars['Boolean']>;
+  delete?: Maybe<Scalars['String']>;
   edit?: Maybe<Listing>;
   login: LoginResponse;
   logout: Scalars['Boolean'];
@@ -80,13 +81,13 @@ export type MutationCreateArgs = {
 
 
 export type MutationDeleteArgs = {
-  listingId: Scalars['String'];
+  id: Scalars['String'];
 };
 
 
 export type MutationEditArgs = {
   data: ListingInput;
-  listingId: Scalars['String'];
+  id: Scalars['String'];
 };
 
 
@@ -116,13 +117,13 @@ export type Query = {
   __typename?: 'Query';
   allListings: Array<Listing>;
   allUsers: Array<User>;
-  displayListing?: Maybe<Listing>;
   displayUser?: Maybe<User>;
+  getListing?: Maybe<Listing>;
 };
 
 
-export type QueryDisplayListingArgs = {
-  listingId: Scalars['Float'];
+export type QueryGetListingArgs = {
+  id: Scalars['String'];
 };
 
 export type S3Response = {
@@ -149,10 +150,32 @@ export type CreateMutationVariables = Exact<{
 
 export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
+export type DeleteMutationVariables = Exact<{
+  deleteId: Scalars['String'];
+}>;
+
+
+export type DeleteMutation = { __typename?: 'Mutation', delete?: string | null };
+
 export type DisplayUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DisplayUserQuery = { __typename?: 'Query', displayUser?: { __typename?: 'User', id: number, username: string } | null };
+
+export type EditMutationVariables = Exact<{
+  data: ListingInput;
+  editId: Scalars['String'];
+}>;
+
+
+export type EditMutation = { __typename?: 'Mutation', edit?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
+
+export type GetListingQueryVariables = Exact<{
+  getListingId: Scalars['String'];
+}>;
+
+
+export type GetListingQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
@@ -283,6 +306,37 @@ export function useCreateMutation(baseOptions?: Apollo.MutationHookOptions<Creat
 export type CreateMutationHookResult = ReturnType<typeof useCreateMutation>;
 export type CreateMutationResult = Apollo.MutationResult<CreateMutation>;
 export type CreateMutationOptions = Apollo.BaseMutationOptions<CreateMutation, CreateMutationVariables>;
+export const DeleteDocument = gql`
+    mutation Delete($deleteId: String!) {
+  delete(id: $deleteId)
+}
+    `;
+export type DeleteMutationFn = Apollo.MutationFunction<DeleteMutation, DeleteMutationVariables>;
+
+/**
+ * __useDeleteMutation__
+ *
+ * To run a mutation, you first call `useDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMutation, { data, loading, error }] = useDeleteMutation({
+ *   variables: {
+ *      deleteId: // value for 'deleteId'
+ *   },
+ * });
+ */
+export function useDeleteMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMutation, DeleteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteMutation, DeleteMutationVariables>(DeleteDocument, options);
+      }
+export type DeleteMutationHookResult = ReturnType<typeof useDeleteMutation>;
+export type DeleteMutationResult = Apollo.MutationResult<DeleteMutation>;
+export type DeleteMutationOptions = Apollo.BaseMutationOptions<DeleteMutation, DeleteMutationVariables>;
 export const DisplayUserDocument = gql`
     query displayUser {
   displayUser {
@@ -318,6 +372,107 @@ export function useDisplayUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type DisplayUserQueryHookResult = ReturnType<typeof useDisplayUserQuery>;
 export type DisplayUserLazyQueryHookResult = ReturnType<typeof useDisplayUserLazyQuery>;
 export type DisplayUserQueryResult = Apollo.QueryResult<DisplayUserQuery, DisplayUserQueryVariables>;
+export const EditDocument = gql`
+    mutation Edit($data: ListingInput!, $editId: String!) {
+  edit(data: $data, id: $editId) {
+    id
+    address1
+    address2
+    price
+    beds
+    baths
+    squareFt
+    status
+    area
+    description
+    dateCreated
+    lastEdited
+    image1
+    image2
+    image3
+    image4
+    image5
+  }
+}
+    `;
+export type EditMutationFn = Apollo.MutationFunction<EditMutation, EditMutationVariables>;
+
+/**
+ * __useEditMutation__
+ *
+ * To run a mutation, you first call `useEditMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editMutation, { data, loading, error }] = useEditMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *      editId: // value for 'editId'
+ *   },
+ * });
+ */
+export function useEditMutation(baseOptions?: Apollo.MutationHookOptions<EditMutation, EditMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditMutation, EditMutationVariables>(EditDocument, options);
+      }
+export type EditMutationHookResult = ReturnType<typeof useEditMutation>;
+export type EditMutationResult = Apollo.MutationResult<EditMutation>;
+export type EditMutationOptions = Apollo.BaseMutationOptions<EditMutation, EditMutationVariables>;
+export const GetListingDocument = gql`
+    query GetListing($getListingId: String!) {
+  getListing(id: $getListingId) {
+    id
+    address1
+    address2
+    price
+    beds
+    baths
+    squareFt
+    status
+    area
+    description
+    dateCreated
+    lastEdited
+    image1
+    image2
+    image3
+    image4
+    image5
+  }
+}
+    `;
+
+/**
+ * __useGetListingQuery__
+ *
+ * To run a query within a React component, call `useGetListingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetListingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetListingQuery({
+ *   variables: {
+ *      getListingId: // value for 'getListingId'
+ *   },
+ * });
+ */
+export function useGetListingQuery(baseOptions: Apollo.QueryHookOptions<GetListingQuery, GetListingQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetListingQuery, GetListingQueryVariables>(GetListingDocument, options);
+      }
+export function useGetListingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetListingQuery, GetListingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetListingQuery, GetListingQueryVariables>(GetListingDocument, options);
+        }
+export type GetListingQueryHookResult = ReturnType<typeof useGetListingQuery>;
+export type GetListingLazyQueryHookResult = ReturnType<typeof useGetListingLazyQuery>;
+export type GetListingQueryResult = Apollo.QueryResult<GetListingQuery, GetListingQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {

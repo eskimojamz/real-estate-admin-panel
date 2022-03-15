@@ -14,6 +14,9 @@ import aws from "aws-sdk"
 class ListingInput {
 
   @Field({nullable: true})
+  id: string;
+
+  @Field({nullable: true})
   address1: string;
 		
 	@Field({nullable: true})
@@ -80,10 +83,12 @@ export class ListingResolver {
 
     @Query(() => Listing, { nullable: true })
     @UseMiddleware(isAuth)
-    // Display listing
-    async displayListing(@Arg("listingId") listingId: number) {
+    // Get listing
+    async getListing(@Arg("id") id: string) {
       try {
-        return await Listing.findOne(listingId);
+        const listing = await Listing.findOne(id);
+        
+        return listing
       } catch(err) {
         console.log(err)
         throw new Error("Listing not found")
@@ -106,29 +111,30 @@ export class ListingResolver {
     @UseMiddleware(isAuth)
     // Edit listing
     async edit(
-      @Arg("listingId") listingId: string,
+      @Arg("id") id: string,
       @Arg("data", () => ListingInput) listingData: ListingInput
       ) {
         try {
           // set lastEdited datetime
           listingData.lastEdited = new Date().toISOString()
           // update db
-          await Listing.update(listingId, listingData)
+          await Listing.update(id, listingData)
           // return listing
-          return await Listing.findOne(listingId)
+          return await Listing.findOne(id)
         } catch(err) {
           console.log(err)
           throw new Error("Error Editing Listing")
         }
     }
 
-    @Mutation(() => Boolean, { nullable: true })
+    @Mutation(() => String, { nullable: true })
     @UseMiddleware(isAuth)
     // Delete listing
-    async delete(@Arg("listingId") listingId: string) {
+    async delete(@Arg("id") id: string) {
         try {
-          await Listing.delete(listingId)
-          return true
+          await Listing.delete(id)
+          const success = `Listing ${id} deleted: success`
+          return success
         } catch(err) {
           console.log(err)
           throw new Error("Error Deleting Listing")

@@ -8,6 +8,10 @@ body {
     background: rgba(249, 249, 249, 1);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 button {
     font-family: 'Noto Sans', sans-serif;
     transition: opacity 0.2s;
@@ -36,6 +40,10 @@ button:focus {
     --blue-light: rgba(237, 242, 255, 1);
     --red-primary: rgba(255, 85, 85, 1);
     --red-light: rgba(255, 215, 215, 1);
+}
+
+.secondary {
+    color: var(--secondary);
 }
 
 ::selection {
@@ -732,4 +740,169 @@ label {
 .error-div {
     margin-top: 1rem;
     color: var(--red-primary);
+}
+
+.create-loading-modal {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    z-index: 100;
+    background: rgba(51, 51, 51, 0.9);
+    color: white;
+    display: grid;
+    place-items: center;
+}
+
+.create-loading-modal-card {
+    height: 200px;
+    width: 300px;
+    z-index: 101;
+    background: var(--bg);
+    color: black;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+}
+
+.listing-view-wrapper {
+    height: 100%;
+    width: 100%;
+    max-width: 85vw;
+    margin: 4rem auto 0 auto;
+    box-sizing: border-box;
+
+    background: white;
+    border-radius: 15px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 0 1rem 1rem 1rem;
+}
+
+.listing-view-header {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    width: 100%;
+    padding: 0 5px;
+}
+
+.listing-view {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    gap: 2rem;
+}
+
+.listing-view-images img{
+    height: 200px;
+    width: 267px;
+    border-radius: 10px;
+}
+
+.listing-view-text {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.listing-view-text-head {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.listing-view-text-head h3 {
+    margin: 0;
+}
+
+.listing-view-text-head h4 {
+    margin: 0;
+    color: var(--grey-dark);
+}
+
+.listing-view-text h5 {
+    margin: 0;
+    color: var(--grey-dark);
+}
+
+.listing-view-text p {
+    margin: 0;
+}
+
+.listing-view-text-body {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.listing-view-text-body span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.listing-view-text-details {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.listing-view-text-details-col {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.listing-view-text-details-col p {
+    font-weight: 700;
+}
+
+.listing-view-text-desc {
+    width: 50%;
+}
+
+.listing-view-text-desc p {
+    font-size: 11px;
+}
+
+.listing-view-text-foot {
+    width: 100%;
+    display: flex;
+}
+
+.listing-view-text-foot span {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.listing-view-text-foot p {
+    font-size: 14px;
+}
+
+.listing-view-map {
+    height: 300px;
+    width: 100%;
+    background:rgb(199, 199, 199);
+    border-radius: 10px;
+}
+
+.listing-view-map div {
+    border-radius: 10px;
+}
+
+.map-marker {
+    height: 15px;
+    width: 15px;
+    background: var(--blue-primary);
+    border-radius: 50%;
 }

@@ -130,20 +130,20 @@ const Create: React.FC = () => {
             },
             onError: error => {
                 console.log(error)
+                setLoading(false)
                 throw new Error(error.toString())
             }
         })
 
         await s3UploadData.forEach(async(data:any) => {
-            await s3Upload(data.signedRequest, data.file)
+            await s3Upload(data.signedRequest, data.file, setLoading)
             // await console.log(data)
         })
 
         setLoading(false)
-        return navigate(`/listings/:${createData?.create?.id}`)
+        // return navigate(`/listings/:${createData?.create?.id}`)
+        return navigate("/")
     }
-
-    
 
     const {
         getRootProps,
@@ -169,9 +169,20 @@ const Create: React.FC = () => {
     const imagePreviews = images.map((image:File) => (
         <img className="image-preview-img" src={URL.createObjectURL(image)} />
     ))
+
+    const loadingModal = (
+        loading ?
+        <div className="create-loading-modal">
+            <div className="create-loading-modal-card">
+                Creating listing...
+            </div>
+        </div>
+        : null
+    )
     
     return (
         <>
+        {loadingModal}
         <div className="create-container">
             <div className="create-header">
                 <div className="create-header-text">

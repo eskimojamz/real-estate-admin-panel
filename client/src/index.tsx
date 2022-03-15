@@ -6,9 +6,10 @@ import {
   ApolloProvider,
   InMemoryCache,
   HttpLink,
-  ApolloLink, 
-  Observable,
+  ApolloLink,
+  Observable, 
 } from '@apollo/client'
+import { setContext } from "@apollo/client/link/context"
 import { onError } from "@apollo/client/link/error";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
@@ -47,6 +48,20 @@ const requestLink = new ApolloLink(
       };
     })
 );
+// const authLink = new ApolloLink((operation, forward) => {
+//   const accessToken = getAccessToken();
+//   console.log("called auth link")
+//   console.log(accessToken)
+//   const authorizationHeader = accessToken ? `Bearer ${accessToken}` : null
+//   operation.setContext({
+//     headers: {
+//       authorization: authorizationHeader,
+//     },
+//   });
+
+//   return forward(operation);
+//  });
+
 
 // Check for expired tokens; link to get and set new refresh token and access token
 const tokenRefreshLink: any = new TokenRefreshLink({
@@ -67,6 +82,7 @@ const tokenRefreshLink: any = new TokenRefreshLink({
       };
       // compare to current date, if greater, then it's expired
       if (Date.now() >= expiration * 1000) {
+        console.log("invalid")
         return false;
       } else {
         return true;
@@ -106,7 +122,7 @@ const client = new ApolloClient({
     new HttpLink({
       uri: "http://localhost:4000/graphql",
       credentials: "include"
-    })
+    }),
   ]),
   // GraphQL InMemoryCache
   cache

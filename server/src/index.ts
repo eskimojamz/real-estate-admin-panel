@@ -8,6 +8,7 @@ import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser"
 import { verify } from "jsonwebtoken"
 import { User } from "./entity/User"
+import { sendRefreshToken } from "./sendRefreshToken";
 import { createAccessToken, createRefreshToken } from "./auth";
 import cors from "cors"
 
@@ -56,11 +57,10 @@ import cors from "cors"
         }
 
         // create new refresh token and set to cookies
-        res.cookie("jid", createRefreshToken(user), {
-            httpOnly: true,
-        })
+        sendRefreshToken(res, createRefreshToken(user));
+        
         // create new access token and send to apollo client
-        return res.send({ ok: true, accessToken: createAccessToken(user) })
+        return res.send({ok: true, accessToken: createAccessToken(user)})
     })
 
     await createConnection();

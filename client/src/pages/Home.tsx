@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 import Table from "../components/Table"
-import { useAllListingsQuery } from "../generated/graphql";
+import { useAllListingsQuery, useDisplayUserQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
 
