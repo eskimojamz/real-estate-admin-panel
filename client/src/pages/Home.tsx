@@ -6,7 +6,7 @@ import { useAllListingsQuery, useDisplayUserQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
 
-export const Home: React.FC = () => {
+function Home(){
   const navigate = useNavigate()
 
   const {data}:any = useAllListingsQuery()
@@ -19,25 +19,29 @@ export const Home: React.FC = () => {
 
   return (
     <>
-    <div className="dashboard-wrapper">
-      <div className="dashboard-header">
-        <div className="dashboard-header-text">
-          <h3>All Listings</h3>
-          <h4>{listings?.length}</h4>
-        </div>
-        <div className="dashboard-header-buttons-wrapper">
-          <div className="search">
-            <input className="search-input"></input>
-            <span className="search-icon"><img src={searchLogo}/></span>
+    <div className="wrapper">
+      <div className="dashboard-wrapper">
+        <div className="dashboard-header">
+          <div className="dashboard-header-text">
+            <h3>All Listings</h3>
+            <h4>{listings?.length}</h4>
           </div>
-          <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
+          <div className="dashboard-header-buttons-wrapper">
+            <div className="search">
+              <input className="search-input"></input>
+              <span className="search-icon"><img src={searchLogo}/></span>
+            </div>
+            <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
+          </div>
         </div>
+        { data 
+        ? <Table listings={listings}/>
+        : null
+        }
       </div>
-      { data 
-      ? <Table listings={listings}/>
-      : null
-      }
     </div>
     </>
   );
 };
+ 
+export default Home

@@ -60,6 +60,14 @@ button:focus {
     width: 100vw;
 }
 
+.wrapper {
+    margin-left: 150px;
+
+    height: 100%;
+    width: 100%;
+    overflow: scroll;
+}
+
 .login-container {
     display: grid;
     place-items: center;
@@ -177,6 +185,7 @@ input:focus, textarea:focus{
 
     display: flex;
     flex-direction: column;
+    position: fixed;
 }
 
 .sidebar-logo {
@@ -279,7 +288,7 @@ input:focus, textarea:focus{
     width: 100%;
     max-height: 85vh;
     max-width: 85vw;
-    margin: 4rem auto 0 auto;
+    margin: 1rem auto;
     box-sizing: border-box;
 
     background: white;
@@ -768,7 +777,7 @@ label {
     height: 100%;
     width: 100%;
     max-width: 85vw;
-    margin: 4rem auto 0 auto;
+    margin: 1rem auto;
     box-sizing: border-box;
 
     background: white;
@@ -777,17 +786,65 @@ label {
     display: flex;
     flex-direction: column;
 
-    padding: 0 1rem 1rem 1rem;
+    padding: 0;
 }
 
 .listing-view-header {
+    position: fixed;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 60px;
-    width: 100%;
+    width: calc(100% - 150px);
+    max-width: 85vw;
     padding: 0 5px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.listing-view-back {
+    display: flex;
+    place-items: center;
+}
+
+.back-btn {
+    background: var(--grey-light);
+    border: none;
+    border-radius: 3px;
+    color: var(--grey-dark);
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+    height: 35px;
+    width: auto;
+}
+
+.listing-view-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.delete-btn {
+    background: var(--red-primary);
+    border: none;
+    border-radius: 3px;
+    color: white;
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+    height: 35px;
+    width: 75px;
+}
+
+.edit-btn {
+    background: var(--blue-primary);
+    border: none;
+    border-radius: 3px;
+    color: white;
+    font-size: 14px;
+    padding: 0.25rem 0.5rem;
+    height: 35px;
+    width: 75px;
 }
 
 .listing-view {
@@ -795,6 +852,7 @@ label {
     flex-direction: column;
     place-items: center;
     gap: 2rem;
+    padding: 5rem 0;
 }
 
 .listing-view-images img{
@@ -906,3 +964,5 @@ label {
     background: var(--blue-primary);
     border-radius: 50%;
 }
+
+

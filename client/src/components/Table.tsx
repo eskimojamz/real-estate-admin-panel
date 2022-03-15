@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"
 import deleteIcon from "../assets/deleteIcon.svg"
 import editIcon from "../assets/editIcon.svg"
 
@@ -22,6 +23,7 @@ interface listing {
 }
 
 function Table({listings}:any) {
+    const navigate = useNavigate()
 
     return (
         <>
@@ -49,7 +51,7 @@ function Table({listings}:any) {
 
                     return (
                     <>
-                    <tr id={listing.id}>
+                    <tr id={listing.id} onClick={() => navigate(`listings/${listing.id!}`)}>
                         <td><img src={listing.image1}/></td>
                         <td>
                             <p className="address1">{listing.address1}</p>
