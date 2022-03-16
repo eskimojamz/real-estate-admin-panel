@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useGetListingQuery } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
+import {AnimatePresence, motion} from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
 
 
@@ -49,6 +50,36 @@ function ListingView(){
     Geocode.setLanguage("en");
     Geocode.setRegion("us");
 
+    const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false)
+    const deleteModal = (
+        deleteConfirm ?
+        <AnimatePresence>
+        <motion.div className="modal-backdrop" onClick={() => setDeleteConfirm(false)}/>
+            <motion.div className="modal-backdrop-wrapper"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+            >
+                <motion.span>
+                    <motion.p>Are you sure you want to delete this listing?</motion.p>
+                    <motion.em className="secondary">Deletions cannot be undone!</motion.em>
+                </motion.span>
+                <motion.span>
+                    <motion.button className="cancel-btn" onClick={() => setDeleteConfirm(false)}>Cancel</motion.button>
+                    <motion.button className="delete-btn" onClick={async() => {
+                        await setDeleteConfirm(false)
+                        // delete mutation
+                        }}
+                    >
+                    Delete
+                    </motion.button>
+                </motion.span>
+            </motion.div>
+        
+        </AnimatePresence>
+        : null
+    )
+
     const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
     const [currentIndex, setIndex] = useState<number>()
 
@@ -56,6 +87,18 @@ function ListingView(){
         setIndex(index)
         setToggleCarousel(true)
     }
+
+    const imageCarousel = (
+        toggleCarousel ?
+        <ImageCarousel 
+            toggleCarousel={toggleCarousel}
+            setToggleCarousel={setToggleCarousel}
+            currentIndex={currentIndex!}
+            listingImages={listingImages}
+            imagesCount={imagesCount}
+        />
+        : null
+    )
 
     useEffect(() => {
         Geocode.fromAddress(address).then(
@@ -74,17 +117,10 @@ function ListingView(){
 
     return listingData ? (
         <>
-        { toggleCarousel ?
-            <ImageCarousel 
-                toggleCarousel={toggleCarousel}
-                setToggleCarousel={setToggleCarousel}
-                currentIndex={currentIndex}
-                listingImages={listingImages}
-                imagesCount={imagesCount}
-            />
-            : null
-
-        }
+        {/* Event conditional components */}
+        {imageCarousel}
+        {deleteModal}
+        {/* -------------------------- */}
         <div className="wrapper">
             <div className="listing-view-wrapper">
                 <div className="listing-view-header">
@@ -94,7 +130,7 @@ function ListingView(){
                         </button>
                     </div>
                     <div className="listing-view-actions">
-                        <button className="delete-btn">Delete</button>
+                        <button className="delete-btn" onClick={() => setDeleteConfirm(true)}>Delete</button>
                         <button className="edit-btn">Edit</button>
                     </div>
                 </div>

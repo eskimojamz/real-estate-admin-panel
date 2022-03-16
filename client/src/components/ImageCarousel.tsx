@@ -1,13 +1,27 @@
-import {useState} from 'react'
+import React, {useState} from 'react'
 import {motion, AnimatePresence} from 'framer-motion'
 import { useSwipeable } from "react-swipeable";
 
-function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listingImages, imagesCount}) {
+type CarouselProps = {
+    toggleCarousel: boolean;
+    setToggleCarousel: (val: boolean) => void;
+    currentIndex: number;
+    listingImages: any;
+    imagesCount: number;
+};
+
+const ImageCarousel: React.FC<CarouselProps> = ({
+    toggleCarousel, 
+    setToggleCarousel, 
+    currentIndex, 
+    listingImages, 
+    imagesCount
+}) => {
     const [activeIndex, setActiveIndex] = useState(currentIndex)
 
     console.log(listingImages)
 
-    const updateIndex = (newIndex) => {
+    const updateIndex = (newIndex:number) => {
         if (newIndex < 0) {
             newIndex = imagesCount - 1;
         } else if (newIndex >= imagesCount) {
@@ -25,25 +39,12 @@ function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listing
     return (
         <>
             <AnimatePresence>
-            <motion.div className="carousel-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-            >
-                {/* <img
-                    className="carousel-arrow carousel-arrow-left"
-                    onClick={() => {
-                        updateIndex(activeIndex - 1);
-                    }}
-                    src={}
+                <motion.div className="carousel-backdrop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setToggleCarousel(false)}
                 />
-                <img
-                    className="carousel-arrow carousel-arrow-right"
-                    onClick={() => {
-                        updateIndex(activeIndex + 1);
-                    }}
-                    src={}
-                /> */}
                 <motion.div className="carousel-wrapper"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -51,9 +52,7 @@ function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listing
                     transition={{ type: 'spring', bounce: 0.25 }} 
                     {...handlers}  
                 >
-                    <div 
-                        className="carousel-inner"
-                    >   
+                    <div className="carousel-inner">   
                         <div className='carousel-inner-main' style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
                         {listingImages[0]
                             ?
@@ -76,7 +75,7 @@ function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listing
                             </div>
                             : null
                         }
-                        {Object.values(listingImages).filter(val => val !== null).map((imageUrl) => {
+                        {Object.values<string>(listingImages).filter(val => val !== null).map((imageUrl) => {
                             return (
                                 <div className="carousel-item">
                                     <img src={imageUrl} className="carousel-img" />
@@ -106,7 +105,7 @@ function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listing
                             </div>
                             : null
                         } */}
-                        {Object.values(listingImages).filter(val => val !== null).map((imageUrl, i) => {
+                        {Object.values<string>(listingImages).filter(val => val !== null).map((imageUrl, i) => {
                             return (
                                 <div className={`carousel-inner-bottom-item `}>
                                     <img src={imageUrl} 
@@ -120,39 +119,38 @@ function ImageCarousel({toggleCarousel, setToggleCarousel, currentIndex, listing
                         })}
                         </div>
                     </div>
-                </motion.div>
-                <motion.div className="carousel-pagin"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', bounce: 0.25 }} 
-                >
-                    {Object.values(listingImages).filter(val => val !== null).map((_, i) => {
-                        return (
-                            <button
-                                className={`carousel-pagin-button ${i === activeIndex ? "carousel-pagin-button-active" : ""}`}
-                                onClick={() => {
-                                    updateIndex(i);
-                                }}
-                            >
-                            </button>
-                        );
-                    })}
-                </motion.div>
-                <motion.div className="carousel-close"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', bounce: 0.25 }} 
-                >
-                    <button 
-                        className="carousel-close-button"
-                        onClick={() => setToggleCarousel(!toggleCarousel)}
+                    <motion.div className="carousel-pagin"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: 'spring', bounce: 0.25 }} 
                     >
-                        Close
-                    </button>
+                        {Object.values(listingImages).filter(val => val !== null).map((_, i) => {
+                            return (
+                                <button
+                                    className={`carousel-pagin-button ${i === activeIndex ? "carousel-pagin-button-active" : ""}`}
+                                    onClick={() => {
+                                        updateIndex(i);
+                                    }}
+                                >
+                                </button>
+                            );
+                        })}
+                    </motion.div>
+                    <motion.div className="carousel-close"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ type: 'spring', bounce: 0.25 }} 
+                    >
+                        <button 
+                            className="carousel-close-button"
+                            onClick={() => setToggleCarousel(!toggleCarousel)}
+                        >
+                            Close
+                        </button>
+                    </motion.div>
                 </motion.div>
-            </motion.div>
             </AnimatePresence>
         </>
     )
