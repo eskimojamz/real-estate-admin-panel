@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetListingQuery } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
+import ImageCarousel from "../components/ImageCarousel"
 
 
 interface MapMarkerProps {
@@ -27,6 +28,18 @@ function ListingView(){
         }
     })
 
+    const listingImages = {
+        0: listingData?.getListing?.image1,
+        1: listingData?.getListing?.image2,
+        2: listingData?.getListing?.image3,
+        3: listingData?.getListing?.image4,
+        4: listingData?.getListing?.image5 
+    }
+
+    const imagesCount = Object.values(listingImages).filter(val => val !== null).length
+
+    console.log(listingImages)
+
     const [mapCenter, setMapCenter] = useState({lat: null, lng: null} as any)
     const address:string = listingData?.getListing?.address1 + " " + listingData?.getListing?.address2
     console.log(address, mapCenter)
@@ -35,6 +48,15 @@ function ListingView(){
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
     Geocode.setLanguage("en");
     Geocode.setRegion("us");
+
+    const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
+    const [currentIndex, setIndex] = useState<number>()
+
+    const handleImg = (index:number) => {
+        setIndex(index)
+        setToggleCarousel(true)
+    }
+
     useEffect(() => {
         Geocode.fromAddress(address).then(
             (response) => {
@@ -52,6 +74,17 @@ function ListingView(){
 
     return listingData ? (
         <>
+        { toggleCarousel ?
+            <ImageCarousel 
+                toggleCarousel={toggleCarousel}
+                setToggleCarousel={setToggleCarousel}
+                currentIndex={currentIndex}
+                listingImages={listingImages}
+                imagesCount={imagesCount}
+            />
+            : null
+
+        }
         <div className="wrapper">
             <div className="listing-view-wrapper">
                 <div className="listing-view-header">
@@ -69,7 +102,29 @@ function ListingView(){
                 <div className="listing-view">
                     <div className="listing-view-images">
                         {/* images carousel */}
-                        <img src={listingData?.getListing?.image1!} />
+                        <div className="listing-view-images-main">
+                            <img src={listingImages[0]!} onClick={() => handleImg(0)} />
+                        </div>
+                        <div className={`listing-view-images-side 
+                            ${
+                                imagesCount == 1 ? "display-none"
+                                : imagesCount == 2 ? "listing-view-images-side-2"
+                                : imagesCount == 3 ? "listing-view-images-side-3"
+                                : ""
+                            }
+                        `}>
+                            {Object.values(listingImages).slice(1).filter(val => val !== null).map((imageUrl, i) => {
+                                return <img src={imageUrl!} onClick={() => handleImg(i + 1)} />
+                            })}
+                            {imagesCount == 4 && 
+                                <div className="listing-view-images-side-placeholder"
+                                    onClick={() => handleImg(0)}
+                                >
+                                    <span>View all</span>
+                                    <span>➟</span>
+                                </div>
+                            }
+                        </div>
                     </div>
 
                     <div className="listing-view-text">

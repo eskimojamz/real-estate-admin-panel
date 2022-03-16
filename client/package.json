@@ -14,6 +14,7 @@
     "apollo-boost": "^0.4.9",
     "apollo-link-token-refresh": "^0.4.0",
     "axios": "^0.26.0",
+    "framer-motion": "^6.2.8",
     "google-map-react": "^2.1.10",
     "graphql": "^15.8.0",
     "jwt-decode": "^3.1.2",
@@ -23,6 +24,7 @@
     "react-geocode": "^0.2.3",
     "react-router-dom": "^6.2.2",
     "react-scripts": "5.0.0",
+    "react-swipeable": "^6.2.0",
     "typescript": "^4.5.5",
     "web-vitals": "^2.1.4"
   },
