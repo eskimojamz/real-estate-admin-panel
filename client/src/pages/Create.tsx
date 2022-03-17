@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import {useDropzone} from "react-dropzone"
-import { useCreateMutation, useSignS3Mutation } from "../generated/graphql";
+import { AllListingsDocument, useAllListingsQuery, useCreateMutation, useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
 
 interface listing {
@@ -37,7 +37,7 @@ const Create: React.FC = () => {
     const [s3UploadData, setS3UploadData] = useState([])
     const [s3Uploading, setS3Uploading] = useState(false as Boolean)
 
-    const [create, {data: createData, error: createError, loading: createLoading}] = useCreateMutation()
+    const [createMutation, {data: createData, error: createError, loading: createLoading}] = useCreateMutation({})
 
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -109,7 +109,7 @@ const Create: React.FC = () => {
         e.preventDefault()
         setLoading(true)
 
-        await create({
+        await createMutation({
             variables: {
                 data: {
                     address1,
@@ -128,6 +128,7 @@ const Create: React.FC = () => {
                     image5: imageUrls[4] || null,
                 }
             },
+            refetchQueries: [{query: AllListingsDocument}],
             onError: error => {
                 console.log(error)
                 setLoading(false)
@@ -142,7 +143,7 @@ const Create: React.FC = () => {
 
         setLoading(false)
         // return navigate(`/listings/:${createData?.create?.id}`)
-        return navigate("/")
+        return navigate("/listings")
     }
 
     const {
@@ -183,6 +184,7 @@ const Create: React.FC = () => {
     return (
         <>
         {loadingModal}
+        <div className="wrapper">
         <div className="create-container">
             <div className="create-header">
                 <div className="create-header-text">
@@ -292,6 +294,7 @@ const Create: React.FC = () => {
                 </div>
                 : null}
             </div>
+        </div>
         </div>
         </>
     )

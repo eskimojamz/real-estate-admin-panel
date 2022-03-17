@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetListingQuery } from "../generated/graphql";
+import { AllListingsDocument, useDeleteMutation, useEditMutation, useGetListingQuery } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import {AnimatePresence, motion} from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
-
+import ListingEditView from "../components/ListingEditView"
 
 interface MapMarkerProps {
     lat: number,
@@ -23,6 +23,12 @@ const MapMarker: React.FC<MapMarkerProps> = () => {
 function ListingView(){
     const {listingId} = useParams()
     const navigate = useNavigate()
+
+    const scaleVariant = {
+        hidden: {scale: 0, opacity: 0},
+        visible: {scale: 1, opacity: 1}
+    }
+
     const {data: listingData} = useGetListingQuery({
         variables: {
             getListingId: listingId as string
@@ -50,6 +56,18 @@ function ListingView(){
     Geocode.setLanguage("en");
     Geocode.setRegion("us");
 
+    const [deleteMutation, {loading: deleteLoading}] = useDeleteMutation({
+        variables: {
+            deleteId: listingId!
+        },
+        refetchQueries: [{query: AllListingsDocument}],
+        onError: error => {
+            console.log(error)
+            // setLoading(false)
+            throw new Error(error.toString())
+        }
+    })
+
     const [deleteConfirm, setDeleteConfirm] = useState<boolean>(false)
     const deleteModal = (
         deleteConfirm ?
@@ -65,18 +83,100 @@ function ListingView(){
                     <motion.em className="secondary">Deletions cannot be undone!</motion.em>
                 </motion.span>
                 <motion.span>
-                    <motion.button className="cancel-btn" onClick={() => setDeleteConfirm(false)}>Cancel</motion.button>
-                    <motion.button className="delete-btn" onClick={async() => {
-                        await setDeleteConfirm(false)
-                        // delete mutation
+                    <motion.button className="cancel-btn" 
+                        onClick={() => setDeleteConfirm(false)}
+                    >
+                        Cancel
+                    </motion.button>
+                    <motion.button className="delete-btn" 
+                        onClick={ async() => {
+                            await setDeleteConfirm(false)
+                            // delete mutation
+                            await deleteMutation()
+                            navigate("/listings", {replace: true})
                         }}
                     >
-                    Delete
+                        Delete
                     </motion.button>
                 </motion.span>
             </motion.div>
         
         </AnimatePresence>
+        : null
+    )
+
+    const [editMode, setEditMode] = useState<boolean>(false)
+    const editListingData = listingData && Object.fromEntries(Object.entries(listingData?.getListing!).slice(2, 11))
+    
+    const [address1, setAddress1] = useState<string>()
+    const [address2, setAddress2] = useState<string>()
+    const [price, setPrice] = useState<number>()
+    const [squareFt, setSquareFt] = useState<number>()
+    const [beds, setBeds] = useState<number>(1)
+    const [baths, setBaths] = useState<number>(1)
+    const [status, setStatus] = useState<string>("Active")
+    const [area, setArea] = useState<string>("Queens")
+    const [description, setDescription] = useState<string>()
+
+    const editState = { 
+        setAddress1,
+        setAddress2,
+        setPrice,
+        setSquareFt,
+        setBeds,
+        setBaths,
+        setStatus,
+        setArea,
+        setDescription
+    }
+
+    const [editMutation, {data: editData}] = useEditMutation({
+        variables: {
+            editId: listingId!,
+            data: {
+                address1,
+                address2,
+                price,
+                beds,
+                baths,
+                squareFt,
+                status,
+                area,
+                description,
+                // image1: imageUrls[0] || null,
+                // image2: imageUrls[1] || null,
+                // image3: imageUrls[2] || null,
+                // image4: imageUrls[3] || null,
+                // image5: imageUrls[4] || null,
+            }
+        },
+        onError: error => {
+            console.log(error)
+            // setLoading(false)
+            throw new Error(error.toString())
+        }
+    })
+
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const submit = async(e: { preventDefault: () => void; }) => {
+        e.preventDefault()
+        setLoading(true)
+        setEditMode(false)
+        await editMutation()
+
+        setLoading(false)
+        // return navigate(`/listings/${listingId}`)
+        return
+    }
+
+    const loadingModal = (
+        loading ?
+        <div className="create-loading-modal">
+            <div className="create-loading-modal-card">
+                Submitting edited listing...
+            </div>
+        </div>
         : null
     )
 
@@ -112,14 +212,13 @@ function ListingView(){
             }
         );
     }, [listingData])
-    
-    
 
     return listingData ? (
         <>
         {/* Event conditional components */}
         {imageCarousel}
         {deleteModal}
+        {loadingModal}
         {/* -------------------------- */}
         <div className="wrapper">
             <div className="listing-view-wrapper">
@@ -130,8 +229,36 @@ function ListingView(){
                         </button>
                     </div>
                     <div className="listing-view-actions">
-                        <button className="delete-btn" onClick={() => setDeleteConfirm(true)}>Delete</button>
-                        <button className="edit-btn">Edit</button>
+                        {editMode ? 
+                        <motion.button className="cancel-btn"
+                            onClick={() => setEditMode(false)}
+                            initial="hidden"
+                            animate="visible"
+                            variants={scaleVariant}
+                        >
+                            Cancel
+                        </motion.button>
+                        : <button className="delete-btn" 
+                            onClick={() => setDeleteConfirm(true)}
+                        >
+                            Delete
+                        </button>
+                        }
+                        {editMode ?
+                        <motion.button className="edit-btn" 
+                            onClick={(e) => submit(e)}
+                            initial="hidden"
+                            animate="visible"
+                            variants={scaleVariant}
+                        >
+                            Submit
+                        </motion.button> 
+                        : <button className="edit-btn" 
+                            onClick={() => setEditMode(true)}
+                        >
+                            Edit
+                        </button>
+                        }
                     </div>
                 </div>
 
@@ -162,7 +289,7 @@ function ListingView(){
                             }
                         </div>
                     </div>
-
+                    { editMode ? <ListingEditView listingData={editListingData} editState={editState}/> : (
                     <div className="listing-view-text">
                         {/* listing view text */}
                         <div className="listing-view-text-head">
@@ -232,6 +359,7 @@ function ListingView(){
                             </GoogleMap>
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
         </div>

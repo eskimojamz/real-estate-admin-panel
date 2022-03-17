@@ -133,8 +133,7 @@ export class ListingResolver {
     async delete(@Arg("id") id: string) {
         try {
           await Listing.delete(id)
-          const success = `Listing ${id} deleted: success`
-          return success
+          return id
         } catch(err) {
           console.log(err)
           throw new Error("Error Deleting Listing")

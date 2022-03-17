@@ -9,7 +9,7 @@ import searchLogo from "../assets/search.svg"
 function Home(){
   const navigate = useNavigate()
 
-  const {data}:any = useAllListingsQuery()
+  const {data, loading}:any = useAllListingsQuery()
   const [listings, setListings] = useState([] as any)
 
   useEffect(() => {
@@ -34,9 +34,9 @@ function Home(){
             <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
           </div>
         </div>
-        { data 
-        ? <Table listings={listings}/>
-        : null
+        { loading 
+        ? null
+        : <Table listings={listings}/>
         }
       </div>
     </div>

@@ -1,9 +1,12 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 import logoSmall from "../assets/logo-small.svg"
 
 function Sidebar() {
     const [currentLink, setCurrentLink] = useState()
     
+    const activeClassName = "active-link"
     return (
         <>
         <div className="sidebar-wrapper">
@@ -12,9 +15,30 @@ function Sidebar() {
             </div>
             <div className="sidebar-grid">
                 <div className="sidebar-top">
-                    <a>All</a>
-                    <a>Active</a>
-                    <a>Sold</a>
+                    <NavLink 
+                        to="/dashboard"
+                        className={({ isActive }) => 
+                        isActive ? "active-navlink" : "navlink"
+                    }
+                    >
+                        Dashboard
+                    </NavLink>
+                    <NavLink 
+                        to="/listings" 
+                        className={({ isActive }) => 
+                            isActive ? "active-navlink" : "navlink"
+                        }
+                    >
+                        Listings
+                    </NavLink>
+                    <NavLink 
+                        to="/calendar" 
+                        className={({ isActive }) => 
+                            isActive ? "active-navlink" : "navlink"
+                        }
+                    >
+                        Calendar
+                    </NavLink>
                 </div>
                 <div className="sidebar-bottom">
                     <div className="sidebar-profile">
@@ -24,8 +48,16 @@ function Sidebar() {
                             <em>joelle@horizon.com</em>
                         </div>
                     </div>
-                    <a>Site Preview</a>
-                    <a>Logout</a>
+                    <button className="site-preview-btn">
+                        <Link to="google.com">
+                            Site Preview
+                        </Link>
+                    </button> 
+                    <button
+                        className="logout-btn"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
