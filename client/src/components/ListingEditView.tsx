@@ -1,7 +1,7 @@
 import React from "react"
 import {motion} from "framer-motion"
 import Dropzone from "react-dropzone"
-import { ImagesFiles } from "../pages/ListingView"
+import { DropState, ImagesFiles } from "../pages/ListingView"
 
 interface EditProps {
     listingImages: {
@@ -24,14 +24,24 @@ interface EditProps {
         4: File | null,
     };
     setImageFiles: React.Dispatch<React.SetStateAction<any>>;
+    dropState: {
+        0: boolean | undefined,
+        1: boolean | undefined,
+        2: boolean | undefined,
+        3: boolean | undefined,
+        4: boolean | undefined, 
+    };
+    setDrop: React.Dispatch<React.SetStateAction<any>>;
+    s3UploadData: [];
+    setS3UploadData: React.Dispatch<any>;
 }
 
 const editVariants = {
-    hidden: { scale: 0, opacity: 0 },
-    visible: { scale: 1, opacity: 1 }
+    hidden: { y: -10, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
 }
 
-const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles}) => (
+const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles, dropState, setDrop, s3UploadData, setS3UploadData}) => (
         
 
                 <div className="listing-view">
@@ -39,18 +49,69 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                         {/* images carousel */}
                         <div className="listing-view-images-main">
                             <span className="listing-view-img-main">
+                                { listingImages[0] && imageFiles[0] == null && !dropState[0] ?
+                                <>
                                 <img className="edit-img-main" src={listingImages[0]!} onClick={() => handleImg(0)} />
                                 <motion.button className="edit-img-main-close" 
+                                    onClick={() => {
+                                        setDrop({...dropState, 0: true})
+                                    }}
                                     initial="hidden"
                                     animate="visible"
                                     variants={editVariants}
                                 />
+                                </>
+                                : imageFiles[0] !== null ?
+                                <>
+                                <motion.img className="edit-img-main" 
+                                    src={URL.createObjectURL(imageFiles[0] as Blob)} 
+                                    onClick={() => handleImg(0)}
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={editVariants}
+                                />
+                                <motion.button className="edit-img-main-close" 
+                                    onClick={() => {
+                                        // remove file from upload data
+                                        setS3UploadData(s3UploadData.filter((data:any) => 
+                                            data.acceptedFile !== imageFiles[0]
+                                            )
+                                        )
+                                        // remove file from cache state
+                                        setImageFiles({...imageFiles, 0: null})
+                                        setDrop({...dropState, 0: true})
+                                    }}
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={editVariants}
+                                />
+                                </>
+                                : dropState[0] || !listingImages[0] ? 
+                                <Dropzone 
+                                    accept={['image/jpeg', 'image/png']}
+                                    maxFiles={1}
+                                    multiple={false}
+                                    onDrop={onDrop}
+                                    onDropAccepted={acceptedFile => {
+                                        console.log(acceptedFile)
+                                        setImageFiles({...imageFiles, [0]: acceptedFile[0]})
+                                    }}
+                                >
+                                    {({getRootProps, getInputProps}) => (
+                                        <div {...getRootProps()} className="edit-main-dropzone">
+                                            <input {...getInputProps()} />
+                                            <p>Click / Drop</p>
+                                        </div>
+                                    )}
+                                </Dropzone>
+                                : null
+                                }
                             </span>
                         </div>
                         <div className="listing-view-images-side">
                             {Object.values(listingImages).slice(1).map((imageUrl, i) => {
                                 return (
-                                    imageUrl !== null ?
+                                    imageUrl !== null && !dropState[i+1 as keyof DropState] ?
                                     <span className="listing-view-img-side edit-span-h-sm">
                                         
                                             {/* // imagesCount == 1 ? ""
@@ -64,6 +125,9 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                                             initial="hidden"
                                             animate="visible"
                                             variants={editVariants}
+                                            onClick={() => 
+                                                setDrop({...dropState, [i+1]: true})
+                                            }
                                         />
                                     </span>
                                     : imageFiles[i+1 as keyof ImagesFiles] ?
@@ -78,9 +142,19 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                                                 initial="hidden"
                                                 animate="visible"
                                                 variants={editVariants}
+                                                onClick={() => {
+                                                    // remove file from upload data
+                                                    setS3UploadData(s3UploadData.filter((data:any) => 
+                                                        data.acceptedFile !== imageFiles[i+1 as keyof ImagesFiles]
+                                                        )
+                                                    )
+                                                    // remove file from cache state
+                                                    setImageFiles({...imageFiles, [i+1]: null})
+                                                    setDrop({...dropState, [i+1]: true})
+                                                }}
                                             />
                                         </span>
-                                        :
+                                        : dropState[i+1 as keyof DropState] || !imageUrl ?
                                         <motion.span className="listing-view-img-side edit-span-h-sm"
                                             initial="hidden"
                                             animate="visible"
@@ -98,11 +172,12 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                                                 {({getRootProps, getInputProps}) => (
                                                     <div {...getRootProps()} className="edit-side-dropzone">
                                                         <input {...getInputProps()} />
-                                                        Drop here
+                                                        <p>Click or Drop</p>
                                                     </div>
                                                 )}
                                             </Dropzone>
                                         </motion.span>
+                                        : null
                                 )
                             })}
                         </div>

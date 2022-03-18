@@ -23,11 +23,11 @@ button {
 }
 
 button:hover {
-    opacity: 0.7;
+    opacity: 0.7 !important;
 }
 
-button:focus {
-    opacity: 1.25;
+button:active {
+    filter: brightness(0.75) !important;
 }
 
 img {
@@ -826,11 +826,25 @@ label {
     place-items: center;
 }
 
+.edit-tooltip {
+    padding: 2px 10px;
+    height: 25px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    background-color: var(--blue-light);
+    color: var(--blue-primary);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+}
+
 .listing-view-wrapper {
     height: 100%;
     width: 100%;
     max-width: 85vw;
-    margin: 1rem auto;
+    margin: 0 auto;
     box-sizing: border-box;
 
     background: white;
@@ -855,6 +869,7 @@ label {
     padding: 0 5px;
     margin: 0 auto;
     padding: 0 1rem;
+    background: white;
 }
 
 .listing-view-back {
@@ -1072,7 +1087,8 @@ label {
     flex-direction: column;
     place-items: center;
     gap: 2rem;
-    padding: 5rem 0;
+    padding: 1rem 0 5rem 0;
+    margin-top: 60px;
 }
 
 .listing-view-images {
@@ -1118,7 +1134,7 @@ label {
     width: 25px;
     border-radius: 50%;
     border: none;
-    background: var(--red-light);
+    background: var(--red-primary);
     position: absolute;
     top: 0;
     right: 0;
@@ -1129,15 +1145,53 @@ label {
     transition: all 0.3s;
 }
 
+.edit-img-main-close:hover {
+    background-color: var(--red-light);
+    opacity: 1 !important;
+}
+
+.edit-img-main-close:hover::after {
+    color: var(--red-primary);
+}
+
 .edit-img-main-close:after{
     content: "\00d7"; /* This will render the 'X' */
     font-size: 18px;
-    color: var(--red-primary);
+    color: white;
     margin: 0 0 1px 0px;
 }
 
-.edit-img-main-close:hover {
-    filter: brightness(1.1);
+.edit-main-dropzone {
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    background: var(--grey-superlight);
+    border: 1px solid var(--grey-light);
+    border-radius: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-main-dropzone:hover {
+    opacity: 0.7;
+}
+
+.edit-main-dropzone p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: var(--grey-dark);
+}
+
+.edit-main-dropzone::before {
+    height: 26.4333px;
+    content: "\002b";
+    font-size: 48px;
+    color: var(--grey-dark);
+    /* margin: 0 0 5px 0; */
+    display: flex;
+    align-items: center;
 }
 
 .listing-view-images-side {
@@ -1196,7 +1250,7 @@ label {
     width: 129px;
     position: relative;
     display: inline-block;
-    transition: all 0.3s;
+    transition: all 0.1s;
 }
 
 .edit-span-h-sm {
@@ -1214,7 +1268,7 @@ label {
     width: 25px;
     border-radius: 50%;
     border: none;
-    background: var(--red-light);
+    background: var(--red-primary);
     position: absolute;
     top: 0;
     right: 0;
@@ -1222,26 +1276,57 @@ label {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.3s;
-}
-
-.edit-img-side-close:after{
-    content: "\00d7"; /* This will render the 'X' */
-    font-size: 18px;
-    color: var(--red-primary);
-    margin: 0 0 1px 0px;
+    transition: background-color color 0.3s;
 }
 
 .edit-img-side-close:hover {
-    filter: brightness(1.1);
+    background-color: var(--red-light);
+    opacity: 1 !important;
+}
+
+.edit-img-side-close:hover::after {
+    color: var(--red-primary);
+}
+
+.edit-img-side-close::after{
+    content: "\00d7"; /* This will render the 'X' */
+    font-size: 18px;
+    color: white;
+    margin: 0 0 1px 0px;
+    transition: color 0.3s;
 }
 
 .edit-side-dropzone {
+    cursor: pointer;
     height: 96px;
     width: 100%;
     background: var(--grey-superlight);
     border: 1px solid var(--grey-light);
     border-radius: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-side-dropzone:hover {
+    opacity: 0.7;
+}
+
+.edit-side-dropzone p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: var(--grey-dark);
+}
+
+.edit-side-dropzone::before {
+    height: 26.4333px;
+    content: "\002b";
+    font-size: 48px;
+    color: var(--grey-dark);
+    /* margin: 0 0 5px 0; */
+    display: flex;
+    align-items: center;
 }
 
 .listing-view-text {

@@ -29,6 +29,14 @@ export interface ImagesFiles {
     4: File | null,
 }
 
+export interface DropState {
+    0: boolean | undefined,
+    1: boolean | undefined,
+    2: boolean | undefined,
+    3: boolean | undefined,
+    4: boolean | undefined,
+}
+
 function ListingView(){
     const {listingId} = useParams()
     const navigate = useNavigate()
@@ -166,6 +174,17 @@ function ListingView(){
         }
     })
 
+    const EditToolip = (
+        editMode ?
+        <motion.div className="edit-tooltip"
+            initial={{y: -10, opacity: 0 }}
+            animate={{y: 0, opacity: 1}}
+        >
+            Edit Mode is On
+        </motion.div>
+        : null
+    )
+
     const [loading, setLoading] = useState<boolean>(false)
 
     const submit = async(e: { preventDefault: () => void; }) => {
@@ -220,13 +239,15 @@ function ListingView(){
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([] as any)
 
-    const onDrop:any = useCallback(async(acceptedFile:File) => {
-        console.log(acceptedFile)
-        
-        let fileName = acceptedFile.name.replace(/\..+$/, "");
+    const onDrop:any = useCallback(async(acceptedFiles:[File]) => {
+        console.log(acceptedFiles)
+        console.log('onDrop triggered')
+
+        const acceptedFile = acceptedFiles[0]
+
+        const fileName = acceptedFile.name.replace(/\..+$/, "");
             
         console.log(acceptedFile.type, acceptedFile.name, acceptedFile)
-        
 
         const s3SignedRequest = await s3Sign({
             variables: {
@@ -242,20 +263,20 @@ function ListingView(){
 
         console.log(s3SignedRequest.data?.signS3.url)
 
-        // await setImageUrls((imageUrls:[]) => [...imageUrls, s3SignedRequest?.data?.signS3?.url])
-        // })
-        setS3UploadData([...s3UploadData, {signedRequest, acceptedFile}])
+    
+        setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, acceptedFile}])
+        console.log(s3UploadData)
         return
     }, [])
-    
-    const {
-        getRootProps,
-        getInputProps,
-    } = useDropzone({
-        accept: 'image/jpeg,image/png',
-        maxFiles: 1,
-        onDrop
-    });
+    console.log(s3UploadData)
+
+    const [dropState, setDrop] = useState({
+        0: undefined,
+        1: undefined,
+        2: undefined,
+        3: undefined,
+        4: undefined,
+    })
 
     useEffect(() => {
         Geocode.fromAddress(address).then(
@@ -285,13 +306,28 @@ function ListingView(){
                             ← Back to Listings
                         </button>
                     </div>
+                    {EditToolip}
                     <div className="listing-view-actions">
                         {editMode ? 
                         <motion.button className="cancel-btn"
-                            onClick={() => setEditMode(false)}
                             initial="hidden"
                             animate="visible"
                             variants={scaleVariant}
+                            onClick={() => {
+                                // reset all edit states
+                                setEditMode(false)
+                                setImageFiles(
+                                    Object.keys(imageFiles).reduce((accumulator,key) => {
+                                        return {...accumulator, [key]: null }
+                                    }, imageFiles)
+                                )
+                                setDrop(
+                                    Object.keys(dropState).reduce((accumulator, key) => {
+                                        return {...accumulator, [key]: false}
+                                    }, dropState)
+                                )
+                                setS3UploadData([])
+                            }}
                         >
                             Cancel
                         </motion.button>
@@ -328,6 +364,10 @@ function ListingView(){
                     onDrop={onDrop}
                     imageFiles={imageFiles}
                     setImageFiles={setImageFiles}
+                    dropState={dropState}
+                    setDrop={setDrop}
+                    s3UploadData={s3UploadData}
+                    setS3UploadData={setS3UploadData}
                 /> 
                 : (
                 <div className="listing-view">
