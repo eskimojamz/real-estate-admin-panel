@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom";
-import { AllListingsDocument, useDeleteMutation, useEditMutation, useGetListingQuery } from "../generated/graphql";
+import { AllListingsDocument, useDeleteMutation, useEditMutation, useGetListingQuery, useSignS3Mutation } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import {AnimatePresence, motion} from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
 import ListingEditView from "../components/ListingEditView"
+import { useDropzone } from "react-dropzone";
 
 interface MapMarkerProps {
     lat: number,
@@ -18,6 +19,14 @@ const MapMarker: React.FC<MapMarkerProps> = () => {
         <div className="map-marker" />
         </>
     )
+}
+
+export interface ImagesFiles {
+    0: File | null,
+    1: File | null,
+    2: File | null,
+    3: File | null,
+    4: File | null,
 }
 
 function ListingView(){
@@ -199,6 +208,54 @@ function ListingView(){
         />
         : null
     )
+    
+    const [imageFiles, setImageFiles] = useState<ImagesFiles>({
+        0: null,
+        1: null,
+        2: null,
+        3: null,
+        4: null,
+    })
+    console.log(imageFiles)
+    const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
+    const [s3UploadData, setS3UploadData] = useState([] as any)
+
+    const onDrop:any = useCallback(async(acceptedFile:File) => {
+        console.log(acceptedFile)
+        
+        let fileName = acceptedFile.name.replace(/\..+$/, "");
+            
+        console.log(acceptedFile.type, acceptedFile.name, acceptedFile)
+        
+
+        const s3SignedRequest = await s3Sign({
+            variables: {
+                filename: fileName,
+                filetype: acceptedFile.type
+            },
+            onError: (err:any) => {
+                console.log(err)
+            }
+        })
+
+        const signedRequest = s3SignedRequest?.data?.signS3?.signedRequest
+
+        console.log(s3SignedRequest.data?.signS3.url)
+
+        // await setImageUrls((imageUrls:[]) => [...imageUrls, s3SignedRequest?.data?.signS3?.url])
+        // })
+        setS3UploadData([...s3UploadData, {signedRequest, acceptedFile}])
+        return
+    }, [])
+    
+    const {
+        getRootProps,
+        getInputProps,
+    } = useDropzone({
+        accept: 'image/jpeg,image/png',
+        maxFiles: 1,
+        onDrop
+    });
 
     useEffect(() => {
         Geocode.fromAddress(address).then(
@@ -261,7 +318,18 @@ function ListingView(){
                         }
                     </div>
                 </div>
-
+                { editMode 
+                ? <ListingEditView 
+                    listingImages={listingImages}
+                    imagesCount={imagesCount}
+                    handleImg={handleImg}
+                    listingData={editListingData} 
+                    editState={editState}
+                    onDrop={onDrop}
+                    imageFiles={imageFiles}
+                    setImageFiles={setImageFiles}
+                /> 
+                : (
                 <div className="listing-view">
                     <div className="listing-view-images">
                         {/* images carousel */}
@@ -289,7 +357,7 @@ function ListingView(){
                             }
                         </div>
                     </div>
-                    { editMode ? <ListingEditView listingData={editListingData} editState={editState}/> : (
+                    
                     <div className="listing-view-text">
                         {/* listing view text */}
                         <div className="listing-view-text-head">
@@ -359,8 +427,9 @@ function ListingView(){
                             </GoogleMap>
                         </div>
                     </div>
-                    )}
                 </div>
+                )}
+                {/* ----- Listing View ----- */}
             </div>
         </div>
         </>

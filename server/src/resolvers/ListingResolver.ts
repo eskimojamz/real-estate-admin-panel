@@ -49,19 +49,19 @@ class ListingInput {
   @Field({nullable: true, defaultValue: null})
   lastEdited: string;
 
-  @Field({nullable: true, defaultValue: null})
+  @Field({nullable: true})
   image1: string;
 
-  @Field({nullable: true, defaultValue: null})
+  @Field({nullable: true})
   image2: string;
 
-  @Field({nullable: true, defaultValue: null})
+  @Field({nullable: true})
   image3: string;
 
-  @Field({nullable: true, defaultValue: null})
+  @Field({nullable: true})
   image4: string;
 
-  @Field({nullable: true, defaultValue: null})
+  @Field({nullable: true})
   image5: string;
 }
 

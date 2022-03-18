@@ -1,9 +1,29 @@
-import React, {useState} from "react"
+import React from "react"
 import {motion} from "framer-motion"
+import Dropzone from "react-dropzone"
+import { ImagesFiles } from "../pages/ListingView"
 
 interface EditProps {
+    listingImages: {
+        0: string | null | undefined, 
+        1: string | null | undefined, 
+        2: string | null | undefined, 
+        3: string | null | undefined, 
+        4: string | null | undefined,
+    };
+    imagesCount: number;
+    handleImg: (index:number) => void;
     listingData: any;
     editState: any;
+    onDrop: any;
+    imageFiles: {
+        0: File | null,
+        1: File | null,
+        2: File | null,
+        3: File | null,
+        4: File | null,
+    };
+    setImageFiles: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const editVariants = {
@@ -11,12 +31,83 @@ const editVariants = {
     visible: { scale: 1, opacity: 1 }
 }
 
-const ListingEditView:React.FC<EditProps> = ({listingData, editState}) => (
+const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles}) => (
         
 
-                // <div className="listing-view">
+                <div className="listing-view">
+                    <div className="listing-view-images">
+                        {/* images carousel */}
+                        <div className="listing-view-images-main">
+                            <span className="listing-view-img-main">
+                                <img className="edit-img-main" src={listingImages[0]!} onClick={() => handleImg(0)} />
+                                <motion.button className="edit-img-main-close" 
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={editVariants}
+                                />
+                            </span>
+                        </div>
+                        <div className="listing-view-images-side">
+                            {Object.values(listingImages).slice(1).map((imageUrl, i) => {
+                                return (
+                                    imageUrl !== null ?
+                                    <span className="listing-view-img-side edit-span-h-sm">
+                                        
+                                            {/* // imagesCount == 1 ? ""
+                                            // : imagesCount == 2 ? ""
+                                            // : imagesCount == 3 ? "edit-span-h-sm"
+                                            // : imagesCount == 4 ? "edit-span-h-sm"
+                                            // : "edit-span-h-sm" */}
+                                         
+                                        <img className="edit-img-side" src={imageUrl!} onClick={() => handleImg(i + 1)} />
+                                        <motion.button className="edit-img-side-close"
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={editVariants}
+                                        />
+                                    </span>
+                                    : imageFiles[i+1 as keyof ImagesFiles] ?
+                                        <span className="listing-view-img-side edit-span-h-sm">
+                                            <motion.img className="edit-img-side" 
+                                                src={URL.createObjectURL(imageFiles[i+1 as keyof ImagesFiles] as Blob)}
+                                                initial="hidden"
+                                                animate="visible"
+                                                variants={editVariants}
+                                            />
+                                            <motion.button className="edit-img-side-close"
+                                                initial="hidden"
+                                                animate="visible"
+                                                variants={editVariants}
+                                            />
+                                        </span>
+                                        :
+                                        <motion.span className="listing-view-img-side edit-span-h-sm"
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={editVariants}
+                                        >
+                                            <Dropzone 
+                                                accept={['image/jpeg', 'image/png']}
+                                                maxFiles={1}
+                                                onDrop={onDrop}
+                                                onDropAccepted={acceptedFile => {
+                                                    console.log(acceptedFile)
+                                                    setImageFiles({...imageFiles, [i+1]: acceptedFile[0]})
+                                                }}
+                                            >
+                                                {({getRootProps, getInputProps}) => (
+                                                    <div {...getRootProps()} className="edit-side-dropzone">
+                                                        <input {...getInputProps()} />
+                                                        Drop here
+                                                    </div>
+                                                )}
+                                            </Dropzone>
+                                        </motion.span>
+                                )
+                            })}
+                        </div>
+                    </div>
                     
-
                     <motion.div className="listing-view-text">
                         {/* listing view text */}
                         <motion.div className="listing-view-text-head">
@@ -157,7 +248,7 @@ const ListingEditView:React.FC<EditProps> = ({listingData, editState}) => (
                             </motion.div>
                         </motion.div>
                     </motion.div>
-                // </div>
+                </div>
 )
 
 export default ListingEditView

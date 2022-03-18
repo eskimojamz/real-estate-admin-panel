@@ -843,6 +843,7 @@ label {
 }
 
 .listing-view-header {
+    z-index: 500;
     position: fixed;
     box-sizing: border-box;
     display: flex;
@@ -1094,10 +1095,49 @@ label {
     width: 267px;
 }
 
+.listing-view-img-main {
+    position: relative;
+    display: inline-block;
+    height: 200px;
+    width: 267px;
+}
+
 .listing-view-images-main img{
     height: 200px;
     width: 267px;
     border-radius: 10px;
+}
+
+.edit-img-main:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.edit-img-main-close {
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: none;
+    background: var(--red-light);
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px 5px 0 0 ;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.edit-img-main-close:after{
+    content: "\00d7"; /* This will render the 'X' */
+    font-size: 18px;
+    color: var(--red-primary);
+    margin: 0 0 1px 0px;
+}
+
+.edit-img-main-close:hover {
+    filter: brightness(1.1);
 }
 
 .listing-view-images-side {
@@ -1150,6 +1190,58 @@ label {
 
 .listing-view-images-side-placeholder span:nth-child(2) {
     font-size: 22px;
+}
+
+.listing-view-img-side {
+    width: 129px;
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.edit-span-h-sm {
+    height: 96px !important;
+}
+
+.edit-img-side:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.edit-img-side-close {
+    z-index: 2;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: none;
+    background: var(--red-light);
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px 5px 0 0 ;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.edit-img-side-close:after{
+    content: "\00d7"; /* This will render the 'X' */
+    font-size: 18px;
+    color: var(--red-primary);
+    margin: 0 0 1px 0px;
+}
+
+.edit-img-side-close:hover {
+    filter: brightness(1.1);
+}
+
+.edit-side-dropzone {
+    height: 96px;
+    width: 100%;
+    background: var(--grey-superlight);
+    border: 1px solid var(--grey-light);
+    border-radius: 10px;
 }
 
 .listing-view-text {
