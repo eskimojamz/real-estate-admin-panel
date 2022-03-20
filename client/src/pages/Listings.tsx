@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
+import { motion } from "framer-motion"
 import Table from "../components/Table"
-import { useAllListingsQuery, useDisplayUserQuery } from "../generated/graphql";
+import { useAllListingsQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
 
@@ -20,7 +20,10 @@ function Home(){
   return (
     <>
     <div className="wrapper">
-      <div className="dashboard-wrapper">
+      <motion.div className="dashboard-wrapper"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+      >
         <div className="dashboard-header">
           <div className="dashboard-header-text">
             <h3>All Listings</h3>
@@ -38,7 +41,7 @@ function Home(){
         ? null
         : <Table listings={listings}/>
         }
-      </div>
+      </motion.div>
     </div>
     </>
   );

@@ -7,6 +7,9 @@ import {AnimatePresence, motion} from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
 import ListingEditView from "../components/ListingEditView"
 import { useDropzone } from "react-dropzone";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import { Img } from "react-image";
 
 interface MapMarkerProps {
     lat: number,
@@ -54,7 +57,7 @@ function ListingView(){
         visible: {scale: 1, opacity: 1}
     }
 
-    const {data: listingData} = useGetListingQuery({
+    const {data: listingData, loading: listingDataLoading} = useGetListingQuery({
         variables: {
             getListingId: listingId as string
         }
@@ -229,29 +232,26 @@ function ListingView(){
         console.log(acceptedFiles)
         console.log('onDrop triggered')
 
-        const acceptedFile = acceptedFiles[0]
-
         // const fileName = acceptedFile.name.replace(/\..+$/, "");
-            
-        console.log(acceptedFile.type, acceptedFile.name, acceptedFile)
 
-        const s3SignedRequest = await s3Sign({
-            variables: {
-                filename: acceptedFile.name,
-                filetype: acceptedFile.type
-            },
-            onError: (err:any) => {
-                console.log(err)
-            }
+        acceptedFiles.forEach(async (acceptedFile) => {
+            const s3SignedRequest = await s3Sign({
+                variables: {
+                    filename: acceptedFile.name,
+                    filetype: acceptedFile.type
+                },
+                onError: (err:any) => {
+                    console.log(err)
+                }
+            })
+
+            const signedRequest = s3SignedRequest?.data?.signS3?.signedRequest
+
+            const url = s3SignedRequest.data?.signS3.url
+
+        
+            setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, acceptedFile}])
         })
-
-        const signedRequest = s3SignedRequest?.data?.signS3?.signedRequest
-
-        const url = s3SignedRequest.data?.signS3.url
-
-    
-        setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, acceptedFile}])
-        console.log(s3UploadData)
         return
     }, [])
     console.log(s3UploadData)
@@ -321,14 +321,17 @@ function ListingView(){
     }, [listingData])
 
     return listingData ? (
-        <>
+        <> 
         {/* Event conditional components */}
         {imageCarousel}
         {deleteModal}
         {loadingModal}
         {/* -------------------------- */}
         <div className="wrapper">
-            <div className="listing-view-wrapper">
+            <motion.div className="listing-view-wrapper"
+                initial={{ opacity: 0}}
+                animate={{ opacity: 1}}
+            >
                 <div className="listing-view-header">
                     <div className="listing-view-back">
                         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -394,10 +397,15 @@ function ListingView(){
                 : (
                 <div className="listing-view">
                     <div className="listing-view-images">
-                        {/* images carousel */}
-                        <div className="listing-view-images-main">
-                            <img src={listingImages[0]!} onClick={() => handleImg(0)} />
-                        </div>
+                        {/* images mosaic */}
+                        <motion.div className="listing-view-images-main"
+                            initial={{opacity: 0, y: 10}}
+                            animate={{opacity: 1, y: 0}}
+                        >
+                            <motion.img src={listingImages[0]!} onClick={() => handleImg(0)} 
+                                
+                            />
+                        </motion.div>
                         <div className={`listing-view-images-side 
                             ${
                                 imagesCount == 1 ? "display-none"
@@ -407,7 +415,14 @@ function ListingView(){
                             }
                         `}>
                             {Object.values(listingImages).slice(1).filter(val => val !== null).map((imageUrl, i) => {
-                                return <img src={imageUrl!} onClick={() => handleImg(i + 1)} />
+                                return (
+                                    <motion.img 
+                                        src={imageUrl!} 
+                                        onClick={() => handleImg(i + 1)}
+                                        initial={{opacity: 0, y: 10}}
+                                        animate={{opacity: 1, y: 0}}
+                                    />
+                                )
                             })}
                             {imagesCount == 4 && 
                                 <div className="listing-view-images-side-placeholder"
@@ -492,9 +507,9 @@ function ListingView(){
                 </div>
                 )}
                 {/* ----- Listing View ----- */}
-            </div>
+            </motion.div>
         </div>
-        </>
+        </> 
     ) : null
 }
 

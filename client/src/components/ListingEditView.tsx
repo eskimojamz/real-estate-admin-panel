@@ -1,7 +1,8 @@
 import React from "react"
 import {motion} from "framer-motion"
 import Dropzone from "react-dropzone"
-import { DropState, ImagesFiles } from "../pages/ListingView"
+import {LazyLoadImage} from "react-lazy-load-image-component"
+import Skeleton from "react-loading-skeleton"
 
 interface EditProps {
     allImages: any;
@@ -51,9 +52,14 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                         {/* images carousel */}
                         <div className="listing-view-images-main">
                             <span className="listing-view-img-main">
-                                { allImages[0].src ?
+                                { allImages.length > 0 ?
                                 <>
-                                <img className="edit-img-main" src={allImages[0].src!} onClick={() => handleImg(0)} />
+                                <motion.img className="edit-img-main" 
+                                    src={allImages[0].src!} 
+                                    initial={{opacity: 0, y: 10}}
+                                    animate={{opacity: 1, y: 0}}
+                                    onClick={() => handleImg(0)} 
+                                />
                                 <motion.button className="edit-img-main-close" 
                                     onClick={() => {
                                         // remove file from upload data
@@ -64,20 +70,21 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                         // remove image from cache state
                                         setAllImages(allImages.filter((image: any) => image.src !== allImages[0].src))
                                     }}
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={editVariants}
+                                    initial={{scale: 0.5, opacity: 0}}
+                                    animate={{scale: 1, opacity: 1}}
                                 />
                                 </>
                                 :
                                 <Dropzone 
                                     accept={['image/jpeg', 'image/png']}
-                                    maxFiles={1}
-                                    multiple={false}
+                                    maxFiles={(5 - allImages.length)}
                                     onDrop={onDrop}
                                     onDropAccepted={acceptedFiles => {
-                                        console.log(acceptedFiles)
-                                        setAllImages((allImages: any) => [...allImages, {src: URL.createObjectURL(acceptedFiles[0]), name: acceptedFiles[0].name}])
+                                        const images = [...allImages]
+                                        acceptedFiles.forEach(file => {
+                                            images.push({"src": URL.createObjectURL(file), "name": file.name})
+                                        })
+                                        setAllImages(images)
                                     }}
                                 >
                                     {({getRootProps, getInputProps}) => (
@@ -90,16 +97,21 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                 }
                             </span>
                         </div>
+                        {allImages.length > 0 &&
                         <div className="listing-view-images-side">
                             {allImages.length > 1 &&
                                 allImages.slice(1).map((image:any, i: number) => {
                                     return(
                                         <span className="listing-view-img-side edit-span-h-sm">
-                                            <img className="edit-img-side" src={image.src} onClick={() => handleImg(i + 1)} />
+                                            <motion.img className="edit-img-side" 
+                                                src={image.src} 
+                                                initial={{y: 10, opacity: 0}}
+                                                animate={{y: 0, opacity: 1}}
+                                                onClick={() => handleImg(i + 1)}
+                                            />
                                             <motion.button className="edit-img-side-close"
-                                                initial="hidden"
-                                                animate="visible"
-                                                variants={editVariants}
+                                                initial={{scale: 0, opacity: 0}}
+                                                animate={{scale: 1, opacity: 1}}
                                                 onClick={() => {
                                                     // remove file from upload data
                                                     setS3UploadData(s3UploadData.filter((data:any) => 
@@ -115,7 +127,7 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                 })
                             }
                             {allImages.length > 0 && allImages.length < 5 ?
-                                <motion.span className="listing-view-img-side edit-span-h-sm"
+                                <motion.span className={`listing-view-img-side ${allImages.length == 1 ? "edit-span-full" : "edit-span-h-sm"}`}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -124,13 +136,16 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                         accept={['image/jpeg', 'image/png']}
                                         maxFiles={1}
                                         onDrop={onDrop}
-                                        onDropAccepted={(acceptedFiles: File[]) => {
-                                            console.log(acceptedFiles)
-                                            setAllImages((allImages: any) => [...allImages, {src: URL.createObjectURL(acceptedFiles[0]), name: acceptedFiles[0].name}])
+                                        onDropAccepted={acceptedFiles => {
+                                            const images = [...allImages]
+                                            acceptedFiles.forEach(file => {
+                                                images.push({"src": URL.createObjectURL(file), "name": file.name})
+                                            })
+                                            setAllImages(images)
                                         }}
                                     >
                                         {({getRootProps, getInputProps}) => (
-                                            <div {...getRootProps()} className="edit-side-dropzone">
+                                            <div {...getRootProps()} className={`edit-side-dropzone ${allImages.length == 1 && "edit-side-dropzone-full"}`}>
                                                 <input {...getInputProps()} />
                                                 <p>Click or Drop</p>
                                             </div>
@@ -140,6 +155,7 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                 : null
                             }
                         </div>
+                        }
                     </div>
                     
                     <motion.div className="listing-view-text">
