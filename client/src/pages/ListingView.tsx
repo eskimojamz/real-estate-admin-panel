@@ -21,6 +21,14 @@ const MapMarker: React.FC<MapMarkerProps> = () => {
     )
 }
 
+interface ListingImages {
+    0: string | null | undefined;
+    1: string | null | undefined;
+    2: string | null | undefined;
+    3: string | null | undefined;
+    4: string | null | undefined;
+}
+
 export interface ImagesFiles {
     0: File | null,
     1: File | null,
@@ -59,8 +67,6 @@ function ListingView(){
         3: listingData?.getListing?.image4,
         4: listingData?.getListing?.image5 
     }
-
-    const imagesCount = Object.values(listingImages).filter(val => val !== null).length
 
     console.log(listingImages)
 
@@ -207,26 +213,6 @@ function ListingView(){
         </div>
         : null
     )
-
-    const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
-    const [currentIndex, setIndex] = useState<number>()
-
-    const handleImg = (index:number) => {
-        setIndex(index)
-        setToggleCarousel(true)
-    }
-
-    const imageCarousel = (
-        toggleCarousel ?
-        <ImageCarousel 
-            toggleCarousel={toggleCarousel}
-            setToggleCarousel={setToggleCarousel}
-            currentIndex={currentIndex!}
-            listingImages={listingImages}
-            imagesCount={imagesCount}
-        />
-        : null
-    )
     
     const [imageFiles, setImageFiles] = useState<ImagesFiles>({
         0: null,
@@ -245,13 +231,13 @@ function ListingView(){
 
         const acceptedFile = acceptedFiles[0]
 
-        const fileName = acceptedFile.name.replace(/\..+$/, "");
+        // const fileName = acceptedFile.name.replace(/\..+$/, "");
             
         console.log(acceptedFile.type, acceptedFile.name, acceptedFile)
 
         const s3SignedRequest = await s3Sign({
             variables: {
-                filename: fileName,
+                filename: acceptedFile.name,
                 filetype: acceptedFile.type
             },
             onError: (err:any) => {
@@ -261,7 +247,7 @@ function ListingView(){
 
         const signedRequest = s3SignedRequest?.data?.signS3?.signedRequest
 
-        console.log(s3SignedRequest.data?.signS3.url)
+        const url = s3SignedRequest.data?.signS3.url
 
     
         setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, acceptedFile}])
@@ -278,6 +264,49 @@ function ListingView(){
         4: undefined,
     })
 
+    const [allImages, setAllImages] = useState([] as any)
+    const imagesCount = allImages?.length
+    
+    const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
+    const [currentIndex, setIndex] = useState<number>()
+
+    const handleImg = (index:number) => {
+        setIndex(index)
+        setToggleCarousel(true)
+    }
+
+    const imageCarousel = (
+        toggleCarousel ?
+        <ImageCarousel 
+            allImages={allImages}
+            toggleCarousel={toggleCarousel}
+            setToggleCarousel={setToggleCarousel}
+            currentIndex={currentIndex!}
+            listingImages={listingImages}
+            imagesCount={imagesCount}
+            imageFiles={imageFiles}
+        />
+        : null
+    )
+    
+    const cancel = () => {
+        const images = [] as any
+        Object.values(listingImages).filter(val => val !== null).forEach(image => {
+            images.push({"src": image, "name": null})
+        })
+        console.log(images)
+        setAllImages(images)
+    }
+
+    useEffect(() => {
+        const images = [] as any
+        Object.values(listingImages).filter(val => val !== null).forEach(image => {
+            images.push({"src": image, "name": null})
+        })
+        console.log(images)
+        setAllImages(images)
+    }, [listingData])
+    console.log(allImages)
     useEffect(() => {
         Geocode.fromAddress(address).then(
             (response) => {
@@ -316,17 +345,8 @@ function ListingView(){
                             onClick={() => {
                                 // reset all edit states
                                 setEditMode(false)
-                                setImageFiles(
-                                    Object.keys(imageFiles).reduce((accumulator,key) => {
-                                        return {...accumulator, [key]: null }
-                                    }, imageFiles)
-                                )
-                                setDrop(
-                                    Object.keys(dropState).reduce((accumulator, key) => {
-                                        return {...accumulator, [key]: false}
-                                    }, dropState)
-                                )
                                 setS3UploadData([])
+                                cancel()
                             }}
                         >
                             Cancel
@@ -356,6 +376,8 @@ function ListingView(){
                 </div>
                 { editMode 
                 ? <ListingEditView 
+                    allImages={allImages}
+                    setAllImages={setAllImages}
                     listingImages={listingImages}
                     imagesCount={imagesCount}
                     handleImg={handleImg}

@@ -4,6 +4,8 @@ import Dropzone from "react-dropzone"
 import { DropState, ImagesFiles } from "../pages/ListingView"
 
 interface EditProps {
+    allImages: any;
+    setAllImages: (value: any) => void;
     listingImages: {
         0: string | null | undefined, 
         1: string | null | undefined, 
@@ -41,7 +43,7 @@ const editVariants = {
     visible: { y: 0, opacity: 1 }
 }
 
-const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles, dropState, setDrop, s3UploadData, setS3UploadData}) => (
+const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles, dropState, setDrop, s3UploadData, setS3UploadData}) => (
         
 
                 <div className="listing-view">
@@ -49,52 +51,33 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                         {/* images carousel */}
                         <div className="listing-view-images-main">
                             <span className="listing-view-img-main">
-                                { listingImages[0] && imageFiles[0] == null && !dropState[0] ?
+                                { allImages[0].src ?
                                 <>
-                                <img className="edit-img-main" src={listingImages[0]!} onClick={() => handleImg(0)} />
-                                <motion.button className="edit-img-main-close" 
-                                    onClick={() => {
-                                        setDrop({...dropState, 0: true})
-                                    }}
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={editVariants}
-                                />
-                                </>
-                                : imageFiles[0] !== null ?
-                                <>
-                                <motion.img className="edit-img-main" 
-                                    src={URL.createObjectURL(imageFiles[0] as Blob)} 
-                                    onClick={() => handleImg(0)}
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={editVariants}
-                                />
+                                <img className="edit-img-main" src={allImages[0].src!} onClick={() => handleImg(0)} />
                                 <motion.button className="edit-img-main-close" 
                                     onClick={() => {
                                         // remove file from upload data
                                         setS3UploadData(s3UploadData.filter((data:any) => 
-                                            data.acceptedFile !== imageFiles[0]
+                                            data.acceptedFile.name !== allImages[0 as keyof EditProps['allImages']].name
                                             )
                                         )
-                                        // remove file from cache state
-                                        setImageFiles({...imageFiles, 0: null})
-                                        setDrop({...dropState, 0: true})
+                                        // remove image from cache state
+                                        setAllImages(allImages.filter((image: any) => image.src !== allImages[0].src))
                                     }}
                                     initial="hidden"
                                     animate="visible"
                                     variants={editVariants}
                                 />
                                 </>
-                                : dropState[0] || !listingImages[0] ? 
+                                :
                                 <Dropzone 
                                     accept={['image/jpeg', 'image/png']}
                                     maxFiles={1}
                                     multiple={false}
                                     onDrop={onDrop}
-                                    onDropAccepted={acceptedFile => {
-                                        console.log(acceptedFile)
-                                        setImageFiles({...imageFiles, [0]: acceptedFile[0]})
+                                    onDropAccepted={acceptedFiles => {
+                                        console.log(acceptedFiles)
+                                        setAllImages((allImages: any) => [...allImages, {src: URL.createObjectURL(acceptedFiles[0]), name: acceptedFiles[0].name}])
                                     }}
                                 >
                                     {({getRootProps, getInputProps}) => (
@@ -104,40 +87,15 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                                         </div>
                                     )}
                                 </Dropzone>
-                                : null
                                 }
                             </span>
                         </div>
                         <div className="listing-view-images-side">
-                            {Object.values(listingImages).slice(1).map((imageUrl, i) => {
-                                return (
-                                    imageUrl !== null && !dropState[i+1 as keyof DropState] ?
-                                    <span className="listing-view-img-side edit-span-h-sm">
-                                        
-                                            {/* // imagesCount == 1 ? ""
-                                            // : imagesCount == 2 ? ""
-                                            // : imagesCount == 3 ? "edit-span-h-sm"
-                                            // : imagesCount == 4 ? "edit-span-h-sm"
-                                            // : "edit-span-h-sm" */}
-                                         
-                                        <img className="edit-img-side" src={imageUrl!} onClick={() => handleImg(i + 1)} />
-                                        <motion.button className="edit-img-side-close"
-                                            initial="hidden"
-                                            animate="visible"
-                                            variants={editVariants}
-                                            onClick={() => 
-                                                setDrop({...dropState, [i+1]: true})
-                                            }
-                                        />
-                                    </span>
-                                    : imageFiles[i+1 as keyof ImagesFiles] ?
+                            {allImages.length > 1 &&
+                                allImages.slice(1).map((image:any, i: number) => {
+                                    return(
                                         <span className="listing-view-img-side edit-span-h-sm">
-                                            <motion.img className="edit-img-side" 
-                                                src={URL.createObjectURL(imageFiles[i+1 as keyof ImagesFiles] as Blob)}
-                                                initial="hidden"
-                                                animate="visible"
-                                                variants={editVariants}
-                                            />
+                                            <img className="edit-img-side" src={image.src} onClick={() => handleImg(i + 1)} />
                                             <motion.button className="edit-img-side-close"
                                                 initial="hidden"
                                                 animate="visible"
@@ -145,41 +103,42 @@ const ListingEditView:React.FC<EditProps> = ({listingImages, imagesCount, handle
                                                 onClick={() => {
                                                     // remove file from upload data
                                                     setS3UploadData(s3UploadData.filter((data:any) => 
-                                                        data.acceptedFile !== imageFiles[i+1 as keyof ImagesFiles]
+                                                        data.acceptedFile.name !== allImages[i+1 as keyof EditProps['allImages']].name
                                                         )
                                                     )
-                                                    // remove file from cache state
-                                                    setImageFiles({...imageFiles, [i+1]: null})
-                                                    setDrop({...dropState, [i+1]: true})
+                                                    // remove image from cache state
+                                                    setAllImages(allImages.filter((imageData:any) => imageData.src !== image.src))
                                                 }}
                                             />
                                         </span>
-                                        : dropState[i+1 as keyof DropState] || !imageUrl ?
-                                        <motion.span className="listing-view-img-side edit-span-h-sm"
-                                            initial="hidden"
-                                            animate="visible"
-                                            variants={editVariants}
-                                        >
-                                            <Dropzone 
-                                                accept={['image/jpeg', 'image/png']}
-                                                maxFiles={1}
-                                                onDrop={onDrop}
-                                                onDropAccepted={acceptedFile => {
-                                                    console.log(acceptedFile)
-                                                    setImageFiles({...imageFiles, [i+1]: acceptedFile[0]})
-                                                }}
-                                            >
-                                                {({getRootProps, getInputProps}) => (
-                                                    <div {...getRootProps()} className="edit-side-dropzone">
-                                                        <input {...getInputProps()} />
-                                                        <p>Click or Drop</p>
-                                                    </div>
-                                                )}
-                                            </Dropzone>
-                                        </motion.span>
-                                        : null
-                                )
-                            })}
+                                    )
+                                })
+                            }
+                            {allImages.length > 0 && allImages.length < 5 ?
+                                <motion.span className="listing-view-img-side edit-span-h-sm"
+                                initial="hidden"
+                                animate="visible"
+                                variants={editVariants}
+                                >
+                                    <Dropzone 
+                                        accept={['image/jpeg', 'image/png']}
+                                        maxFiles={1}
+                                        onDrop={onDrop}
+                                        onDropAccepted={(acceptedFiles: File[]) => {
+                                            console.log(acceptedFiles)
+                                            setAllImages((allImages: any) => [...allImages, {src: URL.createObjectURL(acceptedFiles[0]), name: acceptedFiles[0].name}])
+                                        }}
+                                    >
+                                        {({getRootProps, getInputProps}) => (
+                                            <div {...getRootProps()} className="edit-side-dropzone">
+                                                <input {...getInputProps()} />
+                                                <p>Click or Drop</p>
+                                            </div>
+                                        )}
+                                    </Dropzone>
+                                </motion.span>
+                                : null
+                            }
                         </div>
                     </div>
                     

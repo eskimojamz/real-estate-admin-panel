@@ -1198,7 +1198,6 @@ label {
     height: 200px;
     width: 267px;
     display: grid;
-    align-items: center;
     grid-template: auto auto / auto auto;
     gap: 0.5rem;
 }
