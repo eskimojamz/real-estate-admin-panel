@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import Table from "../components/Table"
+import Map from "../components/Map";
 import { useAllListingsQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
@@ -12,6 +13,8 @@ function Home(){
   const {data, loading}:any = useAllListingsQuery()
   const [listings, setListings] = useState([] as any)
 
+  const [view, setView] = useState<string>("table")
+  
   useEffect(() => {
     data && setListings(data?.allListings)
     console.log(data)
@@ -25,9 +28,20 @@ function Home(){
         animate={{ y: 0, opacity: 1 }}
       >
         <div className="dashboard-header">
-          <div className="dashboard-header-text">
-            <h3>All Listings</h3>
-            <h4>{listings?.length}</h4>
+          <div className="dashboard-header-left">
+            <span className="dashboard-header-left-text">
+              <h3>All Listings</h3>
+              <h4>{listings?.length}</h4>
+            </span>
+            <span>
+              <AnimatePresence>
+              <motion.div className="dashboard-view">
+                <motion.span layout className={`dashboard-view-background ${view === "table" ? "view-left" : "view-right"}`} ></motion.span>
+                <motion.span className={`dashboard-view-label ${view === "table" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("table")}>Table</motion.span>
+                <motion.span className={`dashboard-view-label ${view === "map" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("map")}>Map</motion.span>
+              </motion.div>
+              </AnimatePresence>
+            </span>
           </div>
           <div className="dashboard-header-buttons-wrapper">
             <div className="search">
@@ -39,7 +53,11 @@ function Home(){
         </div>
         { loading 
         ? null
-        : <Table listings={listings}/>
+        : view === "table" ? 
+          <Table listings={listings}/>
+        : view === "map" ? 
+          <Map listings={listings} setListings={setListings} />
+        : null
         }
       </motion.div>
     </div>
