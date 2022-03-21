@@ -805,6 +805,7 @@ label {
 }
 
 .create-loading-modal {
+    z-index: 700 !important;
     position: fixed;
     height: 100vh;
     width: 100vw;
@@ -816,6 +817,7 @@ label {
 }
 
 .create-loading-modal-card {
+    z-index: 701 !important;
     height: 200px;
     width: 300px;
     z-index: 101;
@@ -1098,13 +1100,13 @@ label {
 
 .listing-view-images img {
     cursor: pointer;
-    transition: all 0.25s;
+    /* transition: all 0.25s; */
 }
 
-.listing-view-images img:hover {
+/* .listing-view-images img:hover {
     transform: scale(1.05);
     box-shadow: -5px 5px 10px rgb(131, 130, 130, 0.2);
-}
+} */
 
 .listing-view-images-main {
     height: 200px;

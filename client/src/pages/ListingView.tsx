@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom";
-import { AllListingsDocument, useDeleteMutation, useEditMutation, useGetListingQuery, useSignS3Mutation } from "../generated/graphql";
+import { AllListingsDocument, GetListingDocument, useDeleteMutation, useEditMutation, useGetListingQuery, useSignS3Mutation } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
-import {AnimatePresence, motion} from "framer-motion"
+import {AnimatePresence, motion, MotionConfig} from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
 import ListingEditView from "../components/ListingEditView"
-import { useDropzone } from "react-dropzone";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { Img } from "react-image";
+import s3Upload from "../utils/s3Upload";
+import axios from "axios";
 
 interface MapMarkerProps {
     lat: number,
@@ -22,14 +23,6 @@ const MapMarker: React.FC<MapMarkerProps> = () => {
         <div className="map-marker" />
         </>
     )
-}
-
-interface ListingImages {
-    0: string | null | undefined;
-    1: string | null | undefined;
-    2: string | null | undefined;
-    3: string | null | undefined;
-    4: string | null | undefined;
 }
 
 export interface ImagesFiles {
@@ -156,6 +149,19 @@ function ListingView(){
         setDescription
     }
 
+    const [allImages, setAllImages] = useState([] as any)
+    // const [prevImages, setPrevImages] = useState<string[] | []>([])
+
+    // const setImagesForEdit = () => {
+    //     const unchangedImages = [] as any
+    //     Object.values(listingImages).filter(val => val !== null).forEach((imageUrl, i) => {
+    //         if (imageUrl == allImages[i]) {
+    //             unchangedImages.push(imageUrl)
+    //         }
+    //     })
+    //     setPrevImages(unchangedImages)
+    // }
+
     const [editMutation, {data: editData}] = useEditMutation({
         variables: {
             editId: listingId!,
@@ -163,19 +169,20 @@ function ListingView(){
                 address1,
                 address2,
                 price,
+                squareFt,
                 beds,
                 baths,
-                squareFt,
                 status,
                 area,
                 description,
-                // image1: imageUrls[0] || null,
-                // image2: imageUrls[1] || null,
-                // image3: imageUrls[2] || null,
-                // image4: imageUrls[3] || null,
-                // image5: imageUrls[4] || null,
+                image1: allImages[0] ? allImages[0].url : null,
+                image2: allImages[1] ? allImages[1].url : null,
+                image3: allImages[2] ? allImages[2].url : null,
+                image4: allImages[3] ? allImages[3].url : null,
+                image5: allImages[4] ? allImages[4].url : null,
             }
         },
+        refetchQueries: [{query: AllListingsDocument}, {query: GetListingDocument, variables: {getListingId: listingId} }],
         onError: error => {
             console.log(error)
             // setLoading(false)
@@ -195,15 +202,38 @@ function ListingView(){
     )
 
     const [loading, setLoading] = useState<boolean>(false)
-
+    const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
+    const [s3UploadData, setS3UploadData] = useState([] as any)
+    
+    const [submitted, setSubmitted] = useState<boolean | undefined>()
     const submit = async(e: { preventDefault: () => void; }) => {
         e.preventDefault()
         setLoading(true)
-        setEditMode(false)
+        // await setImagesForEdit()
         await editMutation()
-
+        // if s3UploadData... upload
+        s3UploadData && await s3UploadData.forEach(async(data:any) => {
+            const options = {
+                headers: {
+                    "Content-Type": data.file.type
+                }
+            }
+            await axios.put(data.signedRequest, data.file, options)
+                .then((res) => {
+                    console.log(res)
+                })
+                .then(() => setLoading(false))
+                .then(() => setEditMode(false))
+                // .then(() => navigate(0))
+                .catch(err => {
+                    console.log(err)
+                    throw new Error(err)
+                })
+            return
+        })
+        // no upload data, return
         setLoading(false)
-        // return navigate(`/listings/${listingId}`)
+        setEditMode(false)
         return
     }
 
@@ -216,25 +246,14 @@ function ListingView(){
         </div>
         : null
     )
-    
-    const [imageFiles, setImageFiles] = useState<ImagesFiles>({
-        0: null,
-        1: null,
-        2: null,
-        3: null,
-        4: null,
-    })
-    console.log(imageFiles)
-    const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
-    const [s3UploadData, setS3UploadData] = useState([] as any)
 
     const onDrop:any = useCallback(async(acceptedFiles:[File]) => {
         console.log(acceptedFiles)
         console.log('onDrop triggered')
-
-        // const fileName = acceptedFile.name.replace(/\..+$/, "");
-
-        acceptedFiles.forEach(async (acceptedFile) => {
+        
+        // const images = [...allImages] 
+        // console.log(images)
+        await acceptedFiles.forEach(async(acceptedFile) => {
             const s3SignedRequest = await s3Sign({
                 variables: {
                     filename: acceptedFile.name,
@@ -248,23 +267,16 @@ function ListingView(){
             const signedRequest = s3SignedRequest?.data?.signS3?.signedRequest
 
             const url = s3SignedRequest.data?.signS3.url
-
-        
-            setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, acceptedFile}])
+                                       
+            // images.push({"src": URL.createObjectURL(acceptedFile), "name": acceptedFile.name, "url": url})
+            
+            setAllImages((allImages:any) => [...allImages, {"src": URL.createObjectURL(acceptedFile), "name": acceptedFile.name, "url": url}])
+            setS3UploadData((uploadData:any) => [...uploadData, {signedRequest, file: acceptedFile}])
         })
-        return
+        console.log(allImages)
     }, [])
     console.log(s3UploadData)
 
-    const [dropState, setDrop] = useState({
-        0: undefined,
-        1: undefined,
-        2: undefined,
-        3: undefined,
-        4: undefined,
-    })
-
-    const [allImages, setAllImages] = useState([] as any)
     const imagesCount = allImages?.length
     
     const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
@@ -284,29 +296,27 @@ function ListingView(){
             currentIndex={currentIndex!}
             listingImages={listingImages}
             imagesCount={imagesCount}
-            imageFiles={imageFiles}
         />
         : null
     )
     
     const cancel = () => {
         const images = [] as any
-        Object.values(listingImages).filter(val => val !== null).forEach(image => {
-            images.push({"src": image, "name": null})
+        Object.values(listingImages).filter(val => val !== null).forEach(imageUrl => {
+            images.push({"src": imageUrl, "name": null, "url": imageUrl})
         })
         console.log(images)
         setAllImages(images)
     }
 
+    console.log(allImages)
     useEffect(() => {
         const images = [] as any
-        Object.values(listingImages).filter(val => val !== null).forEach(image => {
-            images.push({"src": image, "name": null})
+        Object.values(listingImages).filter(val => val !== null).forEach(imageUrl => {
+            images.push({"src": imageUrl, "name": null, "url": imageUrl})
         })
-        console.log(images)
         setAllImages(images)
     }, [listingData])
-    console.log(allImages)
     useEffect(() => {
         Geocode.fromAddress(address).then(
             (response) => {
@@ -319,7 +329,7 @@ function ListingView(){
             }
         );
     }, [listingData])
-
+    
     return listingData ? (
         <> 
         {/* Event conditional components */}
@@ -334,7 +344,7 @@ function ListingView(){
             >
                 <div className="listing-view-header">
                     <div className="listing-view-back">
-                        <button className="back-btn" onClick={() => navigate(-1)}>
+                        <button className="back-btn" onClick={() => navigate("/listings")}>
                             ← Back to Listings
                         </button>
                     </div>
@@ -370,7 +380,10 @@ function ListingView(){
                             Submit
                         </motion.button> 
                         : <button className="edit-btn" 
-                            onClick={() => setEditMode(true)}
+                            onClick={() => {
+                                setEditMode(true)
+                                }
+                            }
                         >
                             Edit
                         </button>
@@ -381,16 +394,10 @@ function ListingView(){
                 ? <ListingEditView 
                     allImages={allImages}
                     setAllImages={setAllImages}
-                    listingImages={listingImages}
-                    imagesCount={imagesCount}
                     handleImg={handleImg}
                     listingData={editListingData} 
                     editState={editState}
                     onDrop={onDrop}
-                    imageFiles={imageFiles}
-                    setImageFiles={setImageFiles}
-                    dropState={dropState}
-                    setDrop={setDrop}
                     s3UploadData={s3UploadData}
                     setS3UploadData={setS3UploadData}
                 /> 
@@ -402,13 +409,17 @@ function ListingView(){
                             initial={{opacity: 0, y: 10}}
                             animate={{opacity: 1, y: 0}}
                         >
+                            {listingImages[0] ?
                             <motion.img src={listingImages[0]!} onClick={() => handleImg(0)} 
-                                
+                                initial={{opacity: 0, y: 10}}
+                                animate={{opacity: 1, y: 0}}
+                                whileHover={{scale: 1.05, transition: {duration: 0.25} }}
                             />
+                            : <p>No images for this listing!</p> }
                         </motion.div>
                         <div className={`listing-view-images-side 
                             ${
-                                imagesCount == 1 ? "display-none"
+                                imagesCount < 2 ? "display-none"
                                 : imagesCount == 2 ? "listing-view-images-side-2"
                                 : imagesCount == 3 ? "listing-view-images-side-3"
                                 : ""
@@ -421,6 +432,7 @@ function ListingView(){
                                         onClick={() => handleImg(i + 1)}
                                         initial={{opacity: 0, y: 10}}
                                         animate={{opacity: 1, y: 0}}
+                                        whileHover={{scale: 1.05, transition: {duration: 0.25} }}
                                     />
                                 )
                             })}
@@ -491,7 +503,7 @@ function ListingView(){
                             </span>
                             <span>
                                 <h5>Last Edited</h5>
-                                <p>{listingData?.getListing?.lastEdited == null ? "N/A" : listingData?.getListing?.lastEdited}</p>
+                                <p>{listingData?.getListing?.lastEdited == null ? "N/A" : new Date(listingData?.getListing?.lastEdited).toLocaleString()}</p>
                             </span>
                         </div>
                         <div className="listing-view-map">

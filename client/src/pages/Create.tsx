@@ -137,7 +137,7 @@ const Create: React.FC = () => {
         })
 
         await s3UploadData.forEach(async(data:any) => {
-            await s3Upload(data.signedRequest, data.file, setLoading)
+            await s3Upload(data.signedRequest, data.file)
             // await console.log(data)
         })
 

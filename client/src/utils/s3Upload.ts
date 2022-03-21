@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const s3Upload = async (signedRequest: string, file: File, setLoading:React.Dispatch<React.SetStateAction<boolean>>) => {
+const s3Upload = async (signedRequest: string, file: File) => {
     const options = {
         headers: {
             "Content-Type": file.type
@@ -12,7 +12,6 @@ const s3Upload = async (signedRequest: string, file: File, setLoading:React.Disp
         })
         .catch(err => {
             console.log(err)
-            setLoading(false)
             throw new Error(err)
         })
 }

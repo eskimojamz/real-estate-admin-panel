@@ -10,7 +10,6 @@ type CarouselProps = {
     currentIndex: number;
     listingImages: any;
     imagesCount: number;
-    imageFiles: any;
 };
 
 const ImageCarousel: React.FC<CarouselProps> = ({
@@ -20,7 +19,6 @@ const ImageCarousel: React.FC<CarouselProps> = ({
     currentIndex, 
     listingImages, 
     imagesCount,
-    imageFiles,
 }) => {
     const [activeIndex, setActiveIndex] = useState(currentIndex)
 
@@ -59,49 +57,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({
                 >
                     <div className="carousel-inner">   
                         <div className='carousel-inner-main' style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
-                        {/* {listingImages[0]
-                            ?
-                            <div className="carousel-item">
-                                <img src={listingImages[0]} className="carousel-img"/>
-                            </div>
-                            : null
-                        }
-                        {listingImages[1]
-                            ?
-                            <div className="carousel-item">
-                                <img src={listingImages[1]} className="carousel-img"/>
-                            </div>
-                            : null
-                        }
-                        {listingImages[2]
-                            ?
-                            <div className="carousel-item">
-                                <img src={listingImages[2]} className="carousel-img"/>
-                            </div>
-                            : null
-                        } */}
-                        {/* {Object.values<string>(listingImages).filter(val => val !== null).map((imageUrl) => {
-                            return (
-                                <div className="carousel-item">
-                                    <img src={imageUrl} className="carousel-img" />
-                                </div>
-                            );
-                        })}*/}
-                            {/* { Object.keys(listingImages).map((key) => {
-                                return (
-                                    listingImages[key] ?
-                                    <div className="carousel-item">
-                                        <img src={listingImages[key]} className="carousel-img" />
-                                    </div>    
-                                    : !listingImages[key] ?
-                                        imageFiles[key as unknown as keyof ImagesFiles] ?
-                                        <div className="carousel-item">
-                                            <img src={URL.createObjectURL(imageFiles[key as unknown as keyof ImagesFiles] as Blob)} className="carousel-img" />
-                                        </div> 
-                                        : null 
-                                    : null
-                                ) 
-                            })} */}
+                        
                             { 
                                 Object.values(allImages)?.map((image:any) => {
                                     return (
@@ -115,27 +71,7 @@ const ImageCarousel: React.FC<CarouselProps> = ({
 
 
                         <div className='carousel-inner-bottom'>
-                        {/* {listingImages[0]
-                            ?
-                            <div className="carousel-inner-bottom-item">
-                                <img src={listingImages[0]} className="carousel-thumb"/>
-                            </div>
-                            : null
-                        }
-                        {listingImages[1]
-                            ?
-                            <div className="carousel-inner-bottom-item">
-                                <img src={listingImages[1]} className="carousel-thumb"/>
-                            </div>
-                            : null
-                        }
-                        {listingImages[2]
-                            ?
-                            <div className="carousel-inner-bottom-item">
-                                <img src={listingImages[2]} className="carousel-thumb"/>
-                            </div>
-                            : null
-                        } */}
+                        
                         {Object.values(allImages).map((image:any, i) => {
                             return (
                                 <div className={`carousel-inner-bottom-item `}>

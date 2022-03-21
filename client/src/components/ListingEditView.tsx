@@ -7,34 +7,10 @@ import Skeleton from "react-loading-skeleton"
 interface EditProps {
     allImages: any;
     setAllImages: (value: any) => void;
-    listingImages: {
-        0: string | null | undefined, 
-        1: string | null | undefined, 
-        2: string | null | undefined, 
-        3: string | null | undefined, 
-        4: string | null | undefined,
-    };
-    imagesCount: number;
     handleImg: (index:number) => void;
     listingData: any;
     editState: any;
     onDrop: any;
-    imageFiles: {
-        0: File | null,
-        1: File | null,
-        2: File | null,
-        3: File | null,
-        4: File | null,
-    };
-    setImageFiles: React.Dispatch<React.SetStateAction<any>>;
-    dropState: {
-        0: boolean | undefined,
-        1: boolean | undefined,
-        2: boolean | undefined,
-        3: boolean | undefined,
-        4: boolean | undefined, 
-    };
-    setDrop: React.Dispatch<React.SetStateAction<any>>;
     s3UploadData: [];
     setS3UploadData: React.Dispatch<any>;
 }
@@ -44,7 +20,7 @@ const editVariants = {
     visible: { y: 0, opacity: 1 }
 }
 
-const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingImages, imagesCount, handleImg, listingData, editState, onDrop, imageFiles, setImageFiles, dropState, setDrop, s3UploadData, setS3UploadData}) => (
+const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, handleImg, listingData, editState, onDrop, s3UploadData, setS3UploadData}) => (
         
 
                 <div className="listing-view">
@@ -64,11 +40,13 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                     onClick={() => {
                                         // remove file from upload data
                                         setS3UploadData(s3UploadData.filter((data:any) => 
-                                            data.acceptedFile.name !== allImages[0 as keyof EditProps['allImages']].name
+                                            data.file.name !== allImages[0 as keyof EditProps['allImages']].name
                                             )
                                         )
                                         // remove image from cache state
-                                        setAllImages(allImages.filter((image: any) => image.src !== allImages[0].src))
+                                        const images = [...allImages]
+                                        images.splice(0, 1)          
+                                        setAllImages(images)
                                     }}
                                     initial={{scale: 0.5, opacity: 0}}
                                     animate={{scale: 1, opacity: 1}}
@@ -79,13 +57,6 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                     accept={['image/jpeg', 'image/png']}
                                     maxFiles={(5 - allImages.length)}
                                     onDrop={onDrop}
-                                    onDropAccepted={acceptedFiles => {
-                                        const images = [...allImages]
-                                        acceptedFiles.forEach(file => {
-                                            images.push({"src": URL.createObjectURL(file), "name": file.name})
-                                        })
-                                        setAllImages(images)
-                                    }}
                                 >
                                     {({getRootProps, getInputProps}) => (
                                         <div {...getRootProps()} className="edit-main-dropzone">
@@ -101,7 +72,7 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                         <div className="listing-view-images-side">
                             {allImages.length > 1 &&
                                 allImages.slice(1).map((image:any, i: number) => {
-                                    return(
+                                    return (
                                         <span className="listing-view-img-side edit-span-h-sm">
                                             <motion.img className="edit-img-side" 
                                                 src={image.src} 
@@ -112,14 +83,18 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                             <motion.button className="edit-img-side-close"
                                                 initial={{scale: 0, opacity: 0}}
                                                 animate={{scale: 1, opacity: 1}}
-                                                onClick={() => {
+                                                onClick={(e:any) => {
+                                                    e.preventDefault()
                                                     // remove file from upload data
                                                     setS3UploadData(s3UploadData.filter((data:any) => 
-                                                        data.acceptedFile.name !== allImages[i+1 as keyof EditProps['allImages']].name
+                                                        data.file.name !== allImages[i+1 as keyof EditProps['allImages']].name
                                                         )
                                                     )
                                                     // remove image from cache state
-                                                    setAllImages(allImages.filter((imageData:any) => imageData.src !== image.src))
+                                                    // setAllImages(allImages.filter((imageData:any) => imageData.src !== image.src))
+                                                    const images = [...allImages]
+                                                    images.splice(i+1, 1)          
+                                                    setAllImages(images)
                                                 }}
                                             />
                                         </span>
@@ -134,15 +109,8 @@ const ListingEditView:React.FC<EditProps> = ({allImages, setAllImages, listingIm
                                 >
                                     <Dropzone 
                                         accept={['image/jpeg', 'image/png']}
-                                        maxFiles={1}
+                                        maxFiles={(5 - allImages.length)}
                                         onDrop={onDrop}
-                                        onDropAccepted={acceptedFiles => {
-                                            const images = [...allImages]
-                                            acceptedFiles.forEach(file => {
-                                                images.push({"src": URL.createObjectURL(file), "name": file.name})
-                                            })
-                                            setAllImages(images)
-                                        }}
                                     >
                                         {({getRootProps, getInputProps}) => (
                                             <div {...getRootProps()} className={`edit-side-dropzone ${allImages.length == 1 && "edit-side-dropzone-full"}`}>
