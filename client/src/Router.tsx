@@ -1,3 +1,4 @@
+import { AnimatePresence } from "framer-motion";
 import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
@@ -8,6 +9,7 @@ import Login from "./pages/Login";
 
 export const Router: React.FC = () => {
   return (
+    <AnimatePresence exitBeforeEnter>
     <div className="container">
       <BrowserRouter>
         <Routes>
@@ -24,6 +26,7 @@ export const Router: React.FC = () => {
         </Routes>
       </BrowserRouter>
     </div>
+    </AnimatePresence>
   );
 };
 
