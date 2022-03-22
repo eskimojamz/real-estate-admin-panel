@@ -41,17 +41,16 @@ function Table({listings}:any) {
                     <th>AREA</th>
                     <th>CREATED</th>
                     <th>EDITED</th>
-                    <th>ACTIONS</th>
                 </tr>
             </thead>
             
             <tbody>
                 {listings?.map((listing:listing) => {
-                    const listingId = listing.id
+                    const listingId = listing?.id
 
                     return (
                     <>
-                    <tr id={listing.id} onClick={() => navigate(`${listing.id!}`)}>
+                    <tr id={listingId} onClick={() => navigate(`${listingId}`)}>
                         <td><img src={listing.image1}/></td>
                         <td>
                             <p className="address1">{listing.address1}</p>
@@ -70,10 +69,9 @@ function Table({listings}:any) {
                         <td><p className="td-p-bold">{listing.area}</p></td>
                         <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
                         <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>
-                        <td>
-                            <button id={listingId} className="td-delete"><img src={deleteIcon}/></button>
-                            <button id={listingId} className="td-edit"><img src={editIcon}/></button>
-                        </td>
+                        {/* <td>
+                            <button id={listingId} className="table-view-btn" onClick={() => navigate(listingId)}></button>
+                        </td> */}
                     </tr>
                     </>
                     )

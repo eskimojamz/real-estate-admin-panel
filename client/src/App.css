@@ -554,42 +554,29 @@ td {
     color: rgba(255, 85, 85, 1);
 }
 
-.td-delete {
-    background: var(--secondary);
-    background-image: "";
+.table-view-btn {
+    position: relative;
+    background: var(--blue-primary);
     color: white;
     border: none;
     border-radius: 5px;
-    height: 24px;
-    width: 24px;
-    margin-right: 5px;
-    padding: 0 0 0 1px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-flex;
+    height: 25px;
+    width: 40px;
+    margin: 0 auto;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 400;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.td-delete img {
-    height: 18px;
-    width: 18px;
-}
-
-.td-edit {
-    background: var(--blue-primary);
-    border: none;
-    border-radius: 5px;
-    height: 24px;
-    width: 24px;
-    margin-left: 5px;
-    padding: 0 0 0 1px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-flex;
-}
-
-.td-edit img {
-    height: 18px;
-    width: 18px;
+.table-view-btn:after {
+    position: absolute;
+    top: -1px;
+    right: 10px;
+    content: "\279E";
+    font-size: 20px;
 }
 
 .dashboard-map {

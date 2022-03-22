@@ -23,7 +23,9 @@ function Home(){
     if (searchInput === "") {
       return setResults(data?.allListings)
     }
-    const resultsRef = listings.filter((listing: { address1: string; address2: string; }) => (listing.address1 + listing.address2).toLowerCase().includes(searchInput.toLowerCase()))
+    const resultsRef = listings.filter((listing: { address1: any; address2: any; price: any; beds: any; baths: any; area: any; }) => 
+      (listing.address1 + listing.address2 + listing.price + listing.beds + listing.baths + listing.area).toLowerCase().includes(searchInput.toLowerCase())
+      )
     setResults(resultsRef)
   }
   

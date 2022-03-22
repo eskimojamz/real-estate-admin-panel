@@ -26,7 +26,12 @@ const MapMarker: React.FC<MapMarkerProps> = ({listingId, setCurrentMapListing}) 
 
     return (
         <>
-        <motion.div className="map-marker" onClick={() => setCurrentMapListing(listingId)}/>
+        <motion.div className="map-marker" 
+            onClick={() => setCurrentMapListing(listingId)}
+            initial={{scale: 0, opacity:0}}
+            animate={{scale: 1, opacity:1}}
+            transition={{type: 'spring', damping:5, delay: 0.5}}
+        />
         </>
     )
 }
