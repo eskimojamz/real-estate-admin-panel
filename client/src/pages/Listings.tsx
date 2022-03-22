@@ -12,11 +12,24 @@ function Home(){
 
   const {data, loading}:any = useAllListingsQuery()
   const [listings, setListings] = useState([] as any)
+  const [results, setResults] = useState([] as any)
 
   const [view, setView] = useState<string>("table")
+
+  const [searchInput, setSearchInput] = useState<string>("")
+
+  const submitSearch = (e:any) => {
+    e.preventDefault()
+    if (searchInput === "") {
+      return setResults(data?.allListings)
+    }
+    const resultsRef = listings.filter((listing: { address1: string; address2: string; }) => (listing.address1 + listing.address2).toLowerCase().includes(searchInput.toLowerCase()))
+    setResults(resultsRef)
+  }
   
   useEffect(() => {
     data && setListings(data?.allListings)
+    setResults(data?.allListings)
     console.log(data)
   }, [data])
 
@@ -44,19 +57,29 @@ function Home(){
             </span>
           </div>
           <div className="dashboard-header-buttons-wrapper">
-            <div className="search">
-              <input className="search-input"></input>
-              <span className="search-icon"><img src={searchLogo}/></span>
-            </div>
+            <form className="search"
+              onSubmit={(e) => submitSearch(e)}
+            >
+              <input className="search-input" 
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyUp={(e) => {
+                  
+                  submitSearch(e)
+                }}
+              >
+              </input>
+              <span className="search-icon" onClick={(e) => submitSearch(e)}><img src={searchLogo}/></span>
+            </form>
             <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
           </div>
         </div>
         { loading 
         ? null
         : view === "table" ? 
-          <Table listings={listings}/>
+          <Table listings={results}/>
         : view === "map" ? 
-          <Map listings={listings} setListings={setListings} />
+          <Map listings={results} setView={setView}/>
         : null
         }
       </motion.div>

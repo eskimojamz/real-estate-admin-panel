@@ -436,29 +436,41 @@ input:focus, textarea:focus{
 
 .search {
     height: 35px;
+    width: 200px;
     position: relative;
 }
 
 .search-input {
     box-sizing: border-box;
     height: 35px;
-    width: 200px;
+    width: 100%;
     background: var(--grey-superlight);
     border: 1px solid var(--grey-light);
     border-radius: 5px;
-    padding: 0.1rem 1.8rem 0.1rem 0.5rem;
+    padding: 0.25rem 32px 0.25rem 0.5rem;
+}
+
+.search-icon{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+    cursor: pointer;
+    background: none;
+    border-radius: 3px;
 }
 
 .search-icon img {
-    position: absolute;
-    height: 20px;
-    width: 20px;
-    top: 7px;
-    right: 7px;
+    height: 24px;
+    width: 24px;
 }
 
 .search-icon img:hover {
-    cursor: pointer;
+    opacity: 0.7;
 }
 
 .dashboard-header-buttons-wrapper .create-btn {

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"
 
 interface Props {
     listings: any;
-    setListings: React.Dispatch<any>;
+    setView: React.Dispatch<any>;
 }
 
 interface MapMarkerProps {
@@ -105,7 +105,7 @@ const MapMarkerListing: React.FC<MapMarkerListingProps> = ({listingId, setCurren
     )
 }
 
-const Map:React.FC<Props> = ({listings, setListings}) => {
+const Map:React.FC<Props> = ({listings, setView}) => {
     // set Google Maps Geocoding API
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
     Geocode.setLanguage("en");
@@ -117,12 +117,15 @@ const Map:React.FC<Props> = ({listings, setListings}) => {
 
     useEffect(() => {
         if (listings) {
-            listings.forEach((listing: { id: string; address1: string; address2: string; }) => {
+            // reset map markers for search filter
+            setMapMarkers([])
+            // map coordinates and set map markers
+            listings.map((listing: { id: string; address1: string; address2: string; }) => {
                 const address:string = listing.address1 + listing.address2
                 Geocode.fromAddress(address).then(
                     (response) => {
                         const { lat, lng } = response.results[0].geometry.location;
-                        setMapMarkers((mapMarkers: any) => [...mapMarkers, { listingId: listing.id, lat, lng }])
+                        setMapMarkers((mapMarkers: any) => [...mapMarkers, <MapMarker listingId={listing.id} lat={lat} lng={lng} setCurrentMapListing={setCurrentMapListing}/>])
                     },
                     (error) => {
                         console.error(error);
@@ -132,18 +135,18 @@ const Map:React.FC<Props> = ({listings, setListings}) => {
         }
     }, [listings])
 
-    return mapMarkers ? (
+    return (
         <div className="dashboard-map">
             <GoogleMap
                 bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
                 center={{lat: 40.7427, lng: -73.8524}}
                 defaultZoom={12}
             >
-                {mapMarkers.map((marker: { listingId: string; lat: number; lng: number }) => <MapMarker listingId={marker.listingId} lat={marker.lat} lng={marker.lng} setCurrentMapListing={setCurrentMapListing}/> )}
+                {mapMarkers}
             </GoogleMap>
             {<MapMarkerListing listingId={currentMapListing!} setCurrentMapListing={setCurrentMapListing} />}
         </div>
-    ):null
+    )
 }
 
 export default Map
