@@ -66,7 +66,7 @@ function Table({listings}:any) {
                         <td>
                             <p className="td-p-bold">{listing.baths}</p>
                         </td>
-                        <td><p className={`td-p-bold ${listing.status == "Active" ? "td-p-active" : "td-p-sold"}`}>{listing.status}</p></td>
+                        <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
                         <td><p className="td-p-bold">{listing.area}</p></td>
                         <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
                         <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>

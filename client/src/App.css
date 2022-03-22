@@ -534,11 +534,11 @@ td {
     margin: 0;
 }
 
-.td-p-active {
+.status-active {
     color: rgba(44, 177, 89, 1);
 }
 
-.td-p-sold {
+.status-sold {
     color: rgba(255, 85, 85, 1);
 }
 
@@ -1656,6 +1656,7 @@ label {
     height: 150px;
     width: 200px;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 .map-marker-listing-close {
@@ -1713,6 +1714,7 @@ label {
 
 .map-marker-listing-details p{
     font-size: 13px;
+    font-weight: 400;
 }
 
 .map-marker-listing-button {

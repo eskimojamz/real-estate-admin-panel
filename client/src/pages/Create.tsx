@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import {useDropzone} from "react-dropzone"
 import { AllListingsDocument, useAllListingsQuery, useCreateMutation, useSignS3Mutation } from "../generated/graphql";
 import s3Upload from "../utils/s3Upload"
+import axios from "axios";
 
 interface listing {
     id: string,
@@ -35,9 +36,10 @@ const Create: React.FC = () => {
 
     const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([])
-    const [s3Uploading, setS3Uploading] = useState(false as Boolean)
+    const [s3UploadError, setS3UploadError] = useState<boolean>(false)
 
     const [createMutation, {data: createData, error: createError, loading: createLoading}] = useCreateMutation({})
+    const [createUpload, setCreateUpload] = useState<boolean>(false)
 
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -105,10 +107,13 @@ const Create: React.FC = () => {
     console.log(images)
     // console.log(imageUrls)
 
+
     const submit = async (e:any) => {
         e.preventDefault()
         setLoading(true)
 
+        let redirectId:string|undefined
+        
         await createMutation({
             variables: {
                 data: {
@@ -129,21 +134,42 @@ const Create: React.FC = () => {
                 }
             },
             refetchQueries: [{query: AllListingsDocument}],
+            awaitRefetchQueries: true,
+            onCompleted: data => {
+                console.log(data)
+                redirectId = data.create?.id
+            },
             onError: error => {
                 console.log(error)
                 setLoading(false)
                 throw new Error(error.toString())
             }
         })
-
-        await s3UploadData.forEach(async(data:any) => {
-            await s3Upload(data.signedRequest, data.file)
-            // await console.log(data)
+        .then(() => {
+            s3UploadData && s3UploadData.forEach(async (data: any) => {
+                const options = {
+                    headers: {
+                        "Content-Type": data.file.type
+                    }
+                };
+                await axios.put(data.signedRequest, data.file, options)
+                    .then(res => {
+                        console.log(res);
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        setLoading(false)
+                        setS3UploadError(true)
+                        throw new Error(err);
+                    });
+            })
         })
-
-        setLoading(false)
-        // return navigate(`/listings/:${createData?.create?.id}`)
-        return navigate("/listings")
+        .then(() => setLoading(false))
+        .then(() => navigate(`/listings/${redirectId}`))
+        .catch(err => {
+            console.log(err)
+            throw new Error(err)
+        })
     }
 
     const {
@@ -184,6 +210,7 @@ const Create: React.FC = () => {
     return (
         <>
         {loadingModal}
+
         <div className="wrapper">
         <div className="create-container">
             <div className="create-header">
@@ -288,7 +315,7 @@ const Create: React.FC = () => {
                         <textarea className="description" id="description" onChange={e => setDescription(e.target.value)}></textarea>
                     </section>
                 </form>
-                {createError ?
+                {createError || s3UploadError ?
                 <div className="error-div">
                     <em>There was an error. Please input all required fields and try again.</em>
                 </div>

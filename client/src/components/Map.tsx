@@ -49,7 +49,11 @@ const MapMarkerListing: React.FC<MapMarkerListingProps> = ({listingId, setCurren
             exit={{x: -10, opacity: 0, transition: {duration: 0.25} }}
         >
             <div className="map-marker-listing-image">
-                <img src={listingData?.getListing?.image1!} />
+                <motion.img src={listingData?.getListing?.image1!} 
+                    onClick={() => navigate(listingId)}
+                    initial={{opacity: 0}}
+                    animate={{opacity: 1}}
+                />
                 {/* close button */}
                 <button className="map-marker-listing-close"
                     onClick={() => setCurrentMapListing(undefined)}
@@ -80,7 +84,7 @@ const MapMarkerListing: React.FC<MapMarkerListingProps> = ({listingId, setCurren
                     </span>
                     <span>
                         <h5>Status:</h5>
-                        <p>{listingData?.getListing?.status}</p>
+                        <p className={`${listingData?.getListing?.status == "Active" ? "status-active" : "status-sold"}`}>{listingData?.getListing?.status}</p>
                     </span>
                 </span>
                 <span className="map-marker-listing-button">

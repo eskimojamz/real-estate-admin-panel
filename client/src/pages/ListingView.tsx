@@ -183,9 +183,10 @@ function ListingView(){
             }
         },
         refetchQueries: [{query: AllListingsDocument}, {query: GetListingDocument, variables: {getListingId: listingId} }],
+        awaitRefetchQueries: true,
         onError: error => {
             console.log(error)
-            // setLoading(false)
+            setLoading(false)
             throw new Error(error.toString())
         }
     })
@@ -202,39 +203,40 @@ function ListingView(){
     )
 
     const [loading, setLoading] = useState<boolean>(false)
-    const [s3Sign, {loading: s3SignLoading}] = useSignS3Mutation()
+    const [s3Sign] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([] as any)
     
-    const [submitted, setSubmitted] = useState<boolean | undefined>()
     const submit = async(e: { preventDefault: () => void; }) => {
         e.preventDefault()
+        
         setLoading(true)
-        // await setImagesForEdit()
+        
         await editMutation()
-        // if s3UploadData... upload
-        s3UploadData && await s3UploadData.forEach(async(data:any) => {
-            const options = {
-                headers: {
-                    "Content-Type": data.file.type
-                }
-            }
-            await axios.put(data.signedRequest, data.file, options)
-                .then((res) => {
-                    console.log(res)
+            .then(() => {
+                // if s3UploadData... upload
+                s3UploadData && s3UploadData.forEach(async(data:any) => {
+                    const options = {
+                        headers: {
+                            "Content-Type": data.file.type
+                        }
+                    }
+                    await axios.put(data.signedRequest, data.file, options)
+                        .then((res) => {
+                            console.log(res)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            setLoading(false)
+                            throw new Error(err)
+                        })
                 })
-                .then(() => setLoading(false))
-                .then(() => setEditMode(false))
-                // .then(() => navigate(0))
-                .catch(err => {
-                    console.log(err)
-                    throw new Error(err)
-                })
-            return
-        })
-        // no upload data, return
-        setLoading(false)
-        setEditMode(false)
-        return
+            })
+            .then(() => setLoading(false)) 
+            .then(() => navigate(0)) 
+            .catch((err) => {
+                console.log(err)
+                throw new Error(err)
+            })
     }
 
     const loadingModal = (
