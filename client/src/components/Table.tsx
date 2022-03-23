@@ -1,8 +1,14 @@
+import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import deleteIcon from "../assets/deleteIcon.svg"
 import editIcon from "../assets/editIcon.svg"
 
-interface listing {
+interface Props {
+    results: any;
+    setResults: React.Dispatch<any>;
+}
+
+interface Listing {
     id: string,
     address1: string
     address2: string,
@@ -22,8 +28,52 @@ interface listing {
     image5: string,
 }
 
-function Table({listings}:any) {
+interface SortConfig {
+    key: string;
+    direction: string;
+}
+
+const Table:React.FC<Props> = ({results, setResults}) => {
     const navigate = useNavigate()
+    
+    const useSortableData = (items: any = results, config = {key: 'dateCreated', direction: 'descending'}) => {
+        const [sortConfig, setSortConfig] = useState<SortConfig | null>(config);
+        
+        const sortedItems = useMemo(() => {
+          let sortableItems = [...items];
+          if (sortConfig !== null) {
+            sortableItems.sort((a, b) => {
+              if (a[sortConfig.key] < b[sortConfig.key]) {
+                return sortConfig.direction === 'ascending' ? -1 : 1;
+              }
+              if (a[sortConfig.key] > b[sortConfig.key]) {
+                return sortConfig.direction === 'ascending' ? 1 : -1;
+              }
+              return 0;
+            });
+          }
+          return sortableItems;
+        }, [items, sortConfig]);
+      
+        const requestSort = (key: any) => {
+          let direction = 'ascending';
+          if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+          }
+          setSortConfig({ key, direction });
+        }
+      
+        return { items: sortedItems, requestSort, sortConfig };
+    }
+
+    const { items, requestSort, sortConfig } = useSortableData(results);
+
+    const getClassNamesFor = (name:string) => {
+        if (!sortConfig) {
+            return;
+        }
+        return sortConfig.key === name ? sortConfig.direction : undefined;
+    };
 
     return (
         <>
@@ -34,18 +84,47 @@ function Table({listings}:any) {
                     <th></th>
                     {/*  */}
                     <th>ADDRESS</th>
-                    <th>PRICE</th>
-                    <th>BEDS</th>
-                    <th>BATHS</th>
-                    <th>STATUS</th>
-                    <th>AREA</th>
-                    <th>CREATED</th>
-                    <th>EDITED</th>
+                    <th className={`filterable ${getClassNamesFor('price')}`} 
+                        onClick={() => requestSort('price')}
+                    >
+                        PRICE
+                    </th>
+                    <th className={`filterable ${getClassNamesFor('beds')}`}
+                        onClick={() => requestSort('beds')}
+                    >
+                        BEDS
+                    </th>
+                    <th className={`filterable ${getClassNamesFor('baths')}`} 
+                        onClick={() => requestSort('baths')}
+                    >
+                        BATHS
+                    </th>
+                    <th className={`filterable ${getClassNamesFor('status')}`} 
+                        onClick={() => requestSort('status')}
+                    >
+                        STATUS
+                    </th>
+                    <th className={`filterable ${getClassNamesFor('area')}`} 
+                        onClick={() => requestSort('area')}
+                    >
+                        AREA
+                    </th>
+                    <th
+                        className={`filterable ${getClassNamesFor('dateCreated')}`} 
+                        onClick={() => requestSort('dateCreated')}
+                    >
+                        CREATED
+                    </th>
+                    <th className={`filterable ${getClassNamesFor('lastEdited')}`} 
+                        onClick={() => requestSort('lastEdited')}
+                    >
+                        EDITED
+                    </th>
                 </tr>
             </thead>
             
             <tbody>
-                {listings?.map((listing:listing) => {
+                {items && items.map((listing:any) => {
                     const listingId = listing?.id
 
                     return (

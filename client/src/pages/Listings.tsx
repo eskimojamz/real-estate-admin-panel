@@ -76,12 +76,11 @@ function Home(){
             <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
           </div>
         </div>
-        { loading 
-        ? null
-        : view === "table" ? 
-          <Table listings={results}/>
-        : view === "map" ? 
-          <Map listings={results} setView={setView}/>
+        { 
+        results && view === "table" ? 
+          <Table results={results} setResults={setResults}/>
+        : results && view === "map" ? 
+          <Map listings={results}/>
         : null
         }
       </motion.div>

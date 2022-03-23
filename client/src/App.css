@@ -520,6 +520,32 @@ tbody tr {
     border-bottom: 1px solid var(--grey-light);
 }
 
+th.filterable {
+    cursor: pointer;
+}
+
+th.filterable:hover {
+    background: var(--bg);
+}
+
+th.ascending::after {
+    position: relative;
+    content: "\25BC";
+    font-size: 11px;
+    color: var(--grey-dark);
+    bottom: 1px;
+    left: 4px;
+}
+
+th.descending::after {
+    position: relative;
+    content: "\25B2";
+    font-size: 11px;
+    color: var(--grey-dark);
+    bottom: 1px;
+    left: 4px;
+}
+
 td {
     text-align: center;
     vertical-align: middle;

@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom"
 
 interface Props {
     listings: any;
-    setView: React.Dispatch<any>;
 }
 
 interface MapMarkerProps {
@@ -110,7 +109,7 @@ const MapMarkerListing: React.FC<MapMarkerListingProps> = ({listingId, setCurren
     )
 }
 
-const Map:React.FC<Props> = ({listings, setView}) => {
+const Map:React.FC<Props> = ({listings}) => {
     // set Google Maps Geocoding API
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
     Geocode.setLanguage("en");
