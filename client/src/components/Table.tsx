@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import deleteIcon from "../assets/deleteIcon.svg"
 import editIcon from "../assets/editIcon.svg"
+import Pagination from "../utils/pagination/Pagination"
 
 interface Props {
     results: any;
-    setResults: React.Dispatch<any>;
 }
 
 interface Listing {
@@ -33,10 +33,14 @@ interface SortConfig {
     direction: string;
 }
 
-const Table:React.FC<Props> = ({results, setResults}) => {
+const Table:React.FC<Props> = ({results}) => {
     const navigate = useNavigate()
+
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const pageSize = Math.floor((window.innerHeight - 230) / 65)
+
     
-    const useSortableData = (items: any = results, config = {key: 'dateCreated', direction: 'descending'}) => {
+    const useSortableData = (items:any = results, config = {key: 'dateCreated', direction: 'descending'}) => {
         const [sortConfig, setSortConfig] = useState<SortConfig | null>(config);
         
         const sortedItems = useMemo(() => {
@@ -63,10 +67,16 @@ const Table:React.FC<Props> = ({results, setResults}) => {
           setSortConfig({ key, direction });
         }
       
-        return { items: sortedItems, requestSort, sortConfig };
+        return { sortedResults: sortedItems, requestSort, sortConfig };
     }
 
-    const { items, requestSort, sortConfig } = useSortableData(results);
+    const { sortedResults, requestSort, sortConfig } = useSortableData(results);
+
+    const paginatedResults = useMemo(() => {
+        const firstPageIndex = (currentPage - 1) * pageSize;
+        const lastPageIndex = firstPageIndex + pageSize;
+        return sortedResults?.slice(firstPageIndex, lastPageIndex);
+    }, [sortedResults, currentPage]);
 
     const getClassNamesFor = (name:string) => {
         if (!sortConfig) {
@@ -124,7 +134,7 @@ const Table:React.FC<Props> = ({results, setResults}) => {
             </thead>
             
             <tbody>
-                {items && items.map((listing:any) => {
+                {paginatedResults && paginatedResults?.map((listing:any) => {
                     const listingId = listing?.id
 
                     return (
@@ -157,6 +167,17 @@ const Table:React.FC<Props> = ({results, setResults}) => {
                 })}
             </tbody>
         </table>
+        <div className="table-footer">
+            <Pagination
+                className="pagination-bar"
+                currentPage={currentPage}
+                totalCount={sortedResults?.length}
+                pageSize={pageSize}
+                onPageChange={(page: number) => {
+                    setCurrentPage(page)
+                }}
+            />
+        </div>
         </>
     )
 }

@@ -38,27 +38,27 @@ function Home(){
   return (
     <>
     <div className="wrapper">
-      <motion.div className="dashboard-wrapper"
+      <motion.div className="listings-wrapper"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
       >
-        <div className="dashboard-header">
-          <div className="dashboard-header-left">
-            <span className="dashboard-header-left-text">
+        <div className="listings-header">
+          <div className="listings-header-left">
+            <span className="listings-header-left-text">
               <h3>All Listings</h3>
               <h4>{listings?.length}</h4>
             </span>
             <span>
               <AnimatePresence>
-              <motion.div className="dashboard-view">
-                <motion.span layout className={`dashboard-view-background ${view === "table" ? "view-left" : "view-right"}`} ></motion.span>
-                <motion.span className={`dashboard-view-label ${view === "table" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("table")}>Table</motion.span>
-                <motion.span className={`dashboard-view-label ${view === "map" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("map")}>Map</motion.span>
+              <motion.div className="listings-view">
+                <motion.span layout className={`listings-view-background ${view === "table" ? "view-left" : "view-right"}`} ></motion.span>
+                <motion.span className={`listings-view-label ${view === "table" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("table")}>Table</motion.span>
+                <motion.span className={`listings-view-label ${view === "map" ? "view-label-active" : "view-label-inactive"}`} onClick={() => setView("map")}>Map</motion.span>
               </motion.div>
               </AnimatePresence>
             </span>
           </div>
-          <div className="dashboard-header-buttons-wrapper">
+          <div className="listings-header-buttons-wrapper">
             <form className="search"
               onSubmit={(e) => submitSearch(e)}
             >
@@ -78,7 +78,7 @@ function Home(){
         </div>
         { 
         results && view === "table" ? 
-          <Table results={results} setResults={setResults}/>
+          <Table results={results}/>
         : results && view === "map" ? 
           <Map listings={results}/>
         : null

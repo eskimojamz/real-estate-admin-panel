@@ -140,7 +140,7 @@ const Map:React.FC<Props> = ({listings}) => {
     }, [listings])
 
     return (
-        <div className="dashboard-map">
+        <div className="listings-map">
             <GoogleMap
                 bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
                 center={{lat: 40.7427, lng: -73.8524}}

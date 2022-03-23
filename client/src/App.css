@@ -1,11 +1,15 @@
 html, body {
-    height: 100%;
     margin: 0;
     font-family: 'Noto Sans', sans-serif;
 }
 
 body {
+    height: 100vh;
     background: rgba(249, 249, 249, 1);
+}
+
+#root {
+    height: 100%;
 }
 
 * {
@@ -75,7 +79,7 @@ img {
 
 .wrapper {
     margin-left: 150px;
-
+    padding: 1rem;
     height: 100%;
     width: 100%;
     overflow: scroll;
@@ -335,12 +339,11 @@ input:focus, textarea:focus{
     font-size: 11px;
 }
 
-.dashboard-wrapper {
-    height: 85vh;
+.listings-wrapper {
+    height: 100%;
     width: 100%;
-    max-height: 85vh;
     max-width: 85vw;
-    margin: 1rem auto;
+    margin: 0 auto;
     box-sizing: border-box;
 
     background: white;
@@ -352,7 +355,7 @@ input:focus, textarea:focus{
     overflow: scroll;
 }
 
-.dashboard-header {
+.listings-header {
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -362,22 +365,22 @@ input:focus, textarea:focus{
     padding: 0 5px;
 }
 
-.dashboard-header-left {
+.listings-header-left {
     display: flex;
     align-items: center;
     gap: 2rem;
 }
 
-.dashboard-header-left h4 {
+.listings-header-left h4 {
     color: var(--grey-dark);
 }
 
-.dashboard-header-left-text {
+.listings-header-left-text {
     display: flex;
     gap: 0.75rem;
 }
 
-.dashboard-view {
+.listings-view {
     position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -390,7 +393,7 @@ input:focus, textarea:focus{
     padding: 0;
 }
 
-.dashboard-view-background {
+.listings-view-background {
     position: absolute;
     display: flex;
     width: 50%;
@@ -407,7 +410,7 @@ input:focus, textarea:focus{
     justify-self: flex-end;
 }
 
-.dashboard-view-label {
+.listings-view-label {
     z-index: 2;
     justify-self: center;
     display: flex;
@@ -429,7 +432,7 @@ input:focus, textarea:focus{
     color: var(--grey-dark);
 }
 
-.dashboard-header-buttons-wrapper {
+.listings-header-buttons-wrapper {
     display: flex;
     gap: 1rem;
 }
@@ -473,7 +476,7 @@ input:focus, textarea:focus{
     opacity: 0.7;
 }
 
-.dashboard-header-buttons-wrapper .create-btn {
+.listings-header-buttons-wrapper .create-btn {
     height: 35px;
     width: 100px;
     background: var(--primary);
@@ -605,14 +608,14 @@ td {
     font-size: 20px;
 }
 
-.dashboard-map {
+.listings-map {
     position: relative;
     height: 100%;
     width: 100%;
     border-radius: 10px;
 }
 
-.dashboard-map div {
+.listings-map div {
     border-radius: 10px;
 }
 
@@ -625,7 +628,7 @@ td {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    height: 85vh;
+    height: auto;
     width: 85vw;
     margin: 1rem auto;
     padding: 1rem;
@@ -661,6 +664,7 @@ td {
     flex-wrap: wrap;
     width: 100%;
     justify-content: center;
+    padding-bottom: 1rem;
 }
 
 .create-wrapper form {
@@ -936,7 +940,7 @@ label {
 }
 
 .listing-view-wrapper {
-    height: 100%;
+    height: auto;
     width: 100%;
     max-width: 85vw;
     margin: 0 auto;
@@ -954,6 +958,7 @@ label {
 .listing-view-header {
     z-index: 500;
     position: fixed;
+    top: 0;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -965,6 +970,7 @@ label {
     margin: 0 auto;
     padding: 0 1rem;
     background: white;
+    border-bottom: 1px solid var(--grey-light);
 }
 
 .listing-view-back {
