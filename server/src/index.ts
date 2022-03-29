@@ -70,33 +70,24 @@ import fetch from "node-fetch"
         return res.send({ok: true, accessToken: createAccessToken(user)})
     })
 
-    app.post("/auth/google/silent-refresh", async (req, _res) =>{
-        const {gRefreshToken, gExpirationDate} = req.cookies;
+    app.post("/auth/google/silent-refresh", async (req, res) =>{
+        const {gAccessToken, gRefreshToken, gExpirationDate} = req.cookies;
       
-        const checkToken = await getGToken(gRefreshToken, gExpirationDate)
-        console.log(checkToken)
-        // if(checkToken){ 
-        //     const gAccessToken = checkToken.gAccessToken
-        //     const gRefreshToken = checkToken.gRefreshToken
-        //     const newExpirationDate = () => {
-        //         let expiration = new Date();
-        //         expiration.setHours(expiration.getHours() + 1);
-        //         return expiration;
-        //     };
-      
-        //     res.cookie('gRefreshToken', gRefreshToken, {
-        //         httpOnly: true
-        //     });
+        const checkTokenExpired = await getGToken(gRefreshToken, gExpirationDate)
 
-        //     res.cookie('gExpirationDate', newExpirationDate().toDateString(), {
-        //         httpOnly: true
-        //     })
+        if(checkTokenExpired){ 
+            const newGAccessToken = checkTokenExpired.access_token
+            const newGExpirationDate = checkTokenExpired.newGExpirationDate
+
+            res.cookie('gExpirationDate', newGExpirationDate, {
+                httpOnly: true
+            })
       
-        //     return res.json(gAccessToken)
-          
-        // }
-        
-        return
+            console.log("Access Token Granted: ", gAccessToken, "Exp date: ", newGExpirationDate)
+            return res.json({gAccessToken: newGAccessToken})
+        }
+        console.log("Token is not yet expired")
+        return res.json({gAccessToken})
       });
 
     const oauth2Client = new google.auth.OAuth2(
@@ -130,10 +121,10 @@ import fetch from "node-fetch"
                 httpOnly: true,
             })
             let expiration = new Date();
-            res.cookie('gExpirationDate', expiration.setHours(expiration.getHours() - 1), {
+            res.cookie('gExpirationDate', expiration.setHours(expiration.getHours() + 1), {
                 httpOnly: true,
             })
-            console.log(token)
+            console.log("New token credentials granted: ", token)
             res.redirect("http://localhost:3000/dashboard/")
         })
         

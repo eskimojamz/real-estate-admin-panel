@@ -10,6 +10,10 @@ import { SignInButton, useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
 import axios from "axios";
 import GoogleSignin from "../utils/GoogleSignIn";
 import { getGToken } from "../utils/gTokens";
+import FullCalendar from "@fullcalendar/react";
+import listPlugin from '@fullcalendar/list';
+import dayGridPlugin from '@fullcalendar/daygrid'
+import '../utils/fullCalendar/fullCalendar.css'
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate()
@@ -153,38 +157,30 @@ const Dashboard: React.FC = () => {
             throw new Error(error.message);
         }
     }
+    
+    // const handleTokenFromQueryParams = () => {
+    //     console.log(query)
+    //     const expirationDate = newExpirationDate();
+    //     console.log("App.js 30 | expiration Date", expirationDate);
+    //     console.log(accessToken)
+    //     console.log(refreshToken)
+    //     if (accessToken && refreshToken) {
+    //         storeTokenData(accessToken, refreshToken, expirationDate)
+    //     }
+    // }
 
-    let {search} = useLocation()
+    // const newExpirationDate = () => {
+    //     var expiration = new Date();
+    //     expiration.setHours(expiration.getHours() + 1);
+    //     return expiration;
+    // };
     
-    const query = useMemo(() => new URLSearchParams(search), [search])
-    const accessToken = query.get("accessToken");
-    const refreshToken = query.get("refreshToken");
-    console.log(accessToken)
-    console.log(refreshToken)
-    
-    const handleTokenFromQueryParams = () => {
-        console.log(query)
-        const expirationDate = newExpirationDate();
-        console.log("App.js 30 | expiration Date", expirationDate);
-        console.log(accessToken)
-        console.log(refreshToken)
-        if (accessToken && refreshToken) {
-            storeTokenData(accessToken, refreshToken, expirationDate)
-        }
-    }
-
-    const newExpirationDate = () => {
-        var expiration = new Date();
-        expiration.setHours(expiration.getHours() + 1);
-        return expiration;
-    };
-    
-    const storeTokenData = (accessToken: string, refreshToken: string, expirationDate: Date) => {
-        localStorage.setItem("gAccessToken", accessToken);
-        localStorage.setItem("gRefreshToken", refreshToken);
-        localStorage.setItem("gExpirationDate", expirationDate.toDateString());
-        console.log(accessToken, refreshToken)
-    };
+    // const storeTokenData = (accessToken: string, refreshToken: string, expirationDate: Date) => {
+    //     localStorage.setItem("gAccessToken", accessToken);
+    //     localStorage.setItem("gRefreshToken", refreshToken);
+    //     localStorage.setItem("gExpirationDate", expirationDate.toDateString());
+    //     console.log(accessToken, refreshToken)
+    // };
     
     const signOut = () => {
         localStorage.removeItem("gAccessToken")
@@ -193,40 +189,85 @@ const Dashboard: React.FC = () => {
         navigate("/dashboard")
     };
 
+    const [calendars, setCalendars] = useState<any[] | null>()
+    const [calendarId, setCalendarId] = useState<string | null>()
+    const [calendarEvents, setCalendarEvents] = useState<any[] | null>()
+
     const getGCalendarsList = async () => {
         try {
-            const token = await getGToken();
-            const request = await fetch(
-                `https://www.googleapis.com/calendar/v3/users/me/calendarList`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-      
-            const data = await request.json();
-            console.log("googleCalendar.js 24 | got calendar events", data);
-            return data;
+            await axios.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
+                .then(res => {
+                    console.log(res.data.items)
+                    const calendarsRef: any[] = []
+                    res.data.items.map((cal: { id: string, summary: string }) => {
+                        calendarsRef.push({id: cal.id, name: cal.summary})
+                    })
+                    setCalendars(calendarsRef)
+                })
         } catch (error:any) {
-            console.log("googleCalendar.js 35 | error getting calendar data", error);
+            console.log("Error getting calendar data", error);
             return error.message;
         }
     };
 
-    const tokensLoaded = useRef(false)
+    const chooseCalendar = async (id: string) => {
+        try {
+            // const date = new Date()
+            // const minDate = new Date(date.setMonth(date.getMonth() - 6)).toISOString()
+            // const maxDate = new Date(date.setMonth(date.getMonth() + 6)).toISOString()
+            const minDate = new Date()
+            minDate.setDate(minDate.getDate() - 180)
+            const maxDate = new Date()
+            maxDate.setDate(maxDate.getDate() + 180)
+
+            await axios.get(`https://www.googleapis.com/calendar/v3/calendars/${id}/events`, {
+                params: {
+                    orderBy: 'startTime',
+                    singleEvents: true,
+                    timeMin: minDate.toISOString(),
+                    timeMax: maxDate.toISOString(),
+                }
+            }).then(res => {
+                console.log(res.data.items)
+                const gCalItems = res.data.items
+                const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
+                gCalItems.map((item:any) => {
+                    calItemsRef.push({
+                        id: item.id,
+                        title: item.summary,
+                        start: item.start.date,
+                        end: item.start.date,
+                        startTime: item.start.datetime,
+                        endTime: item.end.dateTime,
+                        extendedProps: {
+                            description: item.description,
+                            location: item.location
+                        },
+                        url: item.htmlLink
+                    })
+                })
+                console.log(calItemsRef)
+                setCalendarEvents(calItemsRef)
+            })
+        } catch (error:any) {
+            console.log("Error getting calendar events")
+            return error.message
+        }
+    }
     
     useEffect(() => {
         axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
             withCredentials:true
-        }).then(res => {
-            console.log(res);
-            const {gAccessToken} = res.data;
-            console.log(gAccessToken);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        }).then((res) => {
+            const {gAccessToken} = res.data
+            console.log(gAccessToken)
+            axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`;    
+        }).then(() => {
+            getGCalendarsList()
+        }).then(() => {
             setIsGLoggedIn(true)
-        });
-    }, []);
+        })
+    }, [])
 
     // useMemo(() => {
     //     if (localStorage.getItem("accessToken")) {
@@ -291,74 +332,120 @@ const Dashboard: React.FC = () => {
                         <motion.div className="dashboard-info-card">
                         {isGLoggedIn ? (
                             <>
-                            <button onClick={() => getGCalendarsList()}>Get Calendars</button>
-                            <button onClick={signOut}>Sign Out</button>
+                            
+                            {calendarEvents ?
+                                
+                            <>
+                                <div className="calendar-events-header">
+                                    <h5>Calendar Events</h5>
+                                </div>
+                                <FullCalendar 
+                                    plugins={[ listPlugin, dayGridPlugin ]}
+                                    initialView="list"
+                                    events={calendarEvents}
+                                    height='100%'
+                                    headerToolbar={false}
+                                    // visibleRange={(currentDate) => {
+                                    //     console.log(currentDate)
+                                    //     const startDate = new Date(currentDate.valueOf());
+                                    //     const endDate = new Date(currentDate.valueOf());
+                                    //     // Adjust the start & end dates, respectively
+                                    //     startDate.setDate(startDate.getDate() - 1); // One day in the past
+                                    //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
+                                    //     console.log(startDate, endDate)
+                                    //     return {start: startDate, end: endDate}
+                                    // }}
+                                    duration={{'days': 180}}
+                                    eventClick={(info) => {
+                                        info.jsEvent.preventDefault(); // don't let the browser navigate
+                                        // open event link in new window
+                                        if (info.event.url) {
+                                          window.open(info.event.url);
+                                        }
+                                      }
+                                    }
+                                />
+                            </>
+                            :
+                            <>
+                            <h6>Choose a calendar:</h6>
+                            <ul>
+                                {calendars?.map((cal: { id: string, name: string }) => {
+                                    return <li><button onClick={() => chooseCalendar(cal.id)}>{cal.name}</button></li>
+                                })}
+                            </ul>
+                            </>
+                            }
                             </>
                         ): 
                         <button onClick={googleAuth}>Sign In</button>
                         }
                         </motion.div>
+
+                        <motion.div className="dashboard-info-card">
+
+                        </motion.div>
                     </motion.div>
-                <motion.div className="dashboard-row-bottom">
-                    <motion.div className="dashboard-info-card">
-                        {dashboardListings && 
-                        <>
-                        <div className="recent-listings-header">
-                            <div className="recent-listings-header-hidden" />
-                            <h5>RECENT LISTINGS</h5>
-                            <button className="recent-listings-header-btn">
-                                View All
-                            </button>
-                        </div>
-                        <table>
-                        <thead>
-                            <tr className="thead-row">
-                                <th></th>
-                                <th>ADDRESS</th>
-                                <th>PRICE</th>
-                                <th>BEDS</th>
-                                <th>BATHS</th>
-                                <th>STATUS</th>
-                                <th>AREA</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            {dashboardListings && dashboardListings?.map((listing:any) => {
-                                const listingId = listing?.id
-            
-                                return (
-                                <>
-                                <tr id={listingId} onClick={() => navigate(`/listings/${listingId}`)}>
-                                    <td><img src={listing.image1}/></td>
-                                    <td>
-                                        <p className="address1">{listing.address1}</p>
-                                        <p className="address2">{listing.address2}</p>
-                                    </td>
-                                    <td>
-                                        <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
-                                    </td>
-                                    <td>
-                                        <p className="td-p-bold">{listing.beds}</p>
-                                    </td>
-                                    <td>
-                                        <p className="td-p-bold">{listing.baths}</p>
-                                    </td>
-                                    <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
-                                    <td><p className="td-p-bold">{listing.area}</p></td>
+                    <motion.div className="dashboard-row-bottom">
+                        <motion.div className="dashboard-info-card">
+                            {dashboardListings && 
+                            <>
+                            <div className="recent-listings-header">
+                                <div className="recent-listings-header-hidden" />
+                                <h5>RECENT LISTINGS</h5>
+                                <button className="recent-listings-header-btn">
+                                    View All
+                                </button>
+                            </div>
+                            <table>
+                            <thead>
+                                <tr className="thead-row">
+                                    <th></th>
+                                    <th>ADDRESS</th>
+                                    <th>PRICE</th>
+                                    <th>BEDS</th>
+                                    <th>BATHS</th>
+                                    <th>STATUS</th>
+                                    <th>AREA</th>
                                 </tr>
-                                </>
-                                )
-                            })}
-                        </tbody>
-                        </table>
-                        </>
-                        }
-                    </motion.div>
-                    <motion.div className="dashboard-info-card">
+                            </thead>
                             
+                            <tbody>
+                                {dashboardListings && dashboardListings?.map((listing:any) => {
+                                    const listingId = listing?.id
+                
+                                    return (
+                                    <>
+                                    <tr id={listingId} onClick={() => navigate(`/listings/${listingId}`)}>
+                                        <td><img src={listing.image1}/></td>
+                                        <td>
+                                            <p className="address1">{listing.address1}</p>
+                                            <p className="address2">{listing.address2}</p>
+                                        </td>
+                                        <td>
+                                            <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
+                                        </td>
+                                        <td>
+                                            <p className="td-p-bold">{listing.beds}</p>
+                                        </td>
+                                        <td>
+                                            <p className="td-p-bold">{listing.baths}</p>
+                                        </td>
+                                        <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
+                                        <td><p className="td-p-bold">{listing.area}</p></td>
+                                    </tr>
+                                    </>
+                                    )
+                                })}
+                            </tbody>
+                            </table>
+                            </>
+                            }
+                        </motion.div>
+                        <motion.div className="dashboard-info-card">
+                                
+                        </motion.div>
                     </motion.div>
-                </motion.div>
                 </motion.div>
             </motion.div>
         </div>

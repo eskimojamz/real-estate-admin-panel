@@ -9,6 +9,12 @@ const tokenExpired = (gExpirationDate: string | number | Date) => {
   
     return false; // valid token
 };
+
+const newExpirationDate = () => {
+    var expiration = new Date()
+    expiration.setHours(expiration.getHours() + 1)
+    return Date.parse(expiration.toDateString())
+};
   
 const getValidTokenFromServer = async (gRefreshToken: string | null) => {
     // get new token from server with refresh token
@@ -31,9 +37,9 @@ const getValidTokenFromServer = async (gRefreshToken: string | null) => {
 
 export const getGToken = async (gRefreshToken: string | null, gExpirationDate: string | number | Date) => {
     if (tokenExpired(gExpirationDate)) {
-        const gToken = await getValidTokenFromServer(gRefreshToken);
-        
-        return gToken
+        const {access_token} = await getValidTokenFromServer(gRefreshToken);
+        const newGExpirationDate = newExpirationDate()
+        return {access_token, newGExpirationDate}
     } else {
         console.log("tokens.js 11 | token not expired");
         return false

@@ -1,0 +1,57 @@
+.fc {
+    height: auto;
+    width: 100%;
+}
+
+.fc table {
+    font-size: 14px !important;
+}
+
+.fc tbody > tr {
+    height: auto !important;
+    border-bottom: none !important;
+}
+
+.fc-list {
+    border: none !important;
+}
+
+.fc-list-day, .fc-list-day > th {
+    border-radius: 5px;
+}
+
+.fc-theme-standard td, .fc-theme-standard th {
+    border: none;
+}
+
+.fc-list-day > * {
+    background-color: var(--blue-light) !important;
+    z-index: 2;
+    border-radius: 5px;
+}
+
+.fc-list-day-cushion {
+    background: none;
+    border-radius: 5px;
+}
+
+.fc .fc-cell-shaded, .fc .fc-day-disabled {
+    background: none;
+}
+
+.fc .fc-list-sticky .fc-list-day > * {
+    background: none;
+}
+
+.fc .fc-list-event-dot {
+    border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid var(--blue-primary);
+}
+
+.fc .fc-list-event.fc-event-forced-url:hover a {
+    text-decoration: none;
+    color: var(--blue-primary);
+}
+
+:visited {
+    color: black;
+}
