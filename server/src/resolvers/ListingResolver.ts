@@ -1,4 +1,4 @@
-import { ArgsType, InputType, ObjectType, Resolver, Query, Mutation, UseMiddleware, Arg, Field } from "type-graphql"
+import { InputType, ObjectType, Resolver, Query, Mutation, UseMiddleware, Arg, Field } from "type-graphql"
 import { Listing } from "../entity/Listings";
 import { isAuth } from "../isAuth";
 import aws from "aws-sdk"
@@ -7,8 +7,6 @@ import aws from "aws-sdk"
 // to-do:
 // - separate @InputType for create and edit
 //   change nullable values
-
-@ArgsType()
 
 @InputType()
 class ListingInput {

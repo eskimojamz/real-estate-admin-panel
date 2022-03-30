@@ -33,12 +33,12 @@ function Sidebar() {
                         Listings
                     </NavLink>
                     <NavLink 
-                        to="/calendar" 
+                        to="/clients" 
                         className={({ isActive }) => 
                             isActive ? "active-navlink" : "navlink"
                         }
                     >
-                        Calendar
+                        Clients
                     </NavLink>
                 </div>
                 <div className="sidebar-bottom">

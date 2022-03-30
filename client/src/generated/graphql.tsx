@@ -71,6 +71,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
+  setDefaultCalendar: User;
   signS3: S3Response;
 };
 
@@ -108,6 +109,12 @@ export type MutationRevokeRefreshTokensForUserArgs = {
 };
 
 
+export type MutationSetDefaultCalendarArgs = {
+  calendarId: Scalars['String'];
+  userId: Scalars['Float'];
+};
+
+
 export type MutationSignS3Args = {
   filename: Scalars['String'];
   filetype: Scalars['String'];
@@ -119,6 +126,7 @@ export type Query = {
   allUsers: Array<User>;
   displayUser?: Maybe<User>;
   getListing?: Maybe<Listing>;
+  getUserDefaultCalendar: User;
 };
 
 
@@ -134,6 +142,7 @@ export type S3Response = {
 
 export type User = {
   __typename?: 'User';
+  defaultCalendarId: Scalars['String'];
   id: Scalars['Int'];
   username: Scalars['String'];
 };
@@ -177,6 +186,11 @@ export type GetListingQueryVariables = Exact<{
 
 export type GetListingQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
+export type GetUserDefaultCalendarQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserDefaultCalendarQuery = { __typename?: 'Query', getUserDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
+
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -197,6 +211,14 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: boolean };
+
+export type SetDefaultCalendarMutationVariables = Exact<{
+  calendarId: Scalars['String'];
+  userId: Scalars['Float'];
+}>;
+
+
+export type SetDefaultCalendarMutation = { __typename?: 'Mutation', setDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
 
 export type SignS3MutationVariables = Exact<{
   filename: Scalars['String'];
@@ -473,6 +495,42 @@ export function useGetListingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type GetListingQueryHookResult = ReturnType<typeof useGetListingQuery>;
 export type GetListingLazyQueryHookResult = ReturnType<typeof useGetListingLazyQuery>;
 export type GetListingQueryResult = Apollo.QueryResult<GetListingQuery, GetListingQueryVariables>;
+export const GetUserDefaultCalendarDocument = gql`
+    query GetUserDefaultCalendar {
+  getUserDefaultCalendar {
+    id
+    username
+    defaultCalendarId
+  }
+}
+    `;
+
+/**
+ * __useGetUserDefaultCalendarQuery__
+ *
+ * To run a query within a React component, call `useGetUserDefaultCalendarQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserDefaultCalendarQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserDefaultCalendarQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserDefaultCalendarQuery(baseOptions?: Apollo.QueryHookOptions<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>(GetUserDefaultCalendarDocument, options);
+      }
+export function useGetUserDefaultCalendarLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>(GetUserDefaultCalendarDocument, options);
+        }
+export type GetUserDefaultCalendarQueryHookResult = ReturnType<typeof useGetUserDefaultCalendarQuery>;
+export type GetUserDefaultCalendarLazyQueryHookResult = ReturnType<typeof useGetUserDefaultCalendarLazyQuery>;
+export type GetUserDefaultCalendarQueryResult = Apollo.QueryResult<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
@@ -573,6 +631,42 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SetDefaultCalendarDocument = gql`
+    mutation SetDefaultCalendar($calendarId: String!, $userId: Float!) {
+  setDefaultCalendar(calendarId: $calendarId, userId: $userId) {
+    id
+    username
+    defaultCalendarId
+  }
+}
+    `;
+export type SetDefaultCalendarMutationFn = Apollo.MutationFunction<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>;
+
+/**
+ * __useSetDefaultCalendarMutation__
+ *
+ * To run a mutation, you first call `useSetDefaultCalendarMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetDefaultCalendarMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setDefaultCalendarMutation, { data, loading, error }] = useSetDefaultCalendarMutation({
+ *   variables: {
+ *      calendarId: // value for 'calendarId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useSetDefaultCalendarMutation(baseOptions?: Apollo.MutationHookOptions<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>(SetDefaultCalendarDocument, options);
+      }
+export type SetDefaultCalendarMutationHookResult = ReturnType<typeof useSetDefaultCalendarMutation>;
+export type SetDefaultCalendarMutationResult = Apollo.MutationResult<SetDefaultCalendarMutation>;
+export type SetDefaultCalendarMutationOptions = Apollo.BaseMutationOptions<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>;
 export const SignS3Document = gql`
     mutation SignS3($filename: String!, $filetype: String!) {
   signS3(filename: $filename, filetype: $filetype) {

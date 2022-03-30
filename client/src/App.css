@@ -339,6 +339,12 @@ input:focus, textarea:focus{
     font-size: 11px;
 }
 
+.dashboard-wrapper-ml {
+    height: 100%;
+    width: 100%;
+    margin-left: 150px;
+}
+
 .dashboard-wrapper {
     height: 100%;
     width: 100%;
@@ -346,21 +352,27 @@ input:focus, textarea:focus{
     margin: 0 auto;
     box-sizing: border-box;
 
-    background: white;
+    background: var(--bg);
     border-radius: 15px;
 
     display: flex;
     flex-direction: column;
-    padding: 0 1rem 1rem 1rem;
+    padding: 1rem;
     overflow: scroll;
 }
 
 .dashboard-header {
     display: flex;
-    align-items: center;
-    height: 50px;
+    align-items: flex-start;
+    height: auto;
     width: 100%;
     padding: 0 5px;
+    margin-bottom: 1rem;
+}
+
+.dashboard-header h3 {
+    margin: 0;
+    color: black;
 }
 
 .dashboard-body {
@@ -392,17 +404,25 @@ input:focus, textarea:focus{
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    background: var(--grey-superlight);
+    background: white;
     border-radius: 10px;
-    padding: 0.5rem 0.5rem;
+    padding: 1rem;
     overflow: scroll;
 }
 
-.piechart-title h5 {
-    margin: 0;
-    color: var(--grey-dark);
+.dashboard-card-header {
+    height: 30px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card-header h4 {
+    color: black;
+    margin: 0 auto 0.5rem 0;
 }
 
 .piechart-active-listings {
@@ -463,27 +483,74 @@ input:focus, textarea:focus{
     margin-bottom: 0.5rem;
 }
 
-.calendar-events-header h5 {
+.calendar-events-header h4 {
     color: black;
-    margin: 0 auto;
+    margin: 0 auto 0.5rem 0;
 }
 
-.recent-listings-header-hidden {
-    visibility: hidden;
-    height: 30px;
-    width: 75px;
+.calendar-events {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+}
+
+.calendar-events h6 {
     margin: 0 auto 0 0;
 }
 
-.recent-listings-header {
-    height: 30px;
-    width: 100%;
+.calendar-events ul {
     display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    gap: 1px;
+    list-style: none;
+    padding-inline-start: 0;
+    width: 100%;
+    padding: 0;
+    border-radius: 10px;
+    background-color: var(--grey-light);
 }
 
-.recent-listings-header-btn {
+.calendar-events li {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 35.5px;
+    padding: 1rem;
+    font-size: 13px;
+    font-weight: 400;
+    background-color: var(--grey-superlight);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.calendar-events li > span {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.calendar-events li:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.calendar-events li:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.calendar-events li:hover {
+    background-color: var(--blue-light);
+}
+
+.dashboard-header-mb-0 {
+    margin-bottom: 0;
+}
+
+/* .recent-listings-header-btn {
     height: 30px;
     width: 75px;
     border-radius: 5px;
@@ -491,15 +558,10 @@ input:focus, textarea:focus{
     background: var(--blue-primary);
     color: white;
     margin: 0 0 0 auto;
-}
-
-.recent-listings-header h5{
-    margin: 0;
-    color: black;
-}
+} */
 
 .dashboard-body table, .dashboard-body table > thead {
-    background-color: var(--grey-superlight) !important;
+    background-color: white !important;
     box-shadow: none !important;
     width: 100%;
 }

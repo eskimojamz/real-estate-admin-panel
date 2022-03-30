@@ -1,0 +1,7 @@
+query GetUserDefaultCalendar {
+  getUserDefaultCalendar {
+    id
+    username
+    defaultCalendarId
+  }
+}

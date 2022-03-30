@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-import { useAllListingsQuery } from "../generated/graphql"
+import { useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
 import { Doughnut, Pie } from "react-chartjs-2"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -14,6 +14,29 @@ import FullCalendar from "@fullcalendar/react";
 import listPlugin from '@fullcalendar/list';
 import dayGridPlugin from '@fullcalendar/daygrid'
 import '../utils/fullCalendar/fullCalendar.css'
+import GoogleMap from "google-map-react"
+import Geocode from "react-geocode"
+
+interface MapMarkerProps {
+    listingId: string;
+    lat: number;
+    lng: number;
+}
+
+const MapMarker: React.FC<MapMarkerProps> = ({listingId}) => {
+    const navigate = useNavigate()
+    console.log(listingId)
+    return (
+        <>
+        <motion.div className="map-marker" 
+            onClick={() => navigate(`/listings/${listingId}`)}
+            initial={{scale: 0, opacity:0}}
+            animate={{scale: 1, opacity:1}}
+            transition={{type: 'spring', damping:5, delay: 0.5}}
+        />
+        </>
+    )
+}
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate()
@@ -142,7 +165,7 @@ const Dashboard: React.FC = () => {
     const [showAuthButton, setShowAuthButton] = useState(true)
     const [showSignOutButton, setShowSignOutButton] = useState(false)
     
-    const [isGLoggedIn, setIsGLoggedIn] = useState(false) 
+    const [isGLoggedIn, setIsGLoggedIn] = useState<boolean | null | undefined>(null) 
     
     const googleAuth = async () => {
         try {
@@ -190,8 +213,19 @@ const Dashboard: React.FC = () => {
     };
 
     const [calendars, setCalendars] = useState<any[] | null>()
-    const [calendarId, setCalendarId] = useState<string | null>()
+    const {data: getCalendarData, loading: calendarIdLoading} = useGetUserDefaultCalendarQuery({
+        onError: (error) => console.log(error)
+    }) 
+    const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
     const [calendarEvents, setCalendarEvents] = useState<any[] | null>()
+    const [setDefaultCalendar] = useSetDefaultCalendarMutation({
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+    const {data: userData} = useDisplayUserQuery({
+        onError: (error) => console.log(error)
+    })
 
     const getGCalendarsList = async () => {
         try {
@@ -199,8 +233,8 @@ const Dashboard: React.FC = () => {
                 .then(res => {
                     console.log(res.data.items)
                     const calendarsRef: any[] = []
-                    res.data.items.map((cal: { id: string, summary: string }) => {
-                        calendarsRef.push({id: cal.id, name: cal.summary})
+                    res.data.items.map((cal: { id: string, summary: string, backgroundColor:string }) => {
+                        calendarsRef.push({id: cal.id, name: cal.summary, color: cal.backgroundColor})
                     })
                     setCalendars(calendarsRef)
                 })
@@ -210,50 +244,44 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    const chooseCalendar = async (id: string) => {
-        try {
-            // const date = new Date()
-            // const minDate = new Date(date.setMonth(date.getMonth() - 6)).toISOString()
-            // const maxDate = new Date(date.setMonth(date.getMonth() + 6)).toISOString()
-            const minDate = new Date()
-            minDate.setDate(minDate.getDate() - 180)
-            const maxDate = new Date()
-            maxDate.setDate(maxDate.getDate() + 180)
-
-            await axios.get(`https://www.googleapis.com/calendar/v3/calendars/${id}/events`, {
-                params: {
-                    orderBy: 'startTime',
-                    singleEvents: true,
-                    timeMin: minDate.toISOString(),
-                    timeMax: maxDate.toISOString(),
-                }
-            }).then(res => {
-                console.log(res.data.items)
-                const gCalItems = res.data.items
-                const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
-                gCalItems.map((item:any) => {
-                    calItemsRef.push({
-                        id: item.id,
-                        title: item.summary,
-                        start: item.start.date,
-                        end: item.start.date,
-                        startTime: item.start.datetime,
-                        endTime: item.end.dateTime,
-                        extendedProps: {
-                            description: item.description,
-                            location: item.location
-                        },
-                        url: item.htmlLink
-                    })
-                })
-                console.log(calItemsRef)
-                setCalendarEvents(calItemsRef)
-            })
-        } catch (error:any) {
-            console.log("Error getting calendar events")
-            return error.message
-        }
+    // choose default calendar on first usage
+    const chooseCalendar = async (calId: string) => {
+        await setDefaultCalendar({
+            variables: {
+                calendarId: calId,
+                userId: userData?.displayUser?.id!
+            }
+        })
     }
+
+    // set Google Maps Geocoding API
+    Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
+    Geocode.setLanguage("en");
+    Geocode.setRegion("us");
+
+    const [mapMarkers, setMapMarkers] = useState<any[]>([])
+    console.log(mapMarkers)
+    console.log(allListingsData?.allListings)
+
+    useEffect(() => {
+        if (allListingsData) {
+            // map coordinates and set map markers
+            allListingsData?.allListings.map((listing: { id: string; address1: string; address2: string; }) => {
+                const address:string = listing.address1 + listing.address2
+                return (
+                    Geocode.fromAddress(address).then(
+                        (response) => {
+                            const { lat, lng } = response.results[0].geometry.location;
+                            setMapMarkers((mapMarkers: any) => [...mapMarkers, <MapMarker listingId={listing.id} lat={lat} lng={lng}/>])
+                        },
+                        (error) => {
+                            console.error(error);
+                        }
+                    )
+                )
+            })
+        }
+    }, [allListingsData])
     
     useEffect(() => {
         axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
@@ -263,23 +291,65 @@ const Dashboard: React.FC = () => {
             console.log(gAccessToken)
             axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`;    
         }).then(() => {
-            getGCalendarsList()
+            if (!calendarId){
+                getGCalendarsList()
+            }
         }).then(() => {
             setIsGLoggedIn(true)
         })
     }, [])
 
-    // useMemo(() => {
-    //     if (localStorage.getItem("accessToken")) {
-    //         getGCalendarsList().then((data) => {
-    //             console.log(data)
-    //         }) 
-    //     }
-    // }, [accessToken])
+    useMemo(async() => {
+        if (getCalendarData){
+            try {
 
+                const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
+                
+                // set time range for g calendar events fetch
+                const minDate = new Date()
+                minDate.setDate(minDate.getDate() - 180)
+                const maxDate = new Date()
+                maxDate.setDate(maxDate.getDate() + 180)
+
+                await axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+                    params: {
+                        orderBy: 'startTime',
+                        singleEvents: true,
+                        timeMin: minDate.toISOString(),
+                        timeMax: maxDate.toISOString(),
+                    }
+                }).then(res => {
+                    console.log(res.data.items)
+                    const gCalItems = res.data.items
+                    gCalItems.map((item:any) => {
+                        calItemsRef.push({
+                            id: item.id,
+                            title: item.summary,
+                            start: item.start.date,
+                            end: item.start.date,
+                            startTime: item.start.datetime,
+                            endTime: item.end.dateTime,
+                            extendedProps: {
+                                description: item.description,
+                                location: item.location
+                            },
+                            url: item.htmlLink
+                        })
+                    })
+                    console.log(calItemsRef)
+                    setCalendarEvents(calItemsRef)
+                })
+            } catch (error:any) {
+                console.log("Error getting calendar events")
+                return error.message
+            }
+        }
+    }, [getCalendarData, chooseCalendar])
+
+    // all component variables loaded ? else { skeletonloading...}
     return (
         <>
-        <div className="wrapper">
+        <div className="dashboard-wrapper-ml">
             <motion.div className="dashboard-wrapper">
                 <motion.div className="dashboard-header">
                     <h3>Dashboard</h3>
@@ -288,8 +358,8 @@ const Dashboard: React.FC = () => {
                     <motion.div className="dashboard-row-top">
                         <motion.div className="dashboard-info-card">
                             <AnimatePresence>
-                            <div className="piechart-title">
-                                <h5>ACTIVE LISTINGS</h5>
+                            <div className="dashboard-card-header">
+                                <h4>Active Listings</h4>
                             </div>
                             <motion.div className="piechart-active-listings"
                                 initial={{opacity: 0}}
@@ -330,72 +400,84 @@ const Dashboard: React.FC = () => {
                         </motion.div>
 
                         <motion.div className="dashboard-info-card">
-                        {isGLoggedIn ? (
-                            <>
-                            
-                            {calendarEvents ?
-                                
-                            <>
-                                <div className="calendar-events-header">
-                                    <h5>Calendar Events</h5>
-                                </div>
-                                <FullCalendar 
-                                    plugins={[ listPlugin, dayGridPlugin ]}
-                                    initialView="list"
-                                    events={calendarEvents}
-                                    height='100%'
-                                    headerToolbar={false}
-                                    // visibleRange={(currentDate) => {
-                                    //     console.log(currentDate)
-                                    //     const startDate = new Date(currentDate.valueOf());
-                                    //     const endDate = new Date(currentDate.valueOf());
-                                    //     // Adjust the start & end dates, respectively
-                                    //     startDate.setDate(startDate.getDate() - 1); // One day in the past
-                                    //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
-                                    //     console.log(startDate, endDate)
-                                    //     return {start: startDate, end: endDate}
-                                    // }}
-                                    duration={{'days': 180}}
-                                    eventClick={(info) => {
-                                        info.jsEvent.preventDefault(); // don't let the browser navigate
-                                        // open event link in new window
-                                        if (info.event.url) {
-                                          window.open(info.event.url);
+                            <div className="dashboard-card-header">
+                                <h4>Calendar Events</h4>
+                            </div>
+                            <div className="calendar-events">
+                            {isGLoggedIn ? (
+                                calendarEvents && calendarId ?
+                                    <>
+                                    <FullCalendar 
+                                        plugins={[ listPlugin, dayGridPlugin ]}
+                                        initialView="list"
+                                        events={calendarEvents}
+                                        height='100%'
+                                        headerToolbar={false}
+                                        // visibleRange={(currentDate) => {
+                                        //     console.log(currentDate)
+                                        //     const startDate = new Date(currentDate.valueOf());
+                                        //     const endDate = new Date(currentDate.valueOf());
+                                        //     // Adjust the start & end dates, respectively
+                                        //     startDate.setDate(startDate.getDate() - 1); // One day in the past
+                                        //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
+                                        //     console.log(startDate, endDate)
+                                        //     return {start: startDate, end: endDate}
+                                        // }}
+                                        duration={{'days': 180}}
+                                        eventClick={(info) => {
+                                            info.jsEvent.preventDefault(); // don't let the browser navigate
+                                            // open event link in new window
+                                            if (info.event.url) {
+                                            window.open(info.event.url);
+                                            }
                                         }
-                                      }
-                                    }
-                                />
-                            </>
-                            :
-                            <>
-                            <h6>Choose a calendar:</h6>
-                            <ul>
-                                {calendars?.map((cal: { id: string, name: string }) => {
-                                    return <li><button onClick={() => chooseCalendar(cal.id)}>{cal.name}</button></li>
-                                })}
-                            </ul>
-                            </>
+                                        }
+                                    />
+                                    </>
+                                : !calendarIdLoading && !calendarId ?
+                                    <>
+                                    <h6>Choose a calendar:</h6>
+                                    <ul>
+                                    {calendars?.map((cal: { id: string, name: string, color:string }) => {
+                                        return <li onClick={() => chooseCalendar(cal.id)}><span style={{backgroundColor: `${cal.color}`}}></span>{cal.name}</li>
+                                    })}
+                                    </ul>
+                                    </>
+                                : null // skeleton loading?
+                                )
+                            : isGLoggedIn === null ?
+                                null // skeleton loading?
+                                : <button className="calendar-events-g-login-btn" onClick={googleAuth}>Sign In</button>
                             }
-                            </>
-                        ): 
-                        <button onClick={googleAuth}>Sign In</button>
-                        }
+                            </div>
                         </motion.div>
 
                         <motion.div className="dashboard-info-card">
-
+                            <div className="dashboard-card-header">
+                                <h4>Listings Map</h4>
+                            </div>
+                            <div className="listings-map">
+                                <GoogleMap
+                                    bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
+                                    center={{lat: 40.7366, lng: -73.8200}}
+                                    defaultZoom={10}
+                                    options={{
+                                        fullscreenControl: false,
+                                        scrollwheel: true,
+                                        zoomControl: false,
+                                    }}
+                                >
+                                    {mapMarkers}
+                                </GoogleMap>
+                            </div>
                         </motion.div>
                     </motion.div>
                     <motion.div className="dashboard-row-bottom">
                         <motion.div className="dashboard-info-card">
                             {dashboardListings && 
                             <>
-                            <div className="recent-listings-header">
-                                <div className="recent-listings-header-hidden" />
-                                <h5>RECENT LISTINGS</h5>
-                                <button className="recent-listings-header-btn">
-                                    View All
-                                </button>
+                            <div className="dashboard-card-header dashboard-header-mb-0">
+                                <h4>Recent Listings</h4>
                             </div>
                             <table>
                             <thead>

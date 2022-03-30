@@ -129,6 +129,7 @@ const Map:React.FC<Props> = ({listings}) => {
                 Geocode.fromAddress(address).then(
                     (response) => {
                         const { lat, lng } = response.results[0].geometry.location;
+                        // {lat, lng} are google-map-react component props
                         setMapMarkers((mapMarkers: any) => [...mapMarkers, <MapMarker listingId={listing.id} lat={lat} lng={lng} setCurrentMapListing={setCurrentMapListing}/>])
                     },
                     (error) => {
@@ -145,6 +146,10 @@ const Map:React.FC<Props> = ({listings}) => {
                 bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
                 center={{lat: 40.7427, lng: -73.8524}}
                 defaultZoom={12}
+                options={{
+                    fullscreenControl: false,
+                    scrollwheel: true,
+                }}
             >
                 {mapMarkers}
             </GoogleMap>

@@ -26,6 +26,7 @@
 
 .fc-list-day > * {
     background-color: var(--blue-light) !important;
+    color: black;
     z-index: 2;
     border-radius: 5px;
 }
