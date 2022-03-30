@@ -72,7 +72,14 @@ import fetch from "node-fetch"
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{
         const {gAccessToken, gRefreshToken, gExpirationDate} = req.cookies;
-      
+        console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
+        
+        // Refresh token was cleared (on logout), so no credentials get sent to client
+        if (!gRefreshToken) {
+            return res.send('G User must log in. Refresh token does not exist.')
+        }
+
+        // Access token expired with valid refresh token, grant new access token + exp date
         const checkTokenExpired = await getGToken(gRefreshToken, gExpirationDate)
 
         if(checkTokenExpired){ 
@@ -82,8 +89,7 @@ import fetch from "node-fetch"
             res.cookie('gExpirationDate', newGExpirationDate, {
                 httpOnly: true
             })
-      
-            console.log("Access Token Granted: ", gAccessToken, "Exp date: ", newGExpirationDate)
+
             return res.json({gAccessToken: newGAccessToken})
         }
         console.log("Token is not yet expired")
@@ -99,7 +105,7 @@ import fetch from "node-fetch"
     app.post("/auth/google", (_req, res) => {
         const url = oauth2Client.generateAuthUrl({
             access_type: "offline",
-            scope: ["https://www.googleapis.com/auth/calendar"],
+            scope: ["https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/contacts"],
             prompt: "consent",
         })
         res.send({ url })
@@ -134,6 +140,21 @@ import fetch from "node-fetch"
             
 
             
+    })
+
+    app.get("/auth/google/logout", (_req, res) => {
+        // clear token credential cookies
+        res.clearCookie('gAccessToken', {
+            httpOnly: true,
+        })
+        res.clearCookie('gRefreshToken', {
+            httpOnly: true,
+        })
+        res.clearCookie('gExpirationDate', {
+            httpOnly: true,
+        })
+        res.send('User logged out of G services, credentials cleared.')
+        res.redirect("http://localhost:3000/dashboard/")
     })
 
     app.post("/getValidToken", async(req, res) => {

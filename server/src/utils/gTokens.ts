@@ -41,7 +41,7 @@ export const getGToken = async (gRefreshToken: string | null, gExpirationDate: s
         const newGExpirationDate = newExpirationDate()
         return {access_token, newGExpirationDate}
     } else {
-        console.log("tokens.js 11 | token not expired");
+        console.log("token not expired");
         return false
     }
 };

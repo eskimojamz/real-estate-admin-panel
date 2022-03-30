@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-import { useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
+import { GetUserDefaultCalendarDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
 import { Doughnut, Pie } from "react-chartjs-2"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -25,7 +25,6 @@ interface MapMarkerProps {
 
 const MapMarker: React.FC<MapMarkerProps> = ({listingId}) => {
     const navigate = useNavigate()
-    console.log(listingId)
     return (
         <>
         <motion.div className="map-marker" 
@@ -205,11 +204,16 @@ const Dashboard: React.FC = () => {
     //     console.log(accessToken, refreshToken)
     // };
     
-    const signOut = () => {
-        localStorage.removeItem("gAccessToken")
-        localStorage.removeItem("gRefreshToken")
-        localStorage.removeItem("gExpirationDate")
-        navigate("/dashboard")
+    const gLogOut = async() => {
+        await axios.get("http://localhost:4000/auth/google/logout", {
+            withCredentials: true
+        }).then(() => {
+            setIsGLoggedIn(false)
+            console.log(isGLoggedIn)
+        }).catch(err => {
+            console.log(err)
+            throw new Error(err)
+        })
     };
 
     const [calendars, setCalendars] = useState<any[] | null>()
@@ -250,7 +254,8 @@ const Dashboard: React.FC = () => {
             variables: {
                 calendarId: calId,
                 userId: userData?.displayUser?.id!
-            }
+            },
+            refetchQueries: [{query: GetUserDefaultCalendarDocument}]
         })
     }
 
@@ -262,6 +267,18 @@ const Dashboard: React.FC = () => {
     const [mapMarkers, setMapMarkers] = useState<any[]>([])
     console.log(mapMarkers)
     console.log(allListingsData?.allListings)
+
+    const getGContactGroupsList = async () => {
+        try {
+            await axios.get('https://people.googleapis.com/v1/contactGroups')
+                .then(res => {
+                    console.log(res)
+                })
+        } catch (error:any) {
+            console.log(error)
+            return error.message
+        }
+    }
 
     useEffect(() => {
         if (allListingsData) {
@@ -284,23 +301,39 @@ const Dashboard: React.FC = () => {
     }, [allListingsData])
     
     useEffect(() => {
-        axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
-            withCredentials:true
-        }).then((res) => {
-            const {gAccessToken} = res.data
-            console.log(gAccessToken)
-            axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`;    
-        }).then(() => {
-            if (!calendarId){
-                getGCalendarsList()
-            }
-        }).then(() => {
-            setIsGLoggedIn(true)
-        })
+        gLogOut()
+        // let gLoginRef = false
+        // axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+        //     withCredentials:true
+        // }).then((res) => {
+        //     const {gAccessToken} = res.data
+        //     console.log(gAccessToken)
+        //     if (gAccessToken) {
+        //         axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+        //         gLoginRef = true
+        //     }   
+        // }).then(() => {
+        //     if (!calendarId && gLoginRef){
+        //         getGCalendarsList()
+        //     }
+        // }).then(() => {
+        //     // if (!contactGroupId){
+        //     //     getGContactGroupsList()
+        //     // }
+        //     if (gLoginRef) {
+        //         getGContactGroupsList()
+        //     }
+        // }).then(() => {
+        //     if (gLoginRef) {
+        //         setIsGLoggedIn(true)
+        //     } else {
+        //         setIsGLoggedIn(false)
+        //     }
+        // })
     }, [])
 
-    useMemo(async() => {
-        if (getCalendarData){
+    useMemo(() => {
+        if (getCalendarData && isGLoggedIn){
             try {
 
                 const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
@@ -311,7 +344,7 @@ const Dashboard: React.FC = () => {
                 const maxDate = new Date()
                 maxDate.setDate(maxDate.getDate() + 180)
 
-                await axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+                axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
                     params: {
                         orderBy: 'startTime',
                         singleEvents: true,
@@ -344,7 +377,7 @@ const Dashboard: React.FC = () => {
                 return error.message
             }
         }
-    }, [getCalendarData, chooseCalendar])
+    }, [calendarId])
 
     // all component variables loaded ? else { skeletonloading...}
     return (
@@ -401,7 +434,7 @@ const Dashboard: React.FC = () => {
 
                         <motion.div className="dashboard-info-card">
                             <div className="dashboard-card-header">
-                                <h4>Calendar Events</h4>
+                                <h4>Appointments</h4>
                             </div>
                             <div className="calendar-events">
                             {isGLoggedIn ? (
@@ -454,21 +487,15 @@ const Dashboard: React.FC = () => {
 
                         <motion.div className="dashboard-info-card">
                             <div className="dashboard-card-header">
-                                <h4>Listings Map</h4>
+                                <h4>Current Clients</h4>
                             </div>
-                            <div className="listings-map">
-                                <GoogleMap
-                                    bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
-                                    center={{lat: 40.7366, lng: -73.8200}}
-                                    defaultZoom={10}
-                                    options={{
-                                        fullscreenControl: false,
-                                        scrollwheel: true,
-                                        zoomControl: false,
-                                    }}
-                                >
-                                    {mapMarkers}
-                                </GoogleMap>
+                            <div className="current-clients">
+                                {isGLoggedIn ? (
+                                    null
+                                )
+                                : (null
+                                )
+                                }
                             </div>
                         </motion.div>
                     </motion.div>
@@ -524,8 +551,25 @@ const Dashboard: React.FC = () => {
                             </>
                             }
                         </motion.div>
+                        
                         <motion.div className="dashboard-info-card">
-                                
+                            <div className="dashboard-card-header">
+                                <h4>Listings Map</h4>
+                            </div>
+                            <div className="listings-map">
+                                <GoogleMap
+                                    bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
+                                    center={{lat: 40.7366, lng: -73.8200}}
+                                    defaultZoom={10}
+                                    options={{
+                                        fullscreenControl: false,
+                                        scrollwheel: true,
+                                        zoomControl: false,
+                                    }}
+                                >
+                                    {mapMarkers}
+                                </GoogleMap>
+                            </div>
                         </motion.div>
                     </motion.div>
                 </motion.div>
