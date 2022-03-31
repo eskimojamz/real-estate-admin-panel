@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-import { GetUserDefaultCalendarDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
+import { GetUserDefaultCalendarDocument, GetUserDefaultContactGroupDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useSetDefaultCalendarMutation, useSetDefaultContactGroupMutation } from "../generated/graphql"
 import { Doughnut, Pie } from "react-chartjs-2"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import '../utils/fullCalendar/fullCalendar.css'
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
+import { GlobalContext } from "../App";
 
 interface MapMarkerProps {
     listingId: string;
@@ -216,20 +217,23 @@ const Dashboard: React.FC = () => {
         })
     };
 
+    const {data: userData} = useDisplayUserQuery({
+        onError: (error) => console.log(error)
+    })
+
     const [calendars, setCalendars] = useState<any[] | null>()
     const {data: getCalendarData, loading: calendarIdLoading} = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error)
     }) 
     const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
-    const [calendarEvents, setCalendarEvents] = useState<any[] | null>()
+    const {calendarEvents, setCalendarEvents} = useContext(GlobalContext)
     const [setDefaultCalendar] = useSetDefaultCalendarMutation({
         onError: (error) => {
             console.log(error)
         }
     })
-    const {data: userData} = useDisplayUserQuery({
-        onError: (error) => console.log(error)
-    })
+    const [calendarInput, setCalendarInput] = useState<string>("Horizon Appointments")
+    const [calendarInfo, setCalendarInfo] = useState<any>()
 
     const getGCalendarsList = async () => {
         try {
@@ -238,9 +242,15 @@ const Dashboard: React.FC = () => {
                     console.log(res.data.items)
                     const calendarsRef: any[] = []
                     res.data.items.map((cal: { id: string, summary: string, backgroundColor:string }) => {
-                        calendarsRef.push({id: cal.id, name: cal.summary, color: cal.backgroundColor})
+                        calendarsRef.push({
+                            id: cal.id, 
+                            name: cal.summary, 
+                            color: cal.backgroundColor
+                        })
                     })
-                    setCalendars(calendarsRef)
+                    calendarsRef.length > 0 && (
+                        setCalendars(calendarsRef)
+                    )
                 })
         } catch (error:any) {
             console.log("Error getting calendar data", error);
@@ -265,19 +275,55 @@ const Dashboard: React.FC = () => {
     Geocode.setRegion("us");
 
     const [mapMarkers, setMapMarkers] = useState<any[]>([])
-    console.log(mapMarkers)
-    console.log(allListingsData?.allListings)
+    // console.log(mapMarkers)
+    // console.log(allListingsData?.allListings)
+
+    const [contactGroups, setContactGroups] = useState<any[] | null>()
+
+    const {data: getContactGroupData, loading: contactGroupIdLoading} = useGetUserDefaultContactGroupQuery({
+        onError: (error) => console.log(error)
+    }) 
+    const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+    const {contacts, setContacts} = useContext(GlobalContext)
+    const [setDefaultContactGroup] = useSetDefaultContactGroupMutation({
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+    const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
 
     const getGContactGroupsList = async () => {
-        try {
-            await axios.get('https://people.googleapis.com/v1/contactGroups')
-                .then(res => {
-                    console.log(res)
+        await axios.get('https://people.googleapis.com/v1/contactGroups')
+            .then(res => {
+                // console.log(res.data.contactGroups)
+                const groupsRef: any[] = []
+                // get user contact groups
+                res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
+                    if (group.groupType === 'USER_CONTACT_GROUP'){
+                        groupsRef.push({
+                            formattedName: group.formattedName,
+                            resourceName: group.resourceName
+                        })
+                    }
                 })
-        } catch (error:any) {
-            console.log(error)
-            return error.message
-        }
+                // set groups
+                groupsRef.length > 0 && (
+                    setContactGroups(groupsRef)
+                )
+            })
+            .catch(err => {
+                throw new Error(err)
+            })
+    }
+    console.log(userData)
+    const chooseContactGroup = async (cGroupId: string) => {
+        await setDefaultContactGroup({
+            variables: {
+                contactGroupId: cGroupId,
+                userId: userData?.displayUser?.id!
+            },
+            refetchQueries: [{query: GetUserDefaultContactGroupDocument}]
+        })
     }
 
     useEffect(() => {
@@ -301,39 +347,38 @@ const Dashboard: React.FC = () => {
     }, [allListingsData])
     
     useEffect(() => {
-        gLogOut()
-        // let gLoginRef = false
-        // axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
-        //     withCredentials:true
-        // }).then((res) => {
-        //     const {gAccessToken} = res.data
-        //     console.log(gAccessToken)
-        //     if (gAccessToken) {
-        //         axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
-        //         gLoginRef = true
-        //     }   
-        // }).then(() => {
-        //     if (!calendarId && gLoginRef){
-        //         getGCalendarsList()
-        //     }
-        // }).then(() => {
-        //     // if (!contactGroupId){
-        //     //     getGContactGroupsList()
-        //     // }
-        //     if (gLoginRef) {
-        //         getGContactGroupsList()
-        //     }
-        // }).then(() => {
-        //     if (gLoginRef) {
-        //         setIsGLoggedIn(true)
-        //     } else {
-        //         setIsGLoggedIn(false)
-        //     }
-        // })
+        let gLoginRef = false
+        axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+            withCredentials:true
+        }).then((res) => {
+            const {gAccessToken} = res.data
+            console.log(gAccessToken)
+            if (gAccessToken) {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+                gLoginRef = true
+            }   
+        }).then(() => {
+            if (!calendarId && gLoginRef){
+                getGCalendarsList()
+            }
+        }).then(() => {
+            // if (!contactGroupId){
+            //     getGContactGroupsList()
+            // }
+            if (!contactGroupId && gLoginRef) {
+                getGContactGroupsList()
+            }
+        }).then(() => {
+            if (gLoginRef) {
+                setIsGLoggedIn(true)
+            } else {
+                setIsGLoggedIn(false)
+            }
+        })
     }, [])
 
     useMemo(() => {
-        if (getCalendarData && isGLoggedIn){
+        if (isGLoggedIn && calendarId && !calendarEvents){
             try {
 
                 const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
@@ -359,7 +404,7 @@ const Dashboard: React.FC = () => {
                             id: item.id,
                             title: item.summary,
                             start: item.start.date,
-                            end: item.start.date,
+                            end: item.end.date,
                             startTime: item.start.datetime,
                             endTime: item.end.dateTime,
                             extendedProps: {
@@ -379,6 +424,44 @@ const Dashboard: React.FC = () => {
         }
     }, [calendarId])
 
+    useMemo(() => {
+        if (isGLoggedIn && contactGroupId && !contacts) {
+            const contactsRef:string[] = []
+            axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
+                params: {
+                    maxMembers: 200
+                }
+            }).then((res) => {
+                console.log(res.data)
+                const gContactItems = res.data.memberResourceNames
+                gContactItems.map((cId:string) => {
+                    contactsRef.push(cId)
+                })
+            }).then(() => {
+                const paramsRef = new URLSearchParams()
+                contactsRef.map(c => {
+                    paramsRef.append("resourceNames", c)
+                }) 
+                paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
+                
+                axios.get('https://people.googleapis.com/v1/people:batchGet', {
+                    params: paramsRef
+                }).then(res => {
+                    const contactItemsRef: { lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
+                    const gContactsData = res.data.responses
+                    gContactsData.forEach((obj: { person: { names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
+                        contactItemsRef.push({
+                            lastName: obj.person.names[0].familyName,
+                            firstName: obj.person.names[0].givenName,
+                            phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
+                        })
+                    })
+                    setContacts(contactItemsRef)
+                })
+            }).catch(err => console.log(err))
+        }
+    }, [contactGroupId])
+
     // all component variables loaded ? else { skeletonloading...}
     return (
         <>
@@ -388,8 +471,9 @@ const Dashboard: React.FC = () => {
                     <h3>Dashboard</h3>
                 </motion.div>
                 <motion.div className="dashboard-body">
-                    <motion.div className="dashboard-row-top">
-                        <motion.div className="dashboard-info-card">
+                    {/* <motion.div className="dashboard-row-top"> */}
+                        
+                        <motion.div className="dashboard-info-card pie">
                             <AnimatePresence>
                             <div className="dashboard-card-header">
                                 <h4>Active Listings</h4>
@@ -432,13 +516,13 @@ const Dashboard: React.FC = () => {
                             </AnimatePresence>
                         </motion.div>
 
-                        <motion.div className="dashboard-info-card">
+                        <motion.div className="dashboard-info-card cal">
                             <div className="dashboard-card-header">
                                 <h4>Appointments</h4>
                             </div>
                             <div className="calendar-events">
                             {isGLoggedIn ? (
-                                calendarEvents && calendarId ?
+                                calendarEvents && calendarId && !calendarInfo ?
                                     <>
                                     <FullCalendar 
                                         plugins={[ listPlugin, dayGridPlugin ]}
@@ -460,21 +544,69 @@ const Dashboard: React.FC = () => {
                                         eventClick={(info) => {
                                             info.jsEvent.preventDefault(); // don't let the browser navigate
                                             // open event link in new window
-                                            if (info.event.url) {
-                                            window.open(info.event.url);
+                                            // if (info.event.url) {
+                                            // window.open(info.event.url);
+                                            // }
+                                            const eventInfo = {
+                                                id: info.event.id,
+                                                title: info.event.title,
+                                                start: info.event.startStr,
+                                                end: info.event.endStr,
+                                                description: info.event.extendedProps.description,
+                                                location: info.event.extendedProps.location,
+                                                url: info.event.url,
                                             }
-                                        }
-                                        }
+                                            setCalendarInfo(eventInfo)
+                                        }}
                                     />
+                                    </>
+                                : calendarInfo ?
+                                    <>
+                                    <div className="calendar-info">
+                                        <div className="calendar-info-back">
+                                            <button onClick={() => setCalendarInfo(null)}>Back</button>
+                                        </div>
+                                        <div className="calendar-info-date">
+                                            <h4>{calendarInfo.start}</h4>
+                                        </div>
+                                        <div className="calendar-info-title">
+                                            <h3>{calendarInfo.title}</h3>
+                                        </div>
+                                        <div className="calendar-info-description">
+                                            <h6>Description:</h6>
+                                            <p>{calendarInfo.description}</p>
+                                        </div>
+                                        <div className="calendar-info-location">
+                                            <h6>Location:</h6>
+                                            <h5>{calendarInfo.location}</h5>
+                                        </div>
+                                        <div className="calendar-info-link">
+                                            <button>View in Google Calendars</button>
+                                        </div>
+                                    </div>
                                     </>
                                 : !calendarIdLoading && !calendarId ?
                                     <>
-                                    <h6>Choose a calendar:</h6>
-                                    <ul>
-                                    {calendars?.map((cal: { id: string, name: string, color:string }) => {
-                                        return <li onClick={() => chooseCalendar(cal.id)}><span style={{backgroundColor: `${cal.color}`}}></span>{cal.name}</li>
-                                    })}
-                                    </ul>
+                                    <div className="calendar-list">
+                                        <form>
+                                            <h6>Create a new Google Calendar:</h6>
+                                            <input placeholder="Horizon Appointments" 
+                                                value={calendarInput} 
+                                                onChange={(e) => setCalendarInput(e.target.value)}
+                                            />
+                                            <button className="create-calendar">Create Calendar</button>
+                                        </form>
+                                        {calendars &&
+                                        <div className="calendar-list-existing">
+                                            <h6>Or choose an exist account calendar:</h6>
+                                            <ul>
+                                            {calendars?.map((cal: { id: string, name: string, color:string }) => {
+                                                return <li onClick={() => chooseCalendar(cal.id)}><span style={{backgroundColor: `${cal.color}`}}></span>{cal.name}</li>
+                                            })}
+                                            </ul>
+                                        </div>
+                                        }
+                                    </div>
                                     </>
                                 : null // skeleton loading?
                                 )
@@ -484,23 +616,59 @@ const Dashboard: React.FC = () => {
                             }
                             </div>
                         </motion.div>
-
-                        <motion.div className="dashboard-info-card">
+                        
+                        <motion.div className="dashboard-info-card contacts">
                             <div className="dashboard-card-header">
-                                <h4>Current Clients</h4>
+                                <h4>Clients</h4>
                             </div>
-                            <div className="current-clients">
+                            <div className="clients-dashboard">
                                 {isGLoggedIn ? (
-                                    null
+                                    contacts && contactGroupId ? 
+                                    <>
+                                    <ul className="clients-list">
+                                        {contacts.map((contact:any) => {
+                                            return (
+                                                <li>
+                                                    <div><h4>{contact.firstName}</h4><h4>{contact.lastName}</h4></div>
+                                                    <div><span /><p>{contact.phoneNumber}</p></div>
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                    </>
+                                    : !contactGroupIdLoading && !contactGroupId ? 
+                                    <>
+                                    <div className="contact-groups">
+                                        <form>
+                                            <h6>Create a new Google Contacts group:</h6>
+                                            <input placeholder="Horizon Clients" 
+                                                value={contactsInput} 
+                                                onChange={(e) => setContactsInput(e.target.value)}
+                                            />
+                                            <button className="create-cgroup">Create Group</button>
+                                        </form>
+                                        {contactGroups && 
+                                        <div className="contact-groups-list">
+                                            <h6>Or choose an existing account contact group:</h6>
+                                            <ul>
+                                            {contactGroups?.map((group, i) => {
+                                                return <li onClick={() => chooseContactGroup(group.resourceName)}><span style={{backgroundColor: `${pieColorScale[i%6]}`}}></span>{group.formattedName}</li>
+                                            })}
+                                            </ul>
+                                        </div>
+                                        }
+                                    </div>
+                                    </>
+                                    : null
                                 )
                                 : (null
                                 )
                                 }
                             </div>
                         </motion.div>
-                    </motion.div>
-                    <motion.div className="dashboard-row-bottom">
-                        <motion.div className="dashboard-info-card">
+                    {/* </motion.div> */}
+                    {/* <motion.div className="dashboard-row-bottom"> */}
+                        <motion.div className="dashboard-info-card table">
                             {dashboardListings && 
                             <>
                             <div className="dashboard-card-header dashboard-header-mb-0">
@@ -552,7 +720,7 @@ const Dashboard: React.FC = () => {
                             }
                         </motion.div>
                         
-                        <motion.div className="dashboard-info-card">
+                        <motion.div className="dashboard-info-card map">
                             <div className="dashboard-card-header">
                                 <h4>Listings Map</h4>
                             </div>
@@ -571,7 +739,7 @@ const Dashboard: React.FC = () => {
                                 </GoogleMap>
                             </div>
                         </motion.div>
-                    </motion.div>
+                    {/* </motion.div> */}
                 </motion.div>
             </motion.div>
         </div>

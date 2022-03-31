@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
-import { GApiProvider } from 'react-gapi-auth2';
 
-interface Props {}
+interface GlobalStateTypes {
+  calendarEvents: any;
+  setCalendarEvents: React.Dispatch<React.SetStateAction<any>>;
+  contacts: any;
+  setContacts: React.Dispatch<React.SetStateAction<any>>;
+}
 
-export const App: React.FC<Props> = () => {
-  
+export const GlobalContext:React.Context<any> = createContext(null)
+
+export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
+
+  const [calendarEvents, setCalendarEvents] = useState<any | null>()
+  const [contacts, setContacts] = useState<any | null>()
+  
+  const globalState: GlobalStateTypes = {
+    calendarEvents,
+    setCalendarEvents,
+    contacts,
+    setContacts,
+  }
 
   useEffect(() => {
     fetch("http://localhost:4000/refresh_token", {
@@ -23,7 +38,9 @@ export const App: React.FC<Props> = () => {
 
   return (
     <>
+    <GlobalContext.Provider value={globalState}>
     {loading ? null : <Router />}
+    </GlobalContext.Provider>
     </>
   )
 }

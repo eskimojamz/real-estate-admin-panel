@@ -22,12 +22,12 @@ a {
 
 button {
     font-family: 'Noto Sans', sans-serif;
-    transition: opacity 0.2s;
+    transition: all 0.2s;
     cursor: pointer;
 }
 
 button:hover {
-    opacity: 0.7 !important;
+    filter: brightness(0.95);
 }
 
 button:active {
@@ -167,11 +167,13 @@ input, textarea {
     font-family: inherit;
     font-weight: 400;
     font-size: 13px;
+    transition: all 0.2s;
 }
 
 input:focus, textarea:focus{
     outline: none;
     border: 1px solid rgb(131, 130, 130) !important;
+    background: white !important;
 }
 
 .login-form-error {
@@ -225,8 +227,8 @@ input:focus, textarea:focus{
 }
 
 .sidebar-grid .navlink {
-    color: var(--grey);
-    font-size: 15px;
+    color: var(--grey-dark);
+    font-size: 14px;
     font-weight: 400;
     width: auto;
     padding: 0.5rem 1.5rem;  
@@ -237,7 +239,7 @@ input:focus, textarea:focus{
 .sidebar-grid .active-navlink {
     color: var(--primary);
     background: var(--primary-superlight);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 400;
     width: auto;
     border-right: 5px solid var(--primary);
@@ -340,13 +342,13 @@ input:focus, textarea:focus{
 }
 
 .dashboard-wrapper-ml {
-    height: 100%;
+    height: 100vh;
     width: 100%;
     margin-left: 150px;
 }
 
 .dashboard-wrapper {
-    height: 100%;
+    height: 100vh;
     width: 100%;
     max-width: 85vw;
     margin: 0 auto;
@@ -355,8 +357,9 @@ input:focus, textarea:focus{
     background: var(--bg);
     border-radius: 15px;
 
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 27px 1fr;
+    gap: 1rem;
     padding: 1rem;
     overflow: scroll;
 }
@@ -367,7 +370,6 @@ input:focus, textarea:focus{
     height: auto;
     width: 100%;
     padding: 0 5px;
-    margin-bottom: 1rem;
 }
 
 .dashboard-header h3 {
@@ -377,30 +379,38 @@ input:focus, textarea:focus{
 
 .dashboard-body {
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: 
+        "pie cal contacts"
+        "tabl tabl map";
     gap: 1rem;
 }
-
-.dashboard-row-top {
-    height: 50%;
-    width: 100%;
-    display: grid;
-    justify-content: center;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 2rem;
+/* grid-areas */
+.pie {
+    grid-area: pie;
 }
 
-.dashboard-row-bottom {
-    height: 50%;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
+.cal {
+    grid-area: cal;
+}
+
+.contacts {
+    grid-area: contacts;
+}
+
+.table {
+    grid-area: tabl;
+}
+
+.map {
+    grid-area: map;
 }
 
 .dashboard-info-card {
-    height: auto;
+    height: 100%;
+    max-height: calc((100vh - 91px) / 2);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -494,25 +504,67 @@ input:focus, textarea:focus{
     height: 100%;
     width: 100%;
     align-items: center;
+    overflow: auto;
 }
 
 .calendar-events h6 {
     margin: 0 auto 0 0;
+    font-weight: 400;
+    font-size: 12px;
 }
 
-.calendar-events ul {
+.calendar-list {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.calendar-list > form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.calendar-list > form > input{
+    background: var(--grey-superlight);
+    border-radius: 5px;
+    border: 1px solid var(--grey-light);
+    padding: 0.5rem;
+    height: 35.5px;
+}
+
+.calendar-list > form > button {
+    height: 35px;
+    width: 130px;
+    background: var(--blue-primary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0 14px;
+}
+
+.calendar-events > .calendar-list .calendar-list-existing {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.calendar-events > .calendar-list ul {
     display: flex;
     flex-direction: column;
     gap: 1px;
     list-style: none;
     padding-inline-start: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
     width: 100%;
     padding: 0;
     border-radius: 10px;
     background-color: var(--grey-light);
 }
 
-.calendar-events li {
+.calendar-events > .calendar-list li {
     display: flex;
     align-items: center;
     width: 100%;
@@ -525,7 +577,7 @@ input:focus, textarea:focus{
     cursor: pointer;
 }
 
-.calendar-events li > span {
+.calendar-events > .calendar-list li > span {
     height: 10px;
     width: 10px;
     border-radius: 50%;
@@ -544,6 +596,196 @@ input:focus, textarea:focus{
 
 .calendar-events li:hover {
     background-color: var(--blue-light);
+}
+
+.calendar-info {
+    width: inherit;
+    height: auto;
+
+}
+
+.calendar-info h3, .calendar-info h4, .calendar-info h5, .calendar-info h6, .calendar-info p {
+    margin: 0;
+}
+
+.calendar-info-date {
+    height: 35.5px;
+    width: inherit;
+    display: flex;
+    align-items: center;
+    background-color: var(--blue-light);
+    border-radius: 10px;
+    font-size: 14px;
+    padding: 8px 14px;
+}
+
+.clients-dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    overflow: auto;
+}
+
+.clients-dashboard h6 {
+    margin: 0 auto 0 0;
+    font-weight: 400;
+}
+
+.clients-dashboard ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding-inline-start: 0;
+    width: 100%;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding: 0;
+    gap: 1px;
+    background-color: var(--grey-light);
+    border-radius: 10px;
+}
+
+.clients-dashboard li {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 35.5px;
+    padding: 1rem;
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.clients-dashboard > .contact-groups {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-groups h6 {
+    margin: 0 auto 0 0;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.contact-groups > form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.contact-groups > form > input{
+    background: var(--grey-superlight);
+    border-radius: 5px;
+    border: 1px solid var(--grey-light);
+    padding: 0.5rem;
+    height: 35.5px;
+}
+
+.contact-groups > form > button {
+    height: 35px;
+    width: 130px;
+    background: var(--blue-primary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0 14px;
+}
+
+.contact-groups > .contact-groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: 10px;
+}
+
+
+
+.contact-groups > .contact-groups-list li {
+    background-color: var(--grey-superlight);
+}
+
+.contact-groups > .contact-groups-list li > span {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.contact-groups > .contact-groups-list li:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.contact-groups > .contact-groups-list li:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.contact-groups > .contact-groups-list li:hover {
+    background-color: var(--blue-light);
+}
+
+.clients-dashboard > .clients-list {
+    background-color: transparent;
+    gap: 0;
+    border-radius: 0;
+    overflow: hidden auto;
+}
+
+.clients-dashboard > .clients-list > li {
+    height: 71px;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.clients-dashboard > .clients-list > li > div:first-child {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #cbe3d5;
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 5px;
+}
+
+.clients-dashboard > .clients-list > li > div:first-child h4:first-child {
+    font-weight: 400;
+    margin: 0;
+}
+
+.clients-dashboard > .clients-list > li > div:first-child h4:last-child {
+    font-weight: 700;
+    margin: 0;
+}
+
+.clients-dashboard > .clients-list > li > div:last-child {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    font-size: 14px;
+    padding: 8px 14px;
+} 
+
+.clients-dashboard > .clients-list > li > div:last-child > span {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: #a8e2b8;
+}
+
+.clients-dashboard > .clients-list > li > div:last-child p {
+    margin: 0;
 }
 
 .dashboard-header-mb-0 {

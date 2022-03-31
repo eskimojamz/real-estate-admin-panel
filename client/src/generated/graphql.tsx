@@ -72,6 +72,7 @@ export type Mutation = {
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
   setDefaultCalendar: User;
+  setDefaultContactGroup: User;
   signS3: S3Response;
 };
 
@@ -115,6 +116,12 @@ export type MutationSetDefaultCalendarArgs = {
 };
 
 
+export type MutationSetDefaultContactGroupArgs = {
+  contactGroupId: Scalars['String'];
+  userId: Scalars['Float'];
+};
+
+
 export type MutationSignS3Args = {
   filename: Scalars['String'];
   filetype: Scalars['String'];
@@ -127,6 +134,7 @@ export type Query = {
   displayUser?: Maybe<User>;
   getListing?: Maybe<Listing>;
   getUserDefaultCalendar: User;
+  getUserDefaultContactGroup: User;
 };
 
 
@@ -143,6 +151,7 @@ export type S3Response = {
 export type User = {
   __typename?: 'User';
   defaultCalendarId: Scalars['String'];
+  defaultContactGroupId: Scalars['String'];
   id: Scalars['Int'];
   username: Scalars['String'];
 };
@@ -191,6 +200,11 @@ export type GetUserDefaultCalendarQueryVariables = Exact<{ [key: string]: never;
 
 export type GetUserDefaultCalendarQuery = { __typename?: 'Query', getUserDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
 
+export type GetUserDefaultContactGroupQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserDefaultContactGroupQuery = { __typename?: 'Query', getUserDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string } };
+
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -219,6 +233,14 @@ export type SetDefaultCalendarMutationVariables = Exact<{
 
 
 export type SetDefaultCalendarMutation = { __typename?: 'Mutation', setDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
+
+export type SetDefaultContactGroupMutationVariables = Exact<{
+  contactGroupId: Scalars['String'];
+  userId: Scalars['Float'];
+}>;
+
+
+export type SetDefaultContactGroupMutation = { __typename?: 'Mutation', setDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string } };
 
 export type SignS3MutationVariables = Exact<{
   filename: Scalars['String'];
@@ -531,6 +553,42 @@ export function useGetUserDefaultCalendarLazyQuery(baseOptions?: Apollo.LazyQuer
 export type GetUserDefaultCalendarQueryHookResult = ReturnType<typeof useGetUserDefaultCalendarQuery>;
 export type GetUserDefaultCalendarLazyQueryHookResult = ReturnType<typeof useGetUserDefaultCalendarLazyQuery>;
 export type GetUserDefaultCalendarQueryResult = Apollo.QueryResult<GetUserDefaultCalendarQuery, GetUserDefaultCalendarQueryVariables>;
+export const GetUserDefaultContactGroupDocument = gql`
+    query GetUserDefaultContactGroup {
+  getUserDefaultContactGroup {
+    id
+    username
+    defaultContactGroupId
+  }
+}
+    `;
+
+/**
+ * __useGetUserDefaultContactGroupQuery__
+ *
+ * To run a query within a React component, call `useGetUserDefaultContactGroupQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserDefaultContactGroupQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserDefaultContactGroupQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserDefaultContactGroupQuery(baseOptions?: Apollo.QueryHookOptions<GetUserDefaultContactGroupQuery, GetUserDefaultContactGroupQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserDefaultContactGroupQuery, GetUserDefaultContactGroupQueryVariables>(GetUserDefaultContactGroupDocument, options);
+      }
+export function useGetUserDefaultContactGroupLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserDefaultContactGroupQuery, GetUserDefaultContactGroupQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserDefaultContactGroupQuery, GetUserDefaultContactGroupQueryVariables>(GetUserDefaultContactGroupDocument, options);
+        }
+export type GetUserDefaultContactGroupQueryHookResult = ReturnType<typeof useGetUserDefaultContactGroupQuery>;
+export type GetUserDefaultContactGroupLazyQueryHookResult = ReturnType<typeof useGetUserDefaultContactGroupLazyQuery>;
+export type GetUserDefaultContactGroupQueryResult = Apollo.QueryResult<GetUserDefaultContactGroupQuery, GetUserDefaultContactGroupQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
@@ -667,6 +725,42 @@ export function useSetDefaultCalendarMutation(baseOptions?: Apollo.MutationHookO
 export type SetDefaultCalendarMutationHookResult = ReturnType<typeof useSetDefaultCalendarMutation>;
 export type SetDefaultCalendarMutationResult = Apollo.MutationResult<SetDefaultCalendarMutation>;
 export type SetDefaultCalendarMutationOptions = Apollo.BaseMutationOptions<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>;
+export const SetDefaultContactGroupDocument = gql`
+    mutation SetDefaultContactGroup($contactGroupId: String!, $userId: Float!) {
+  setDefaultContactGroup(contactGroupId: $contactGroupId, userId: $userId) {
+    id
+    username
+    defaultContactGroupId
+  }
+}
+    `;
+export type SetDefaultContactGroupMutationFn = Apollo.MutationFunction<SetDefaultContactGroupMutation, SetDefaultContactGroupMutationVariables>;
+
+/**
+ * __useSetDefaultContactGroupMutation__
+ *
+ * To run a mutation, you first call `useSetDefaultContactGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetDefaultContactGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setDefaultContactGroupMutation, { data, loading, error }] = useSetDefaultContactGroupMutation({
+ *   variables: {
+ *      contactGroupId: // value for 'contactGroupId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useSetDefaultContactGroupMutation(baseOptions?: Apollo.MutationHookOptions<SetDefaultContactGroupMutation, SetDefaultContactGroupMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetDefaultContactGroupMutation, SetDefaultContactGroupMutationVariables>(SetDefaultContactGroupDocument, options);
+      }
+export type SetDefaultContactGroupMutationHookResult = ReturnType<typeof useSetDefaultContactGroupMutation>;
+export type SetDefaultContactGroupMutationResult = Apollo.MutationResult<SetDefaultContactGroupMutation>;
+export type SetDefaultContactGroupMutationOptions = Apollo.BaseMutationOptions<SetDefaultContactGroupMutation, SetDefaultContactGroupMutationVariables>;
 export const SignS3Document = gql`
     mutation SignS3($filename: String!, $filetype: String!) {
   signS3(filename: $filename, filetype: $filetype) {

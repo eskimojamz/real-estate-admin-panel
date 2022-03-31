@@ -33,6 +33,14 @@ function Sidebar() {
                         Listings
                     </NavLink>
                     <NavLink 
+                        to="/appointments" 
+                        className={({ isActive }) => 
+                            isActive ? "active-navlink" : "navlink"
+                        }
+                    >
+                        Appointments
+                    </NavLink>
+                    <NavLink 
                         to="/clients" 
                         className={({ isActive }) => 
                             isActive ? "active-navlink" : "navlink"

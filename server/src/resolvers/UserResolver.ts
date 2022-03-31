@@ -86,6 +86,44 @@ export class UserResolver {
       }
     }
 
+    @Query(() => User)
+    getUserDefaultContactGroup(@Ctx() context: MyContext) {
+      // get auth header
+      const authorization = context.req.headers["authorization"];
+      // if not authorized, return null
+      if (!authorization) {
+        return null;
+      }
+
+      try {
+        // get token from auth header
+        const token = authorization.split(" ")[1];
+        // verify token and set to payload const
+        const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        // return User but only query for defaultCalendarId on client-side
+        return User.findOne(payload.userId)
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    }
+
+    @Mutation(() => User)
+    @UseMiddleware(isAuth)
+    async setDefaultContactGroup(
+      @Arg("userId") userId: number,
+      @Arg("contactGroupId") contactGroupId: string
+      ) {
+      try {
+        // update defaultCalendarId
+        await User.update(userId, {defaultContactGroupId: contactGroupId})
+        // return User
+        return await User.findOne(userId)
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    }
   
     @Mutation(() => Boolean)
     logout(@Ctx() { res }: MyContext) {

@@ -1,0 +1,7 @@
+mutation SetDefaultContactGroup($contactGroupId: String!, $userId: Float!) {
+  setDefaultContactGroup(contactGroupId: $contactGroupId, userId: $userId) {
+    id
+    username
+    defaultContactGroupId
+  }
+}

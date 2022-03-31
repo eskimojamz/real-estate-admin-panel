@@ -21,4 +21,8 @@ export class User extends BaseEntity {
     @Field()
     @Column("text", { default: null})
     defaultCalendarId: string
+
+    @Field()
+    @Column("text", { default: null})
+    defaultContactGroupId: string
 }

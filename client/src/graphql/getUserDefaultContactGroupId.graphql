@@ -1,0 +1,7 @@
+query GetUserDefaultContactGroup {
+  getUserDefaultContactGroup {
+    id
+    username
+    defaultContactGroupId
+  }
+}
