@@ -39,7 +39,7 @@ export const App: React.FC = () => {
   return (
     <>
     <GlobalContext.Provider value={globalState}>
-    {loading ? null : <Router />}
+      {loading ? null : <Router />}
     </GlobalContext.Provider>
     </>
   )

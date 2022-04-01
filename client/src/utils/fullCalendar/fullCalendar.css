@@ -24,16 +24,19 @@
     border: none;
 }
 
+.fc-list-day:hover {
+    cursor: default;
+}
+
 .fc-list-day > * {
-    background-color: var(--blue-light) !important;
+    background-color: white !important;
     color: black;
     z-index: 2;
-    border-radius: 5px;
 }
 
 .fc-list-day-cushion {
     background: none;
-    border-radius: 5px;
+    border-bottom: 1px solid var(--grey-light) !important;
 }
 
 .fc .fc-cell-shaded, .fc .fc-day-disabled {
@@ -44,8 +47,20 @@
     background: none;
 }
 
+.fc-list-event{
+    transition: background-color 0.2s;
+}
+
+.fc-list-event:hover {
+    background-color: var(--grey-mediumlight) !important;
+}
+
 .fc .fc-list-event-dot {
     border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid var(--blue-primary);
+}
+
+.fc .fc-list-event.fc-event-forced-url:hover a {
+    transition: color 0.2s;
 }
 
 .fc .fc-list-event.fc-event-forced-url:hover a {
