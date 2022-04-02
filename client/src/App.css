@@ -505,6 +505,65 @@ input:focus, textarea:focus{
     border-radius: 50%;
 }
 
+.dashboard-g-login-modal-backdrop {
+    z-index: 799;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-g-login-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -150px;
+    z-index: 800;
+    height: 200px;
+    width: 300px;
+    border-radius: 10px;
+    background-color: var(--bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
+    padding: 3rem;
+}
+
+.dashboard-g-login-modal h6 {
+    margin: 0 !important;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.g-login-btn {
+    height: 35px;
+    width: auto;
+    background-color: var(--blue-primary);
+    border-radius: 5px;
+    border: none;
+    color: white;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+}
+
+.calendar-events-login {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .calendar-events-header {
     height: 30px;
     width: 100%;
@@ -931,10 +990,10 @@ input:focus, textarea:focus{
     display: flex;
     align-items: center;
     gap: 5px;
-    background-color: #cbe3d5;
+    background-color: white;
     font-size: 14px;
     padding: 8px 14px;
-    border-radius: 5px;
+    border-bottom: 1px solid var(--grey-light);
 }
 
 .clients-dashboard > .clients-list > li > div:first-child h4:first-child {

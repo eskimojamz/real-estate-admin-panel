@@ -18,6 +18,8 @@ import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import { GlobalContext } from "../App";
 import { MdLocationPin, MdPerson, MdArrowBack } from "react-icons/md"
+import { FaGoogle } from "react-icons/fa"
+import { IoCloseCircle } from "react-icons/io5"
 
 interface MapMarkerProps {
     listingId: string;
@@ -227,6 +229,8 @@ const Dashboard: React.FC = () => {
             throw new Error(err)
         })
     };
+
+    const [loginModal, setLoginModal] = useState<boolean>(true)
 
     const {data: userData} = useDisplayUserQuery({
         onError: (error) => console.log(error)
@@ -553,6 +557,28 @@ const Dashboard: React.FC = () => {
     // all component variables loaded ? else { skeletonloading...}
     return (
         <>
+        {isGLoggedIn === false && loginModal && (
+            <>
+            <motion.div className="dashboard-g-login-modal-backdrop"
+                initial={{opacity: 0}}
+                animate={{opacity: 1}}
+                onClick={() => setLoginModal(false)}
+            />
+                <motion.div key='g-login' className="dashboard-g-login-modal"
+                    initial={{opacity: 0.5, scale: 0.5}}
+                    animate={{opacity: 1, scale: 1}}
+                >   
+                    {/* <div className="close-btn">
+                        <IoCloseCircle color="red" size="18px" />
+                    </div> */}
+                    <span>
+                        <h6>Connect your Google Account</h6> 
+                        <h6>to access Calendars and Contacts</h6>
+                    </span>
+                    <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                </motion.div>
+            </>
+        )}
         <div className="dashboard-wrapper-ml">
             <motion.div className="dashboard-wrapper">
                 <motion.div className="dashboard-header">
@@ -782,14 +808,12 @@ const Dashboard: React.FC = () => {
                                     </>
                                 : null // skeleton loading?
                                 )
-                            : isGLoggedIn === null ?
-                                null // skeleton loading?
-                                : 
+                            : isGLoggedIn === false ?
                                 <>
-                                <motion.div key='g-login' className="dashboard-g-login">
-                                    <motion.button className="calendar-events-g-login-btn" onClick={googleAuth}>Sign In</motion.button>
-                                </motion.div>
-                                </>
+                                <div className="calendar-events-login">
+                                    <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                                </div>
+                                </> : null
                             }
                             </LayoutGroup>
                             </div>
@@ -840,7 +864,8 @@ const Dashboard: React.FC = () => {
                                     </>
                                     : null
                                 )
-                                : (null
+                                : (
+                                    null
                                 )
                                 }
                             </div>
