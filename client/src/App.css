@@ -2474,7 +2474,7 @@ em {
 
 .appointments-wrapper {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 1fr 350px;
   gap: 1rem;
   max-width: 85vw;
   margin: 0 auto;
@@ -2525,6 +2525,105 @@ em {
   margin-bottom: 0.5rem;
 }
 
+.appointments-side-body .form-date-time {
+  display: flex;
+  justify-content: space-between;
+}
+
+.appointments-side-body form span {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+}
+
+.appointments-side-body #start-date,
+.appointments-side-body #start-time,
+.appointments-side-body #end-date,
+.appointments-side-body #end-time {
+  width: auto;
+}
+
+.appointments-side-body #form-checkbox-allday {
+  display: flex;
+  align-items: center;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.appointments-side-body #all-day {
+  height: auto;
+  margin-block: 0;
+  margin-inline: 0;
+}
+
+.appointments-side-body #form-checkbox-allday label {
+  margin-bottom: 0;
+  margin-left: 0.5rem;
+}
+
+.appointments-side-body .submit-btn-null {
+  height: 35px;
+  width: 100px;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--grey-light);
+  color: var(--grey-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 14px;
+  position: relative;
+  cursor: default;
+}
+
+.appointments-side-body .submit-btn-null:hover {
+  filter: none;
+}
+
+.appointments-side-body .submit-btn-null:focus {
+  filter: none !important;
+}
+
+.appointments-side-body .submit-btn-null:hover .submit-btn-null-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.appointments-side-body .submit-btn-null-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  position: absolute;
+  bottom: -60px;
+  left: 0px;
+  height: 45px;
+  width: 150px;
+  padding: 0.25rem 0.5rem;
+  font-size: 11px;
+  background-color: var(--grey-medium-light);
+  color: black;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  cursor: default;
+  transition: all 0.3s;
+}
+
+.appointments-side-body .submit-btn-null-tooltip::before {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  left: 10px; /* To the left of the tooltip */
+  /* margin-top: -7px; */
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent var(--grey-medium-light) transparent;
+}
+
 .appointments-side-body p {
   margin: 0 0 0.5rem 0;
   font-size: 12px;
@@ -2539,18 +2638,27 @@ em {
 }
 
 .appointments-side-body .calendar-info-title span {
-  margin: 4px;
+  margin: 0 1px 0 6px;
 }
 
 .appointments-side-body .calendar-info-title-date h5 {
   padding-left: 29px;
 }
 
+.appointments-side-body .calendar-info-title-date #times {
+  display: flex;
+  gap: 3px;
+}
+
+.appointments-side-body .calendar-info-title-date #times h5:last-child {
+  padding-left: 0;
+}
+
 .calendar-info-map {
   height: 250px;
   width: 100%;
   border-radius: 10px;
-  margin: 1rem 0;
+  margin-top: 1rem;
 }
 
 .calendar-info-map * {
@@ -2565,5 +2673,5 @@ em {
   height: 35px;
   width: fit-content;
   padding: 0 1rem;
-  margin: 0 0 0 auto;
+  margin: 1rem 0 0 auto;
 }

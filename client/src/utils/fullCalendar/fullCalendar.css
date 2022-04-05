@@ -68,7 +68,7 @@
 }
 
 .fc .fc-list-event.fc-event-forced-url:hover a {
-  text-decoration: none;
+  text-decoration: none !important;
   color: var(--blue-primary);
 }
 
@@ -130,6 +130,10 @@
 .full-calendar-month .fc-h-event {
   background-color: var(--blue-primary);
   border: 1px solid var(--blue-primary);
+}
+
+.full-calendar-month .fc-h-event:hover {
+  filter: brightness(0.9);
 }
 
 .full-calendar-month .fc .fc-highlight {

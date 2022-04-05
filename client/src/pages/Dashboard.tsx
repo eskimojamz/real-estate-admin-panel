@@ -428,7 +428,7 @@ const Dashboard: React.FC = () => {
         if (isGLoggedIn && calendarId && !calendarEvents) {
             try {
 
-                const calItemsRef: { id: any; title: any; start: any; end: any; startTime: any; endTime: any; extendedProps: { description: any; location: any; }; url: any; }[] = []
+                const calItemsRef: { id: any; title: any; start: any; end: any; startStr: any; endStr: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
 
                 // set time range for g calendar events fetch
                 const minDate = new Date()
@@ -442,6 +442,7 @@ const Dashboard: React.FC = () => {
                         singleEvents: true,
                         timeMin: minDate.toISOString(),
                         timeMax: maxDate.toISOString(),
+                        timeZone: 'America/New_York'
                     }
                 }).then(res => {
                     console.log(res.data.items)
@@ -450,15 +451,16 @@ const Dashboard: React.FC = () => {
                         calItemsRef.push({
                             id: item.id,
                             title: item.summary,
-                            start: item.start.date,
-                            end: item.end.date,
-                            startTime: item.start.datetime,
-                            endTime: item.end.dateTime,
+                            start: item.start.date || item.start.dateTime,
+                            end: item.end.date || item.end.dateTime,
+                            startStr: item.start.dateTime,
+                            endStr: item.end.dateTime,
                             extendedProps: {
                                 description: item.description,
                                 location: item.location
                             },
-                            url: item.htmlLink
+                            url: item.htmlLink,
+                            allDay: item.start.dateTime ? false : true
                         })
                     })
                     console.log(calItemsRef)
@@ -628,6 +630,12 @@ const Dashboard: React.FC = () => {
                                                         //     return {start: startDate, end: endDate}
                                                         // }}
                                                         duration={{ 'days': 180 }}
+                                                        eventTimeFormat={{
+                                                            hour: 'numeric',
+                                                            minute: '2-digit',
+                                                            meridiem: 'short'
+                                                        }}
+                                                        timeZone='America/New_York'
                                                         eventClick={(info) => {
                                                             info.jsEvent.preventDefault(); // don't let the browser navigate
                                                             // open event link in new window
