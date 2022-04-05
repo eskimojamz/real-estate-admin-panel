@@ -2506,6 +2506,26 @@ em {
   max-width: 350px;
 }
 
+.appointments-side-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.appointments-side-header span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.appointments-side-header svg {
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.appointments-side-header svg:hover {
+  filter: brightness(1.1);
+}
+
 .appointments-side-body {
   padding: 0 1rem;
 }
