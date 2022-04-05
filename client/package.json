@@ -5,6 +5,7 @@
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
     "@fullcalendar/daygrid": "^5.10.1",
+    "@fullcalendar/interaction": "^5.10.1",
     "@fullcalendar/list": "^5.10.1",
     "@fullcalendar/react": "^5.10.1",
     "@testing-library/jest-dom": "^5.16.2",
@@ -48,12 +49,6 @@
     "eject": "react-scripts eject",
     "gen": "graphql-codegen --config codegen.yml"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -76,6 +71,10 @@
     "@types/jwt-decode": "^3.1.0",
     "@types/react-geocode": "^0.2.0",
     "@types/react-lazy-load-image-component": "^1.5.2",
-    "@types/react-router-dom": "^5.3.3"
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/parser": "^5.17.0",
+    "eslint": "^6.8.0",
+    "prettier": "^1.9.1",
+    "prettier-eslint": "^13.0.0"
   }
 }

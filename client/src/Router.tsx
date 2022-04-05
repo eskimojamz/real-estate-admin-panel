@@ -2,6 +2,7 @@ import { AnimatePresence } from "framer-motion";
 import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
+import Appointments from "./pages/Appointments";
 import Create from "./pages/Create";
 import Dashboard from "./pages/Dashboard";
 import Listings from "./pages/Listings";
@@ -22,7 +23,7 @@ export const Router: React.FC = () => {
             <Route path="listings" element={<Listings />} />
             <Route path="listings/create" element={<Create />} />
             <Route path="listings/:listingId" element={<ListingView />} />
-            {/* Calendar */}
+            <Route path="appointments" element={<Appointments />} />
           </Route>
         </Routes>
       </BrowserRouter>
