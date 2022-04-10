@@ -556,236 +556,235 @@ const Dashboard: React.FC = () => {
                                 <div className="dashboard-card-header">
                                     <h4>Active Listings</h4>
                                 </div>
-                                <motion.div className="piechart-active-listings"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                >
-                                    {allListingsData ? (
-                                        <>
-                                            <Doughnut data={activeData}
-                                                options={activeOptions}
-                                            />
-                                        </>
-                                    ) : null}
-                                </motion.div>
-                                <div className="piechart-active-listings-legend">
-                                    {allListingsData && activeDataLabels?.map((label, i) => {
-                                        return (
+                                <div className="dashboard-card-body">
+                                    <motion.div className="piechart-active-listings"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                    >
+                                        {allListingsData ? (
                                             <>
-                                                <motion.div className="piechart-legend-item"
-                                                    initial={{ scale: 0, opacity: 0 }}
-                                                    animate={{ scale: 1, opacity: 1 }}
-                                                >
-                                                    <div className="label"
-                                                        style={{ backgroundColor: pieColorScale[i] }}
-                                                    >
-                                                        <h6>{label}</h6>
-                                                    </div>
-                                                    <div className="value"
-                                                        style={{ backgroundColor: pieColorScale[i] }}
-                                                    >
-                                                        <h6>{activeDataValues[i]}</h6>
-                                                    </div>
-                                                </motion.div>
+                                                <Doughnut data={activeData}
+                                                    options={activeOptions}
+                                                />
                                             </>
-                                        )
-                                    })}
+                                        ) : null}
+                                    </motion.div>
+
+                                    <div className="piechart-active-listings-legend">
+                                        {allListingsData && activeDataLabels?.map((label, i) => {
+                                            return (
+                                                <>
+                                                    <motion.div className="piechart-legend-item"
+                                                        initial={{ scale: 0, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                    >
+                                                        <div className="label"
+                                                            style={{ backgroundColor: pieColorScale[i] }}
+                                                        >
+                                                            <h6>{label}</h6>
+                                                        </div>
+                                                        <div className="value"
+                                                            style={{ backgroundColor: pieColorScale[i] }}
+                                                        >
+                                                            <h6>{activeDataValues[i]}</h6>
+                                                        </div>
+                                                    </motion.div>
+                                                </>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
                             </AnimatePresence>
                         </motion.div>
 
                         <motion.div className="dashboard-info-card cal"
-                            variants={yVariants}
-                            initial='initial'
-                            animate='animate'
                         >
                             <div className="dashboard-card-header">
                                 <h4>Appointments</h4>
                             </div>
-                            <div className="calendar-events">
-                                <LayoutGroup>
-                                    {isGLoggedIn ? (
-                                        calendarEvents && calendarId && !calendarInfo ?
-                                            <>
-                                                <motion.div className="full-calendar"
-                                                    key='full-calendar'
-                                                    variants={yVariants}
-                                                    initial='initial'
-                                                    animate='animate'
-                                                >
-                                                    <FullCalendar
-                                                        plugins={[listPlugin, dayGridPlugin]}
-                                                        initialView="list"
-                                                        initialEvents={calendarEvents}
-                                                        height='100%'
-                                                        headerToolbar={false}
-                                                        // visibleRange={(currentDate) => {
-                                                        //     console.log(currentDate)
-                                                        //     const startDate = new Date(currentDate.valueOf());
-                                                        //     const endDate = new Date(currentDate.valueOf());
-                                                        //     // Adjust the start & end dates, respectively
-                                                        //     startDate.setDate(startDate.getDate() - 1); // One day in the past
-                                                        //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
-                                                        //     console.log(startDate, endDate)
-                                                        //     return {start: startDate, end: endDate}
-                                                        // }}
-                                                        duration={{ 'days': 180 }}
-                                                        eventTimeFormat={{
-                                                            hour: 'numeric',
-                                                            minute: '2-digit',
-                                                            meridiem: 'short'
-                                                        }}
-                                                        timeZone='America/New_York'
-                                                        eventClick={(info) => {
-                                                            info.jsEvent.preventDefault(); // don't let the browser navigate
-                                                            // open event link in new window
-                                                            // if (info.event.url) {
-                                                            // window.open(info.event.url);
-                                                            // }
-                                                            const eventInfo = {
-                                                                id: info.event.id,
-                                                                title: info.event.title,
-                                                                start: info.event.startStr,
-                                                                end: info.event.endStr,
-                                                                description: info.event.extendedProps.description,
-                                                                location: info.event.extendedProps.location,
-                                                                url: info.event.url,
-                                                            }
-                                                            setCalendarInfo(eventInfo)
-
-                                                        }}
-                                                    />
-                                                </motion.div>
-                                            </>
-                                            : calendarInfo ?
+                            <div className="dashboard-card-body">
+                                <div className="calendar-events">
+                                    <LayoutGroup>
+                                        {isGLoggedIn ? (
+                                            calendarEvents && calendarId && !calendarInfo ?
                                                 <>
-                                                    <motion.div className="calendar-info"
-                                                        key='calendar-info'
-                                                        variants={xVariants}
-                                                        initial='initial'
-                                                        animate='animate'
-                                                        exit={{ x: -10, opacity: 0 }}
+                                                    <motion.div className="full-calendar"
+                                                        key='full-calendar'
                                                     >
-                                                        <div className="calendar-info-header">
-                                                            <h5>Event Details</h5>
-                                                        </div>
-                                                        <div className="calendar-info-title-date">
-                                                            <div className="calendar-info-title">
-                                                                <span />
-                                                                <h4>{calendarInfo.title}</h4>
-                                                            </div>
+                                                        <FullCalendar
+                                                            plugins={[listPlugin, dayGridPlugin]}
+                                                            initialView="list"
+                                                            initialEvents={calendarEvents}
+                                                            height='100%'
+                                                            headerToolbar={false}
+                                                            // visibleRange={(currentDate) => {
+                                                            //     console.log(currentDate)
+                                                            //     const startDate = new Date(currentDate.valueOf());
+                                                            //     const endDate = new Date(currentDate.valueOf());
+                                                            //     // Adjust the start & end dates, respectively
+                                                            //     startDate.setDate(startDate.getDate() - 1); // One day in the past
+                                                            //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
+                                                            //     console.log(startDate, endDate)
+                                                            //     return {start: startDate, end: endDate}
+                                                            // }}
+                                                            duration={{ 'days': 180 }}
+                                                            eventTimeFormat={{
+                                                                hour: 'numeric',
+                                                                minute: '2-digit',
+                                                                meridiem: 'short'
+                                                            }}
+                                                            timeZone='America/New_York'
+                                                            eventClick={(info) => {
+                                                                info.jsEvent.preventDefault(); // don't let the browser navigate
+                                                                // open event link in new window
+                                                                // if (info.event.url) {
+                                                                // window.open(info.event.url);
+                                                                // }
+                                                                const eventInfo = {
+                                                                    id: info.event.id,
+                                                                    title: info.event.title,
+                                                                    start: info.event.startStr,
+                                                                    end: info.event.endStr,
+                                                                    description: info.event.extendedProps.description,
+                                                                    location: info.event.extendedProps.location,
+                                                                    url: info.event.url,
+                                                                }
+                                                                setCalendarInfo(eventInfo)
 
-                                                            <h5>{new Date(calendarInfo.start).toLocaleDateString('en-US', {
-                                                                weekday: 'long',
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric'
-                                                            })}
-                                                            </h5>
-                                                        </div>
-                                                        <div className="calendar-info-location">
-                                                            {/* <h6>Location:</h6> */}
-                                                            <MdLocationPin color='#737373' size='24px' />
-                                                            {calendarInfo.location ?
-                                                                <p>{calendarInfo.location}</p>
-                                                                : !calendarInfo.location && !locationToggle
-                                                                    ? <motion.button onClick={() => setLocationToggle(true)}>Add a location</motion.button>
-                                                                    : !calendarInfo.location && locationToggle
-                                                                        ? <motion.input
-                                                                            initial={{ opacity: 0.5, x: -10 }}
-                                                                            animate={{ opacity: 1, x: 0 }}
-                                                                            value={locationInput}
-                                                                            onChange={(e) => setLocationInput(e.target.value)}
-                                                                        />
-                                                                        : null}
-                                                        </div>
-                                                        <div className="calendar-info-description">
-                                                            {/* <h6>Description:</h6> */}
-                                                            <MdPerson color='#737373' size='24px' />
-                                                            <div className="calendar-info-description-value">
-                                                                {calendarInfo.description ?
-                                                                    <p>{calendarInfo.description}</p>
-                                                                    : !calendarInfo.description && !descriptionToggle
-                                                                        ? <button onClick={() => setDescriptionToggle(true)}>Add clients</button>
-                                                                        : !calendarInfo.description && descriptionToggle
+                                                            }}
+                                                        />
+                                                    </motion.div>
+                                                </>
+                                                : calendarInfo ?
+                                                    <>
+                                                        <motion.div className="calendar-info"
+                                                            key='calendar-info'
+                                                            variants={xVariants}
+                                                            initial='initial'
+                                                            animate='animate'
+                                                            exit={{ x: -10, opacity: 0 }}
+                                                        >
+                                                            <div className="calendar-info-header">
+                                                                <h5>Event Details</h5>
+                                                            </div>
+                                                            <div className="calendar-info-title-date">
+                                                                <div className="calendar-info-title">
+                                                                    <span />
+                                                                    <h4>{calendarInfo.title}</h4>
+                                                                </div>
+
+                                                                <h5>{new Date(calendarInfo.start).toLocaleDateString('en-US', {
+                                                                    weekday: 'long',
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric'
+                                                                })}
+                                                                </h5>
+                                                            </div>
+                                                            <div className="calendar-info-location">
+                                                                {/* <h6>Location:</h6> */}
+                                                                <MdLocationPin color='#737373' size='24px' />
+                                                                {calendarInfo.location ?
+                                                                    <p>{calendarInfo.location}</p>
+                                                                    : !calendarInfo.location && !locationToggle
+                                                                        ? <motion.button onClick={() => setLocationToggle(true)}>Add a location</motion.button>
+                                                                        : !calendarInfo.location && locationToggle
                                                                             ? <motion.input
                                                                                 initial={{ opacity: 0.5, x: -10 }}
                                                                                 animate={{ opacity: 1, x: 0 }}
-                                                                                value={descriptionInput}
-                                                                                onChange={(e) => setDescriptionInput(e.target.value)} />
+                                                                                value={locationInput}
+                                                                                onChange={(e) => setLocationInput(e.target.value)}
+                                                                            />
                                                                             : null}
                                                             </div>
-                                                        </div>
-                                                        {descriptionToggle || locationToggle
-                                                            ?
-                                                            <div className="calendar-info-edit-buttons">
-                                                                <button className="cancel-btn"
-                                                                    onClick={() => {
-                                                                        // reset states
-                                                                        setDescriptionToggle(false)
-                                                                        setDescriptionInput(undefined)
-                                                                        setLocationToggle(false)
-                                                                        setLocationInput(undefined)
-                                                                    }}
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                                <button className="submit-btn"
-                                                                    onClick={() => gCalendarEdit(calendarInfo.id)}
-                                                                >
-                                                                    Submit
-                                                                </button>
+                                                            <div className="calendar-info-description">
+                                                                {/* <h6>Description:</h6> */}
+                                                                <MdPerson color='#737373' size='24px' />
+                                                                <div className="calendar-info-description-value">
+                                                                    {calendarInfo.description ?
+                                                                        <p>{calendarInfo.description}</p>
+                                                                        : !calendarInfo.description && !descriptionToggle
+                                                                            ? <button onClick={() => setDescriptionToggle(true)}>Add clients</button>
+                                                                            : !calendarInfo.description && descriptionToggle
+                                                                                ? <motion.input
+                                                                                    initial={{ opacity: 0.5, x: -10 }}
+                                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                                    value={descriptionInput}
+                                                                                    onChange={(e) => setDescriptionInput(e.target.value)} />
+                                                                                : null}
+                                                                </div>
                                                             </div>
-                                                            :
-                                                            <div className="calendar-info-link">
-                                                                <button className="return"
-                                                                    onClick={() => {
-                                                                        // null calendar info, returns to no-cal-view-all state <FullCalendar/>
-                                                                        setCalendarInfo(null)
-                                                                    }}
-                                                                >
-                                                                    <MdArrowBack color="grey" size='18px' />
-                                                                </button>
-                                                                <button className="view" onClick={() => window.open(calendarInfo.url)}>View in Google Calendar</button>
-                                                            </div>
-                                                        }
-                                                    </motion.div>
-                                                </>
-                                                : !calendarIdLoading && !calendarId ?
-                                                    <>
-                                                        <motion.div className="calendar-list"
-                                                            key='cal-list'
-                                                        >
-                                                            <form>
-                                                                <h6>Create a new Google Calendar:</h6>
-                                                                <input placeholder="Horizon Appointments"
-                                                                    value={calendarInput}
-                                                                    onChange={(e) => setCalendarInput(e.target.value)}
-                                                                />
-                                                                <button className="create-calendar">Create Calendar</button>
-                                                            </form>
-                                                            {calendars &&
-                                                                <div className="calendar-list-existing">
-                                                                    <h6>Or choose an existing account calendar:</h6>
-                                                                    <ul>
-                                                                        {calendars?.map((cal: { id: string, name: string, color: string }) => {
-                                                                            return <li onClick={() => chooseCalendar(cal.id)}><span style={{ backgroundColor: `${cal.color}` }}></span>{cal.name}</li>
-                                                                        })}
-                                                                    </ul>
+                                                            {descriptionToggle || locationToggle
+                                                                ?
+                                                                <div className="calendar-info-edit-buttons">
+                                                                    <button className="cancel-btn"
+                                                                        onClick={() => {
+                                                                            // reset states
+                                                                            setDescriptionToggle(false)
+                                                                            setDescriptionInput(undefined)
+                                                                            setLocationToggle(false)
+                                                                            setLocationInput(undefined)
+                                                                        }}
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                    <button className="submit-btn"
+                                                                        onClick={() => gCalendarEdit(calendarInfo.id)}
+                                                                    >
+                                                                        Submit
+                                                                    </button>
+                                                                </div>
+                                                                :
+                                                                <div className="calendar-info-link">
+                                                                    <button className="return"
+                                                                        onClick={() => {
+                                                                            // null calendar info, returns to no-cal-view-all state <FullCalendar/>
+                                                                            setCalendarInfo(null)
+                                                                        }}
+                                                                    >
+                                                                        <MdArrowBack color="grey" size='18px' />
+                                                                    </button>
+                                                                    <button className="view" onClick={() => window.open(calendarInfo.url)}>View in Google Calendar</button>
                                                                 </div>
                                                             }
                                                         </motion.div>
                                                     </>
-                                                    : null // skeleton loading?
-                                    )
-                                        : isGLoggedIn === false ?
-                                            <>
-                                                <div className="calendar-events-login">
-                                                    <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
-                                                </div>
-                                            </> : null
-                                    }
-                                </LayoutGroup>
+                                                    : !calendarIdLoading && !calendarId ?
+                                                        <>
+                                                            <motion.div className="calendar-list"
+                                                                key='cal-list'
+                                                            >
+                                                                <form>
+                                                                    <h6>Create a new Google Calendar:</h6>
+                                                                    <input placeholder="Horizon Appointments"
+                                                                        value={calendarInput}
+                                                                        onChange={(e) => setCalendarInput(e.target.value)}
+                                                                    />
+                                                                    <button className="create-calendar">Create Calendar</button>
+                                                                </form>
+                                                                {calendars &&
+                                                                    <div className="calendar-list-existing">
+                                                                        <h6>Or choose an existing account calendar:</h6>
+                                                                        <ul>
+                                                                            {calendars?.map((cal: { id: string, name: string, color: string }) => {
+                                                                                return <li onClick={() => chooseCalendar(cal.id)}><span style={{ backgroundColor: `${cal.color}` }}></span>{cal.name}</li>
+                                                                            })}
+                                                                        </ul>
+                                                                    </div>
+                                                                }
+                                                            </motion.div>
+                                                        </>
+                                                        : null // skeleton loading?
+                                        )
+                                            : isGLoggedIn === false ?
+                                                <>
+                                                    <div className="calendar-events-login">
+                                                        <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                                                    </div>
+                                                </> : null
+                                        }
+                                    </LayoutGroup>
+                                </div>
                             </div>
                         </motion.div>
 
@@ -793,124 +792,131 @@ const Dashboard: React.FC = () => {
                             <div className="dashboard-card-header">
                                 <h4>Clients</h4>
                             </div>
-                            <div className="clients-dashboard">
-                                {isGLoggedIn ? (
-                                    contacts && contactGroupId ?
-                                        <>
-                                            <ul className="clients-list">
-                                                {contacts.map((contact: any) => {
-                                                    const contactId = contact.id.replace('people/', "")
-                                                    return (
-                                                        <li onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>
-                                                            <div><h4>{contact.firstName}</h4><h4>{contact.lastName}</h4></div>
-                                                            <div><span /><p>{contact.phoneNumber}</p></div>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-                                        </>
-                                        : !contactGroupIdLoading && !contactGroupId ?
+                            <div className="dashboard-card-body">
+                                <div className="clients-dashboard">
+                                    {isGLoggedIn ? (
+                                        contacts && contactGroupId ?
                                             <>
-                                                <div className="contact-groups">
-                                                    <form>
-                                                        <h6>Create a new Google Contacts group:</h6>
-                                                        <input placeholder="Horizon Clients"
-                                                            value={contactsInput}
-                                                            onChange={(e) => setContactsInput(e.target.value)}
-                                                        />
-                                                        <button className="create-cgroup">Create Group</button>
-                                                    </form>
-                                                    {contactGroups &&
-                                                        <div className="contact-groups-list">
-                                                            <h6>Or choose an existing account contact group:</h6>
-                                                            <ul>
-                                                                {contactGroups?.map((group, i) => {
-                                                                    return <li onClick={() => chooseContactGroup(group.resourceName)}><span style={{ backgroundColor: `${pieColorScale[i % 6]}` }}></span>{group.formattedName}</li>
-                                                                })}
-                                                            </ul>
-                                                        </div>
-                                                    }
-                                                </div>
+                                                <ul className="clients-list">
+                                                    {contacts.map((contact: any) => {
+                                                        const contactId = contact.id.replace('people/', "")
+                                                        return (
+                                                            <li onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>
+                                                                <div><h4>{contact.firstName}</h4><h4>{contact.lastName}</h4></div>
+                                                                <div><span /><p>{contact.phoneNumber}</p></div>
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
                                             </>
-                                            : null
-                                )
-                                    : (
-                                        null
+                                            : !contactGroupIdLoading && !contactGroupId ?
+                                                <>
+                                                    <div className="contact-groups">
+                                                        <form>
+                                                            <h6>Create a new Google Contacts group:</h6>
+                                                            <input placeholder="Horizon Clients"
+                                                                value={contactsInput}
+                                                                onChange={(e) => setContactsInput(e.target.value)}
+                                                            />
+                                                            <button className="create-cgroup">Create Group</button>
+                                                        </form>
+                                                        {contactGroups &&
+                                                            <div className="contact-groups-list">
+                                                                <h6>Or choose an existing account contact group:</h6>
+                                                                <ul>
+                                                                    {contactGroups?.map((group, i) => {
+                                                                        return <li onClick={() => chooseContactGroup(group.resourceName)}><span style={{ backgroundColor: `${pieColorScale[i % 6]}` }}></span>{group.formattedName}</li>
+                                                                    })}
+                                                                </ul>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </>
+                                                : null
                                     )
-                                }
+                                        : (
+                                            null
+                                        )
+                                    }
+                                </div>
                             </div>
                         </motion.div>
                         {/* </motion.div> */}
                         {/* <motion.div className="dashboard-row-bottom"> */}
                         <motion.div className="dashboard-info-card table">
-                            {dashboardListings &&
-                                <>
-                                    <div className="dashboard-card-header dashboard-header-mb-0">
-                                        <h4>Recent Listings</h4>
-                                    </div>
-                                    <table>
-                                        <thead>
-                                            <tr className="thead-row">
-                                                <th></th>
-                                                <th>ADDRESS</th>
-                                                <th>PRICE</th>
-                                                <th>BEDS</th>
-                                                <th>BATHS</th>
-                                                <th>STATUS</th>
-                                                <th>AREA</th>
-                                            </tr>
-                                        </thead>
+                            <div className="dashboard-card-header dashboard-header-mb-0">
+                                <h4>Recent Listings</h4>
+                            </div>
+                            <div className="dashboard-card-body">
+                                {dashboardListings &&
+                                    <>
 
-                                        <tbody>
-                                            {dashboardListings && dashboardListings?.map((listing: any) => {
-                                                const listingId = listing?.id
+                                        <table>
+                                            <thead>
+                                                <tr className="thead-row">
+                                                    <th></th>
+                                                    <th>ADDRESS</th>
+                                                    <th>PRICE</th>
+                                                    <th>BEDS</th>
+                                                    <th>BATHS</th>
+                                                    <th>STATUS</th>
+                                                    <th>AREA</th>
+                                                </tr>
+                                            </thead>
 
-                                                return (
-                                                    <>
-                                                        <tr id={listingId} onClick={() => navigate(`/listings/${listingId}`)}>
-                                                            <td><img src={listing.image1} /></td>
-                                                            <td>
-                                                                <p className="address1">{listing.address1}</p>
-                                                                <p className="address2">{listing.address2}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p className="td-p-bold">{listing.beds}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p className="td-p-bold">{listing.baths}</p>
-                                                            </td>
-                                                            <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
-                                                            <td><p className="td-p-bold">{listing.area}</p></td>
-                                                        </tr>
-                                                    </>
-                                                )
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </>
-                            }
+                                            <tbody>
+                                                {dashboardListings && dashboardListings?.map((listing: any) => {
+                                                    const listingId = listing?.id
+
+                                                    return (
+                                                        <>
+                                                            <tr id={listingId} onClick={() => navigate(`/listings/${listingId}`)}>
+                                                                <td><img src={listing.image1} /></td>
+                                                                <td>
+                                                                    <p className="address1">{listing.address1}</p>
+                                                                    <p className="address2">{listing.address2}</p>
+                                                                </td>
+                                                                <td>
+                                                                    <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
+                                                                </td>
+                                                                <td>
+                                                                    <p className="td-p-bold">{listing.beds}</p>
+                                                                </td>
+                                                                <td>
+                                                                    <p className="td-p-bold">{listing.baths}</p>
+                                                                </td>
+                                                                <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
+                                                                <td><p className="td-p-bold">{listing.area}</p></td>
+                                                            </tr>
+                                                        </>
+                                                    )
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </>
+                                }
+                            </div>
                         </motion.div>
 
                         <motion.div className="dashboard-info-card map">
                             <div className="dashboard-card-header">
                                 <h4>Listings Map</h4>
                             </div>
-                            <div className="listings-map">
-                                <GoogleMap
-                                    bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
-                                    center={{ lat: 40.7366, lng: -73.8200 }}
-                                    defaultZoom={10}
-                                    options={{
-                                        fullscreenControl: false,
-                                        scrollwheel: true,
-                                        zoomControl: false,
-                                    }}
-                                >
-                                    {mapMarkers}
-                                </GoogleMap>
+                            <div className="dashboard-card-body">
+                                <div className="listings-map">
+                                    <GoogleMap
+                                        bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
+                                        center={{ lat: 40.7366, lng: -73.8200 }}
+                                        defaultZoom={10}
+                                        options={{
+                                            fullscreenControl: false,
+                                            scrollwheel: true,
+                                            zoomControl: false,
+                                        }}
+                                    >
+                                        {mapMarkers}
+                                    </GoogleMap>
+                                </div>
                             </div>
                         </motion.div>
                         {/* </motion.div> */}

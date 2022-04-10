@@ -41,6 +41,10 @@
   border-bottom: 1px solid var(--grey-light) !important;
 }
 
+.fc-list-day-text {
+  font-weight: 500;
+}
+
 .fc .fc-cell-shaded,
 .fc .fc-day-disabled {
   background: none;
@@ -73,7 +77,7 @@
 }
 
 .calendar-events .full-calendar .fc-list-day-cushion {
-  background-color: transparent;
+  background-color: #f9fafb;
 }
 
 :visited {

@@ -22,8 +22,10 @@ a {
 }
 
 button {
-  font-family: "Noto Sans", sans-serif;
-  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  height: 30px;
+  transition: all 0.3s;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -31,11 +33,11 @@ button {
 }
 
 button:hover {
-  filter: brightness(0.95);
+  filter: brightness(1.1);
 }
 
 button:active {
-  filter: brightness(0.75) !important;
+  filter: brightness(0.9) !important;
 }
 
 img {
@@ -230,8 +232,10 @@ textarea:focus {
   width: 150px;
   background: var(--primary);
   border-right: 1px solid var(--grey-light);
+  padding: 1rem 0;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   position: fixed;
 }
 
@@ -243,14 +247,13 @@ textarea:focus {
 .sidebar-logo-img {
   height: auto;
   width: 110px;
-  margin: 1rem 0 0 0.5rem;
+  margin: 0 0 0 0.5rem;
 }
 
 .sidebar-grid {
   height: 100%;
   width: 100%;
   display: grid;
-  padding: 2rem 0;
   position: relative;
 }
 
@@ -307,21 +310,26 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1rem;
   width: 150px;
 }
 
 .site-preview-btn {
-  height: 35px;
+  height: 30px;
   width: 90%;
   margin: 0 auto;
-  background: var(--blue-light);
-  color: black;
+  background: var(--grey-medium-light);
   border: none;
   border-radius: 5px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 500;
 }
 
 .site-preview-btn a {
-  color: var(--blue-primary);
+  color: var(--primary);
 }
 
 .logout-btn {
@@ -336,12 +344,12 @@ textarea:focus {
 
 .sidebar-profile {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  width: inherit;
   gap: 0.5rem;
-  color: var(--primary-superlight);
-  margin-bottom: 2rem;
-  padding: 0 1.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
+  border-top: 1px solid var(--primary-superlight);
 }
 
 .sidebar-profile img {
@@ -349,6 +357,7 @@ textarea:focus {
   height: 35px;
   width: 35px;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .sidebar-profile-text {
@@ -360,61 +369,72 @@ textarea:focus {
 
 .sidebar-profile span {
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.sidebar-profile h4,
-em {
+.sidebar-profile h5,
+h6 {
   margin: 0;
 }
 
-.sidebar-profile span h4:first-child {
-  font-size: 14px;
-  font-weight: 400;
+.sidebar-profile span h5 {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
 }
 
-.sidebar-profile em {
+.sidebar-profile span h6 {
   font-size: 11px;
+  font-weight: 400;
+  color: var(--primary-superlight);
+  cursor: pointer;
 }
 
 .dashboard-wrapper {
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  max-width: 85vw;
   margin: 0 auto;
   box-sizing: border-box;
 
   background: var(--bg);
-  border-radius: 15px;
 
-  display: grid;
-  grid-template-rows: 27px 1fr;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
   overflow: scroll;
 }
 
 .dashboard-header {
+  box-sizing: border-box;
   display: flex;
-  align-items: flex-start;
-  height: auto;
+  justify-content: space-between;
+  align-items: center;
+  height: fit-content;
   width: 100%;
-  padding: 0 5px;
+  padding: 20px 0 20px 1.5rem;
+  border-bottom: 1px solid var(--grey-light);
+  background-color: white;
 }
 
 .dashboard-header h3 {
+  font-size: 16px;
+  font-weight: 500;
   margin: 0;
   color: black;
 }
 
 .dashboard-body {
-  height: 100%;
+  height: calc(100% - 60.5px);
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 50% 50%;
   grid-template-areas:
     "pie cal contacts"
     "tabl tabl map";
-  gap: 1rem;
+  column-gap: 1rem;
+  padding: 0.5rem 1.5rem;
 }
 /* grid-areas */
 .pie {
@@ -439,34 +459,42 @@ em {
 
 .dashboard-info-card {
   height: 100%;
-  max-height: calc((100vh - 91px) / 2);
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  background: white;
-  border: 1px solid var(--grey-light);
-  border-radius: 10px;
-  padding: 1rem;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  box-shadow: var(--box-shadow);
+  padding: 0.5rem 0;
 }
 
 .dashboard-card-header {
-  height: 30px;
+  height: fit-content;
   width: 100%;
+  padding: 0 0 0.5rem 0;
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .dashboard-card-header h4 {
   color: black;
-  margin: 0 auto 0.5rem 0;
-  font-size: 13px;
-  font-weight: 600;
+  /* margin: 0 auto 0.5rem 0; */
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dashboard-card-body {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border: 1px solid var(--grey-light);
+  border-radius: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .piechart-active-listings {
@@ -1005,7 +1033,7 @@ em {
   display: flex;
   align-items: center;
   gap: 5px;
-  background-color: white;
+  background-color: #f9fafb;
   font-size: 14px;
   padding: 8px 14px;
   border-bottom: 1px solid var(--grey-light);
@@ -1017,7 +1045,7 @@ em {
 }
 
 .clients-dashboard > .clients-list > li > div:first-child h4:last-child {
-  font-weight: 700;
+  font-weight: 500;
   margin: 0;
 }
 
@@ -1063,8 +1091,7 @@ em {
     margin: 0 0 0 auto;
 } */
 
-.dashboard-body table,
-.dashboard-body table > thead {
+.dashboard-body table {
   background-color: white !important;
   box-shadow: none !important;
   width: 100%;
@@ -1304,7 +1331,7 @@ tbody tr {
   border-bottom: 1px solid var(--grey-light);
 }
 
-tbody tr td:first-child {
+.listings-table tbody tr td:first-child {
   height: inherit;
   display: flex;
   align-items: center;
@@ -1659,10 +1686,10 @@ label {
   border: none;
   border-radius: 5px;
   color: black;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0.25rem 0.5rem;
-  height: 35px;
-  width: 100px;
+  height: 30px;
+  width: 75px;
 }
 
 .submit-btn {
@@ -1730,7 +1757,6 @@ label {
 .listing-view-wrapper {
   height: auto;
   width: 100%;
-  max-width: 85vw;
   margin: 0 auto;
   box-sizing: border-box;
 
@@ -1751,9 +1777,8 @@ label {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px;
+  height: 60.5px;
   width: calc(100% - 150px);
-  max-width: 85vw;
   padding: 0 5px;
   margin: 0 auto;
   padding: 0 1rem;
@@ -1769,29 +1794,29 @@ label {
 .back-btn {
   background: var(--grey-light);
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
   color: black;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0.25rem 0.5rem;
-  height: 35px;
+  height: 30px;
   width: auto;
 }
 
 .listing-view-actions {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .delete-btn {
-  background: var(--red-primary);
+  background: var(--red-light);
   border: none;
-  border-radius: 3px;
-  color: white;
-  font-size: 14px;
+  border-radius: 5px;
+  color: var(--red-primary);
+  font-size: 13px;
   padding: 0.25rem 0.5rem;
-  height: 35px;
-  width: 100px;
+  height: 30px;
+  width: 75px;
 }
 
 .modal-backdrop {
@@ -1838,14 +1863,14 @@ em {
 }
 
 .edit-btn {
-  background: var(--blue-primary);
+  background: var(--primary);
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0.25rem 0.5rem;
-  height: 35px;
-  width: 100px;
+  height: 30px;
+  width: 75px;
 }
 
 /* Image Carousel */
@@ -2048,7 +2073,7 @@ em {
   content: "\00d7"; /* This will render the 'X' */
   font-size: 18px;
   color: white;
-  margin: 0 0 1px 0px;
+  margin: 0 0 2px 0px;
 }
 
 .edit-main-dropzone {
@@ -2254,9 +2279,10 @@ em {
   height: 36px;
 }
 
-.listing-view-text input:focus {
-  background: var(--primary-superlight) !important;
-  border: 1px solid var(--primary) !important;
+.listing-view-text input:focus,
+.listing-view-text textarea:focus {
+  background: var(--grey-superlight) !important;
+  border: 1px solid var(--grey-dark) !important;
 }
 
 .listing-view-text-head {
@@ -2273,11 +2299,13 @@ em {
 
 .listing-view-text-head h3 {
   margin: 0;
+  font-weight: 700;
 }
 
 .listing-view-text-head h4 {
   margin: 0;
   color: var(--grey-dark);
+  font-weight: 600;
 }
 
 .listing-view-text-head span:first-child input {
@@ -2291,7 +2319,7 @@ em {
 .listing-view-text-head .edit-address1,
 .edit-price {
   font-size: 18.7px;
-  font-weight: 700;
+  font-weight: 600;
   color: black !important;
 }
 
@@ -2299,7 +2327,7 @@ em {
   position: absolute;
   left: 20px;
   font-size: 18.7px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--grey-dark);
 }
 
@@ -2315,23 +2343,24 @@ em {
 
 .listing-view-text-head .edit-address1::placeholder {
   font-size: 18.7px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .listing-view-text-head .edit-address2 {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--grey-dark) !important;
 }
 
 .listing-view-text-head .edit-address2::placeholder {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .listing-view-text h5 {
   margin: 0;
   color: var(--grey-dark);
+  font-weight: 500;
 }
 
 .listing-view-text p {
@@ -2366,7 +2395,7 @@ em {
   font-weight: 400;
   padding: 0.5rem;
   margin-top: 0.5rem;
-  height: 36px;
+  height: 32px;
   width: 100%;
 }
 
@@ -2385,8 +2414,12 @@ em {
   gap: 0.5rem;
 }
 
+.listing-view-text-details-col h5 {
+  font-weight: 500;
+}
+
 .listing-view-text-details-col p {
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .edit-squareFt {
@@ -2394,6 +2427,7 @@ em {
   font-weight: 400;
   color: black !important;
   width: 50%;
+  height: 32px !important;
 }
 
 .listing-view-text-desc {

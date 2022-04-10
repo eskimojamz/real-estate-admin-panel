@@ -56,27 +56,30 @@ function Sidebar() {
                         </NavLink>
                     </div>
                     <div className="sidebar-bottom">
-                        <div className="sidebar-profile">
-                            {loggedIn ?
-                                <>
-                                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" />
-                                    <div className="sidebar-profile-text">
-                                        <span><h4>Joelle</h4></span>
-                                        <em>Admin Account</em>
-                                    </div>
-                                </>
-                                : null}
-                        </div>
                         <button className="site-preview-btn">
                             <Link to="google.com">
                                 Site Preview
                             </Link>
                         </button>
-                        <button
+                        <div className="sidebar-profile">
+                            {loggedIn ?
+                                <>
+                                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" />
+                                    <div className="sidebar-profile-text">
+                                        <span>
+                                            <h5>Joelle</h5>
+                                            <h6>View Settings</h6>
+                                        </span>
+                                    </div>
+                                </>
+                                : null}
+                        </div>
+
+                        {/* <button
                             className="logout-btn"
                         >
                             Logout
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>
