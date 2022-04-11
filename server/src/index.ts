@@ -105,7 +105,7 @@ import fetch from "node-fetch"
     app.post("/auth/google", (_req, res) => {
         const url = oauth2Client.generateAuthUrl({
             access_type: "offline",
-            scope: ["profile", "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/contacts"],
+            scope: ["profile", "email", "https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/contacts"],
             prompt: "consent",
         })
         res.send({ url })

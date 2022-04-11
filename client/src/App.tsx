@@ -5,6 +5,8 @@ import "./App.css"
 import axios from "axios";
 
 interface GlobalStateTypes {
+  gAccountInfo: { email: any, photo: any } | undefined
+  setGAccountInfo: React.Dispatch<React.SetStateAction<any>>
   isGLoggedIn: boolean | undefined;
   setIsGLoggedIn: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   calendarEvents: any;
@@ -19,10 +21,13 @@ export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const [isGLoggedIn, setIsGLoggedIn] = useState<boolean>()
+  const [gAccountInfo, setGAccountInfo] = useState<any>()
   const [calendarEvents, setCalendarEvents] = useState<any | null>()
   const [contacts, setContacts] = useState<any | null>()
 
   const globalState: GlobalStateTypes = {
+    gAccountInfo,
+    setGAccountInfo,
     isGLoggedIn,
     setIsGLoggedIn,
     calendarEvents,
@@ -57,10 +62,16 @@ export const App: React.FC = () => {
       if (gLoginRef) {
         axios.get('https://people.googleapis.com/v1/people/me', {
           params: {
-            personFields: 'emailAddresses,names,photos',
+            personFields: 'emailAddresses,photos',
           }
-        }).then(res => console.log(res))
+        }).then((res) => {
+          setGAccountInfo({
+            email: res.data.emailAddresses[0].value,
+            photo: res.data.photos[0].url
+          })
+        })
       }
+
     }).then(() => {
       if (gLoginRef) {
         setIsGLoggedIn(true)

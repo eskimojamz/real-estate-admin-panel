@@ -427,21 +427,85 @@ h6 {
   height: 30px;
 }
 
+.google-connected-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 400;
+}
+
 .google-connected {
-  cursor: default;
+  z-index: 401;
+  position: relative;
+  cursor: pointer;
   height: 30px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  border: 1px solid var(--grey-light);
+  transition: all 0.3s;
+}
+
+.google-connected-main {
   display: flex;
   place-items: center;
   gap: 0.5rem;
   padding: 0.25rem 0.5rem;
-  background-color: var(--grey-medium-light);
   border-radius: 5px;
-  border: 1px solid var(--grey-light);
 }
 
-.google-connected h6 {
+.google-connected-main h6 {
   font-size: 13px;
   font-weight: 500;
+  color: #000000;
+}
+
+.google-connected-main:hover {
+  background-color: var(--grey-superlight);
+}
+
+.google-connected-expand:before {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  left: 10px; /* To the left of the tooltip */
+  /* margin-top: -7px; */
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent var(--grey-light) transparent;
+}
+
+.google-connected-expand {
+  z-index: 401;
+  position: absolute;
+  top: 38px;
+  left: -1px;
+  height: 40px;
+  width: fit-content;
+  display: flex;
+  gap: 8px;
+  place-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--grey-light);
+  background-color: #ffffff;
+}
+
+.google-connected-expand:hover {
+  background-color: var(--grey-superlight);
+}
+
+.google-connected-expand img {
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
+}
+
+.google-connected-expand h6 {
+  font-size: 13px;
+  font-weight: 400;
   color: #000000;
 }
 
