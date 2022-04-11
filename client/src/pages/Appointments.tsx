@@ -5,7 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import '../utils/fullCalendar/fullCalendar.css'
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { createRef, useContext, useEffect, useMemo, useState } from 'react'
 import { GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 import { MdAddCircle, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
@@ -47,6 +47,7 @@ function Appointments() {
     const { data: userData } = useDisplayUserQuery({
         onError: (error) => console.log(error)
     })
+    const calRef = createRef<any>()
     const [calendars, setCalendars] = useState<any[] | null>()
     const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error)
@@ -58,7 +59,7 @@ function Appointments() {
             console.log(error)
         }
     })
-
+    console.log(calendarEvents)
     const getGCalendarsList = async () => {
         try {
             await axios.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
@@ -149,6 +150,7 @@ function Appointments() {
 
     const createAppointment = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        let calendarApi = calRef.current.getApi()
         const appointmentRef = {
             "start": {
                 "date": startDate,
@@ -186,7 +188,37 @@ function Appointments() {
         }
         console.log(appointmentRef)
         await axios.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
-            .then(res => console.log(res))
+            .then(res => {
+                console.log(res)
+                calendarApi.addEvent({
+                    id: res?.data?.id,
+                    title: res?.data?.summary,
+                    start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                    end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                    startStr: res?.data?.start?.dateTime,
+                    endStr: res?.data?.end?.dateTime,
+                    extendedProps: {
+                        description: res?.data?.description,
+                        location: res?.data?.location
+                    },
+                    url: res?.data?.htmlLink,
+                    allDay: res?.data?.start?.dateTime ? false : true
+                })
+                // setCalendarEvents((events: any) => [...events, {
+                //     id: res?.data?.id,
+                //     title: res?.data?.summary,
+                //     start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                //     end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                //     startStr: res?.data?.start?.dateTime,
+                //     endStr: res?.data?.end?.dateTime,
+                //     extendedProps: {
+                //         description: res?.data?.description,
+                //         location: res?.data?.location
+                //     },
+                //     url: res?.data?.htmlLink,
+                //     allDay: res?.data?.start?.dateTime ? false : true
+                // }])
+            })
     }
 
     const [appointmentInfo, setAppointmentInfo] = useState<any>()
@@ -319,6 +351,7 @@ function Appointments() {
                                             animate='animate'
                                         >
                                             <FullCalendar
+                                                ref={calRef}
                                                 plugins={[dayGridPlugin, interactionPlugin]}
                                                 initialView="dayGridMonth"
                                                 initialEvents={calendarEvents}
