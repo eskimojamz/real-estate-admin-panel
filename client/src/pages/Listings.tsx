@@ -43,11 +43,11 @@ function Home() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
-          <div className="listings-header">
+          <div className="page-header">
             <span className="listings-header-text">
               <h5>Listings</h5>
-              {/* <h5>{listings?.length}</h5> */}
             </span>
+            <button className="btn-primary" onClick={() => navigate("/listings/create")}>Create Listing</button>
           </div>
           <div className="listings-bar">
 
@@ -62,7 +62,8 @@ function Home() {
               </AnimatePresence>
             </span>
 
-            <div className="listings-header-buttons-wrapper">
+            <div className="listings-search-container">
+              <h6>SEARCH</h6>
               <form className="search"
                 onSubmit={(e) => submitSearch(e)}
               >
@@ -77,7 +78,6 @@ function Home() {
                 </input>
                 <span className="search-icon" onClick={(e) => submitSearch(e)}><MdOutlineSearch size='20px' color='#CCCCCC' /></span>
               </form>
-              <button className="create-btn" onClick={() => navigate("/listings/create")}>Create Listing</button>
             </div>
           </div>
           {

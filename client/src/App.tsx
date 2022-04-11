@@ -13,7 +13,7 @@ interface GlobalStateTypes {
   setContacts: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export const GlobalContext:React.Context<any> = createContext(null)
+export const GlobalContext: React.Context<any> = createContext(null)
 
 export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -21,9 +21,9 @@ export const App: React.FC = () => {
   const [isGLoggedIn, setIsGLoggedIn] = useState<boolean>()
   const [calendarEvents, setCalendarEvents] = useState<any | null>()
   const [contacts, setContacts] = useState<any | null>()
-  
+
   const globalState: GlobalStateTypes = {
-    isGLoggedIn, 
+    isGLoggedIn,
     setIsGLoggedIn,
     calendarEvents,
     setCalendarEvents,
@@ -45,28 +45,36 @@ export const App: React.FC = () => {
   useEffect(() => {
     let gLoginRef = false
     axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
-        withCredentials:true
+      withCredentials: true
     }).then((res) => {
-        const {gAccessToken} = res.data
-        console.log(gAccessToken)
-        if (gAccessToken) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
-            gLoginRef = true
-        }  
+      const { gAccessToken } = res.data
+      console.log(gAccessToken)
+      if (gAccessToken) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+        gLoginRef = true
+      }
     }).then(() => {
-        if (gLoginRef) {
-            setIsGLoggedIn(true)
-        } else {
-            setIsGLoggedIn(false)
-        }
+      if (gLoginRef) {
+        axios.get('https://people.googleapis.com/v1/people/me', {
+          params: {
+            personFields: 'emailAddresses,names,photos',
+          }
+        }).then(res => console.log(res))
+      }
+    }).then(() => {
+      if (gLoginRef) {
+        setIsGLoggedIn(true)
+      } else {
+        setIsGLoggedIn(false)
+      }
     })
   }, [])
 
   return (
     <>
-    <GlobalContext.Provider value={globalState}>
-      {loading ? null : <Router />}
-    </GlobalContext.Provider>
+      <GlobalContext.Provider value={globalState}>
+        {loading ? null : <Router />}
+      </GlobalContext.Provider>
     </>
   )
 }

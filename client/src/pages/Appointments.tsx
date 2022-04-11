@@ -11,6 +11,7 @@ import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultC
 import { MdAddCircle, MdEdit, MdLocationPin, MdPerson } from 'react-icons/md';
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
+import GoogleConnected from '../components/GoogleConnected';
 
 interface MapMarkerProps {
     lat: number;
@@ -298,11 +299,16 @@ function Appointments() {
     return (
         <>
             <div className='wrapper'>
+                <div className="page-header">
+                    <h3>Appointments</h3>
+                    {isGLoggedIn && (
+                        <GoogleConnected />
+                    )}
+
+
+                </div>
                 <div className='appointments-wrapper'>
                     <div className='appointments-list'>
-                        <div className='appointments-header'>
-                            <h3>Appointments</h3>
-                        </div>
                         {isGLoggedIn ? (
                             calendarEvents && calendarId ?
                                 <>

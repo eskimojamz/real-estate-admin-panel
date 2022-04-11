@@ -2,8 +2,8 @@ import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, 
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion"
 
 import { GetUserDefaultCalendarDocument, GetUserDefaultContactGroupDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useSetDefaultCalendarMutation, useSetDefaultContactGroupMutation } from "../generated/graphql"
-import { Doughnut, Pie } from "react-chartjs-2"
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import { useLocation, useNavigate } from "react-router-dom";
 import { gapi } from 'gapi-script'
 import { SignInButton, useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
@@ -20,6 +20,8 @@ import { GlobalContext } from "../App";
 import { MdLocationPin, MdPerson, MdArrowBack } from "react-icons/md"
 import { FaGoogle } from "react-icons/fa"
 import { IoCloseCircle } from "react-icons/io5"
+import GoogleConnected from "../components/GoogleConnected";
+
 
 interface MapMarkerProps {
     listingId: string;
@@ -47,7 +49,6 @@ const Dashboard: React.FC = () => {
 
     const activeListingsTotal = allListingsData?.allListings.filter(l => l.status === "Active").length
     const activeListings = allListingsData?.allListings.filter(l => l.status === "Active")
-    const soldListings = allListingsData?.allListings.filter(l => l.status === "Sold")
 
     const activeDataFilled = [
         { label: "Queens", value: activeListings?.filter(l => l.area === "Queens").length },
@@ -59,18 +60,10 @@ const Dashboard: React.FC = () => {
         { label: "Staten Island", value: activeListings?.filter(l => l.area === "Staten Island").length },
     ]
 
-    const activeDataLabels = useMemo(() => {
+    const activeData = useMemo(() => {
         const arr: any[] = []
         activeDataFilled.filter(d => d.value !== 0).map(x => {
-            arr.push(x.label)
-        })
-        return arr
-    }, [activeDataFilled])
-
-    const activeDataValues = useMemo(() => {
-        const arr: any[] = []
-        activeDataFilled.filter(d => d.value !== 0).map(x => {
-            arr.push(x.value)
+            arr.push(x)
         })
         return arr
     }, [activeDataFilled])
@@ -85,88 +78,53 @@ const Dashboard: React.FC = () => {
         animate: { x: 0, opacity: 1 }
     }
 
-    const pieColorScale = [
-        "#FCA703",
-        "#FF5E4F",
-        "rgba(98, 142, 255, 1)",
-        "#62F4AC",
-        "#FFA49C",
-        "#ADC5FF",
-    ]
+    const [activePieIndex, setActivePieIndex] = useState<number>(0)
 
-    ChartJS.register(ArcElement, Tooltip, Legend);
-
-    const activeData = {
-        labels: activeDataLabels,
-        datasets: [
-            {
-                label: 'Areas',
-                data: activeDataValues,
-                fill: true,
-                backgroundColor: pieColorScale,
-                hoverBackgroundColor: pieColorScale,
-                borderWidth: 1,
-            },
-        ],
+    const onPieEnter = (_: any, index: any) => {
+        setActivePieIndex(index)
     };
 
-    const activeOptions = {
-        layout: {
-            padding: 16,
-        },
-        borderWidth: 0,
-        spacing: 1,
-        hoverBorderWidth: 0,
-        hoverOffset: 10,
-        plugins: {
-            tooltip: {
-                enabled: false,
-                //     intersect: true,
-                //     displayColors: false,
-                //     backgroundColor: 'rgba(249, 249, 249, 1)',
-                //     bodyColor: 'rgba(115, 115, 115, 1)',
-                //     bodyFont: {
-                //         family: "'Noto Sans', sans-serif",
-                //         size: 13,
-                //         weight: '700'
-                //     },
-                //     caretSize: 3,
-                //     callbacks: {
-                //         label: function(context: { dataset: { data: { [x: string]: any; }; }; dataIndex: string | number; }) {
-                //             let label
-                //             if (context.dataIndex === 1) {
-                //                 label = context.dataset.data[context.dataIndex] + " listing"
-                //             } else {
-                //                 label = context.dataset.data[context.dataIndex] + " listings"
-                //             }
-                //             return label;
-                //         }
-                //     }
-            },
-            legend: {
-                display: false,
-            },
-        }
-    }
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setActiveData(activeDataFilled)
-    //         // setEndAngle(360)
-    //     }, 100)
-    // }, [])
-
-    console.log(activeData)
-
-    const soldData = [
-        soldListings?.filter(l => l.area === "Queens").length,
-        soldListings?.filter(l => l.area === "Brooklyn").length,
-        soldListings?.filter(l => l.area === "Bronx").length,
-        soldListings?.filter(l => l.area === "Manhattan").length,
-        soldListings?.filter(l => l.area === "Long Island").length,
-        soldListings?.filter(l => l.area === "New Jersey").length,
-        soldListings?.filter(l => l.area === "Staten Island").length,
+    const pieColorScale = [
+        "#13345d",
+        "#2c5990",
+        "#769ac5",
+        "#9cbee8",
+        "#9cbee8ad",
     ]
+
+    const renderActiveShape = (props: { cx: any; cy: any; innerRadius: any; outerRadius: any; startAngle: any; endAngle: any; fill: any; payload: any; }) => {
+
+        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload } = props;
+
+        return (
+            <g>
+                <text className="pie-label-a" x={cx} y={cy} dy={-2} textAnchor="middle" fill="#000000">
+                    {payload.label}
+                </text>
+                <text className="pie-label-b" x={cx} y={cy} dy={20} textAnchor="middle" fill="#838282">
+                    {payload.value} {payload.value > 1 ? 'Listings' : 'Listing'}
+                </text>
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                />
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    innerRadius={outerRadius + 6}
+                    outerRadius={outerRadius + 10}
+                    fill={fill}
+                />
+            </g>
+        );
+    };
 
     const dashboardListings = useMemo(() => {
         const arr = allListingsData?.allListings.slice(0, 3)
@@ -545,8 +503,14 @@ const Dashboard: React.FC = () => {
             )}
             <div className="wrapper">
                 <motion.div className="dashboard-wrapper">
-                    <motion.div className="dashboard-header">
+                    <motion.div className="page-header">
                         <h3>Dashboard</h3>
+                        <span className="page-header-end">
+                            {isGLoggedIn && (
+                                <GoogleConnected />
+                            )}
+                            <button className="btn-primary" onClick={() => navigate("/listings/create")}>Create Listing</button>
+                        </span>
                     </motion.div>
                     <motion.div className="dashboard-body">
                         {/* <motion.div className="dashboard-row-top"> */}
@@ -557,42 +521,32 @@ const Dashboard: React.FC = () => {
                                     <h4>Active Listings</h4>
                                 </div>
                                 <div className="dashboard-card-body">
-                                    <motion.div className="piechart-active-listings"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                    >
-                                        {allListingsData ? (
-                                            <>
-                                                <Doughnut data={activeData}
-                                                    options={activeOptions}
-                                                />
-                                            </>
-                                        ) : null}
-                                    </motion.div>
-
-                                    <div className="piechart-active-listings-legend">
-                                        {allListingsData && activeDataLabels?.map((label, i) => {
-                                            return (
-                                                <>
-                                                    <motion.div className="piechart-legend-item"
-                                                        initial={{ scale: 0, opacity: 0 }}
-                                                        animate={{ scale: 1, opacity: 1 }}
+                                    {activeData.length ? (
+                                        <>
+                                            <ResponsiveContainer width='95%' height='95%'>
+                                                <PieChart>
+                                                    <Pie
+                                                        activeIndex={activePieIndex}
+                                                        activeShape={renderActiveShape}
+                                                        data={activeData}
+                                                        dataKey='value'
+                                                        nameKey='label'
+                                                        innerRadius={60}
+                                                        outerRadius={90}
+                                                        paddingAngle={2}
+                                                        onMouseEnter={onPieEnter}
+                                                        onClick={(index) => {
+                                                            navigate(`/listings?area=${index.label.replace(' ', '_')}`)
+                                                        }}
                                                     >
-                                                        <div className="label"
-                                                            style={{ backgroundColor: pieColorScale[i] }}
-                                                        >
-                                                            <h6>{label}</h6>
-                                                        </div>
-                                                        <div className="value"
-                                                            style={{ backgroundColor: pieColorScale[i] }}
-                                                        >
-                                                            <h6>{activeDataValues[i]}</h6>
-                                                        </div>
-                                                    </motion.div>
-                                                </>
-                                            )
-                                        })}
-                                    </div>
+                                                        {activeDataFilled.map((_, index) => (
+                                                            <Cell key={`cell-${index}`} fill={pieColorScale[index % pieColorScale.length]} />
+                                                        ))}
+                                                    </Pie>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </>
+                                    ) : null}
                                 </div>
                             </AnimatePresence>
                         </motion.div>

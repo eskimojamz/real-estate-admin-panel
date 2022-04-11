@@ -56,10 +56,8 @@ function Sidebar() {
                         </NavLink>
                     </div>
                     <div className="sidebar-bottom">
-                        <button className="site-preview-btn">
-                            <Link to="google.com">
-                                Site Preview
-                            </Link>
+                        <button className="site-preview-btn" onClick={() => window.open('http://horizon-development.plasmic.site/', '_blank')}>
+                            Site Preview
                         </button>
                         <div className="sidebar-profile">
                             {loggedIn ?
