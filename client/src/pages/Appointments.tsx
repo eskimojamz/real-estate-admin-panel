@@ -8,7 +8,8 @@ import { motion } from 'framer-motion';
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
-import { MdAddCircle, MdEdit, MdLocationPin, MdPerson } from 'react-icons/md';
+import { MdAddCircle, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
+import { CgCalendarToday } from 'react-icons/cg'
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import GoogleConnected from '../components/GoogleConnected';
@@ -299,384 +300,373 @@ function Appointments() {
     return (
         <>
             <div className='wrapper'>
-                <div className="page-header">
-                    <h3>Appointments</h3>
-                    {isGLoggedIn && (
-                        <GoogleConnected />
-                    )}
-
-
-                </div>
                 <div className='appointments-wrapper'>
-                    <div className='appointments-list'>
-                        {isGLoggedIn ? (
-                            calendarEvents && calendarId ?
-                                <>
-                                    <motion.div className="full-calendar-month"
-                                        key='full-calendar'
-                                        variants={yVariants}
-                                        initial='initial'
-                                        animate='animate'
-                                    >
-                                        <FullCalendar
-                                            plugins={[dayGridPlugin, interactionPlugin]}
-                                            initialView="dayGridMonth"
-                                            initialEvents={calendarEvents}
-                                            height='auto'
-                                            headerToolbar={{
-                                                left: 'title',
-                                                center: '',
-                                                right: 'prev,next'
-                                            }}
-                                            // visibleRange={(currentDate) => {
-                                            //     console.log(currentDate)
-                                            //     const startDate = new Date(currentDate.valueOf());
-                                            //     const endDate = new Date(currentDate.valueOf());
-                                            //     // Adjust the start & end dates, respectively
-                                            //     startDate.setDate(startDate.getDate() - 1); // One day in the past
-                                            //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
-                                            //     console.log(startDate, endDate)
-                                            //     return {start: startDate, end: endDate}
-                                            // }}
-                                            duration={{ 'days': 180 }}
-                                            timeZone='America/New_York'
-                                            dateClick={(info) => {
-                                                // if edit was on, reset form on clicking new date 
-                                                editToggle && resetForm()
-                                                // if editmode is on, toggle off
-                                                editToggle && setEditToggle(false)
-                                                setStartDate(info.dateStr)
-                                                setEndDate(info.dateStr)
-                                                setAppointmentInfo(undefined)
-                                            }}
-                                            eventClick={(info) => {
-                                                info.jsEvent.preventDefault(); // don't let the browser navigate
-                                                // if edit was on, reset form on clicking new event 
-                                                editToggle && resetForm()
-                                                // if editmode is on, toggle off
-                                                editToggle && setEditToggle(false)
-                                                const infoRef = {
-                                                    id: info.event.id,
-                                                    title: info.event.title,
-                                                    start: info.event.startStr,
-                                                    end: info.event.endStr,
-                                                    description: info.event.extendedProps.description,
-                                                    location: info.event.extendedProps.location,
-                                                    url: info.event.url,
-                                                    allDay: info.event.allDay,
-                                                }
-                                                setAppointmentInfo(infoRef)
-
-                                            }}
-                                            selectable={true}
-                                        />
-                                    </motion.div>
-                                </>
-                                : null)
-                            : null}
+                    <div className="page-header">
+                        <h3>Appointments</h3>
+                        {isGLoggedIn && (
+                            <GoogleConnected />
+                        )}
                     </div>
-                    <div className='appointments-side'>
-                        <div className='appointments-side-header'>
-                            {appointmentInfo
-                                ? (
+                    <div className="appointments-body">
+                        <div className='appointments-list'>
+                            {isGLoggedIn ? (
+                                calendarEvents && calendarId ?
                                     <>
-                                        {editToggle ? <h4>Edit Appointment</h4> : <h4>Appointment Details</h4>}
-                                        <span>
-                                            {!editToggle &&
-                                                <MdEdit size='24px' color='#628eff'
-                                                    onClick={() => {
-                                                        // set form fields to appointmentInfo
-                                                        setTitle(appointmentInfo?.title)
-                                                        setAllDay(appointmentInfo?.allDay)
-                                                        setStartDate(appointmentInfo?.start.substring(0, 10))
-                                                        setEndDate(appointmentInfo?.end.substring(0, 10))
-                                                        if (!appointmentInfo?.allDay) {
-                                                            setStartTime(new Date(appointmentInfo?.start).toLocaleTimeString('en', {
-                                                                timeStyle: 'short',
-                                                                hour12: false,
-                                                                timeZone: 'America/New_York'
-                                                            }))
-                                                            setEndTime(new Date(appointmentInfo?.end).toLocaleTimeString('en', {
-                                                                timeStyle: 'short',
-                                                                hour12: false,
-                                                                timeZone: 'America/New_York'
-                                                            }))
-                                                        }
-                                                        setLocation(appointmentInfo?.location)
-                                                        setClient(appointmentInfo?.description)
-                                                        // toggle edit mode
-                                                        setEditToggle(true)
-                                                    }}
-                                                />
-                                            }
-                                            <MdAddCircle size='24px' color='#628eff'
-                                                onClick={() => {
-                                                    resetForm()
+                                        <motion.div className="full-calendar-month"
+                                            key='full-calendar'
+                                            variants={yVariants}
+                                            initial='initial'
+                                            animate='animate'
+                                        >
+                                            <FullCalendar
+                                                plugins={[dayGridPlugin, interactionPlugin]}
+                                                initialView="dayGridMonth"
+                                                initialEvents={calendarEvents}
+                                                height='auto'
+                                                headerToolbar={{
+                                                    left: 'title',
+                                                    center: '',
+                                                    right: 'prev,next'
+                                                }}
+                                                // visibleRange={(currentDate) => {
+                                                //     console.log(currentDate)
+                                                //     const startDate = new Date(currentDate.valueOf());
+                                                //     const endDate = new Date(currentDate.valueOf());
+                                                //     // Adjust the start & end dates, respectively
+                                                //     startDate.setDate(startDate.getDate() - 1); // One day in the past
+                                                //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
+                                                //     console.log(startDate, endDate)
+                                                //     return {start: startDate, end: endDate}
+                                                // }}
+                                                duration={{ 'days': 180 }}
+                                                timeZone='America/New_York'
+                                                dateClick={(info) => {
+                                                    // if edit was on, reset form on clicking new date 
+                                                    editToggle && resetForm()
+                                                    // if editmode is on, toggle off
+                                                    editToggle && setEditToggle(false)
+                                                    setStartDate(info.dateStr)
+                                                    setEndDate(info.dateStr)
                                                     setAppointmentInfo(undefined)
                                                 }}
-                                            />
-                                        </span>
-                                    </>
-                                )
-                                : <h3>Create an appointment</h3>
-                            }
-                        </div>
-                        <div className='appointments-side-body'>
-                            {appointmentInfo
-                                ? (
-                                    editToggle
-                                        ? (
-                                            <motion.div className="calendar-edit"
-                                                key='calendar-edit'
-                                                initial={{ x: 10, opacity: 0 }}
-                                                animate={{ x: 0, opacity: 1 }}
-                                            >
-                                                <form>
-                                                    <label>Title *</label>
-                                                    <input required={true} defaultValue={appointmentInfo?.title} value={title} onChange={(e) => setTitle(e.target.value)}></input>
-                                                    <div className='form-date-time'>
-                                                        <span id='start-date-time'>
-                                                            <label>Start Date *</label>
-                                                            <input type="date" id="start-date"
-                                                                required={true}
-                                                                defaultValue={startDate || new Date().toISOString().substring(0, 10)}
-                                                                value={startDate}
-                                                                min="2022-01-01"
-                                                                max="2025-12-31"
-                                                                onChange={(e) => setStartDate(e.target.value)}
-                                                            />
-                                                            {allDay === false && (
-                                                                <>
-                                                                    <label>Start Time</label>
-                                                                    <input id="start-time" type="time"
-                                                                        defaultValue="00:00"
-                                                                        value={startTime}
-                                                                        onChange={(e) => setStartTime(e.target.value)}
-                                                                    />
-                                                                </>
-                                                            )}
-                                                        </span>
-                                                        <span id='end-date-time'>
-                                                            <label>End Date *</label>
-                                                            <input type="date" id="end-date"
-                                                                required={true}
-                                                                defaultValue={startDate || new Date().toISOString().substring(0, 10)}
-                                                                value={endDate}
-                                                                min={startDate || "2022-01-01"}
-                                                                max="2025-12-31"
-                                                                onChange={(e) => setEndDate(e.target.value)}
-                                                            />
-                                                            {allDay === false && (
-                                                                <>
-                                                                    <label>End Time</label>
-                                                                    <input id="end-time" type="time"
-                                                                        defaultValue="23:59"
-                                                                        value={endTime}
-                                                                        onChange={(e) => setEndTime(e.target.value)}
-                                                                    />
-                                                                </>
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <div id='form-checkbox-allday'>
-                                                        <input type="checkbox" id="all-day" checked={allDay} onChange={() => setAllDay(!allDay)} />
-                                                        <label>All-Day</label>
-                                                    </div>
-                                                    <label>Location</label>
-                                                    <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
-                                                    <label>Client</label>
-                                                    <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                                    <p>* Required Fields</p>
-                                                    {title && startDate && endDate
-                                                        ? (
-                                                            <button className='submit-btn' onClick={(e) => createAppointment(e)}>Submit</button>
-                                                        )
-                                                        : (
-                                                            <>
-                                                                <button className='submit-btn-null'>
-                                                                    Submit
-                                                                    <div className='submit-btn-null-tooltip'>
-                                                                        Please enter required fields to submit
-                                                                    </div>
-                                                                </button>
-                                                            </>
-                                                        )
+                                                eventClick={(info) => {
+                                                    info.jsEvent.preventDefault(); // don't let the browser navigate
+                                                    // if edit was on, reset form on clicking new event 
+                                                    editToggle && resetForm()
+                                                    // if editmode is on, toggle off
+                                                    editToggle && setEditToggle(false)
+                                                    const infoRef = {
+                                                        id: info.event.id,
+                                                        title: info.event.title,
+                                                        start: info.event.startStr,
+                                                        end: info.event.endStr,
+                                                        description: info.event.extendedProps.description,
+                                                        location: info.event.extendedProps.location,
+                                                        url: info.event.url,
+                                                        allDay: info.event.allDay,
                                                     }
-                                                </form>
-                                            </motion.div>
-                                        )
-                                        : (
-                                            <motion.div className="calendar-info"
-                                                key='calendar-info'
-                                                variants={xVariants}
-                                                initial='initial'
-                                                animate='animate'
-                                                exit={{ x: -10, opacity: 0 }}
-                                            >
-                                                <div className="calendar-info-title-date">
+                                                    setAppointmentInfo(infoRef)
+
+                                                }}
+                                                selectable={true}
+                                            />
+                                        </motion.div>
+                                    </>
+                                    : null)
+                                : null}
+                        </div>
+                        <div className='appointments-side'>
+                            <div className='appointments-side-header'>
+                                {appointmentInfo
+                                    ? (
+                                        <>
+                                            {editToggle ? <h4>Edit Appointment</h4> : <h4>Appointment Details</h4>}
+                                            <span>
+                                                {!editToggle &&
+                                                    <MdEdit size='24px' color='#2c5990'
+                                                        onClick={() => {
+                                                            // set form fields to appointmentInfo
+                                                            setTitle(appointmentInfo?.title)
+                                                            setAllDay(appointmentInfo?.allDay)
+                                                            setStartDate(appointmentInfo?.start.substring(0, 10))
+                                                            setEndDate(appointmentInfo?.end.substring(0, 10))
+                                                            if (!appointmentInfo?.allDay) {
+                                                                setStartTime(new Date(appointmentInfo?.start).toLocaleTimeString('en', {
+                                                                    timeStyle: 'short',
+                                                                    hour12: false,
+                                                                    timeZone: 'America/New_York'
+                                                                }))
+                                                                setEndTime(new Date(appointmentInfo?.end).toLocaleTimeString('en', {
+                                                                    timeStyle: 'short',
+                                                                    hour12: false,
+                                                                    timeZone: 'America/New_York'
+                                                                }))
+                                                            }
+                                                            setLocation(appointmentInfo?.location)
+                                                            setClient(appointmentInfo?.description)
+                                                            // toggle edit mode
+                                                            setEditToggle(true)
+                                                        }}
+                                                    />
+                                                }
+                                                <MdAddCircle size='24px' color='#2c5990'
+                                                    onClick={() => {
+                                                        resetForm()
+                                                        setAppointmentInfo(undefined)
+                                                    }}
+                                                />
+                                            </span>
+                                        </>
+                                    )
+                                    : <h4>Create Appointment</h4>
+                                }
+                            </div>
+                            <div className='appointments-side-body'>
+                                {appointmentInfo
+                                    ? (
+                                        editToggle
+                                            ? (
+                                                <motion.div className="calendar-edit"
+                                                    key='calendar-edit'
+                                                    initial={{ x: 10, opacity: 0 }}
+                                                    animate={{ x: 0, opacity: 1 }}
+                                                >
+                                                    <form>
+                                                        <label>Title *</label>
+                                                        <input required={true} defaultValue={appointmentInfo?.title} value={title} onChange={(e) => setTitle(e.target.value)}></input>
+                                                        <div className='form-date-time'>
+                                                            <span id='start-date-time'>
+                                                                <label>Start Date *</label>
+                                                                <input type="date" id="start-date"
+                                                                    required={true}
+                                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                                    value={startDate}
+                                                                    min="2022-01-01"
+                                                                    max="2025-12-31"
+                                                                    onChange={(e) => setStartDate(e.target.value)}
+                                                                />
+                                                                {allDay === false && (
+                                                                    <>
+                                                                        <label>Start Time</label>
+                                                                        <input id="start-time" type="time"
+                                                                            defaultValue="00:00"
+                                                                            value={startTime}
+                                                                            onChange={(e) => setStartTime(e.target.value)}
+                                                                        />
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                            <span id='end-date-time'>
+                                                                <label>End Date *</label>
+                                                                <input type="date" id="end-date"
+                                                                    required={true}
+                                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                                    value={endDate}
+                                                                    min={startDate || "2022-01-01"}
+                                                                    max="2025-12-31"
+                                                                    onChange={(e) => setEndDate(e.target.value)}
+                                                                />
+                                                                {allDay === false && (
+                                                                    <>
+                                                                        <label>End Time</label>
+                                                                        <input id="end-time" type="time"
+                                                                            defaultValue="23:59"
+                                                                            value={endTime}
+                                                                            onChange={(e) => setEndTime(e.target.value)}
+                                                                        />
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                        <div id='form-checkbox-allday'>
+                                                            <input type="checkbox" id="all-day" checked={allDay} onChange={() => setAllDay(!allDay)} />
+                                                            <label>All-Day</label>
+                                                        </div>
+                                                        <label>Location</label>
+                                                        <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
+                                                        <label>Client</label>
+                                                        <input value={client} onChange={(e) => setClient(e.target.value)}></input>
+                                                        <p>* Required Fields</p>
+                                                        {title && startDate && endDate
+                                                            ? (
+                                                                <button className='btn-primary' onClick={(e) => createAppointment(e)}>Submit</button>
+                                                            )
+                                                            : (
+                                                                <>
+                                                                    <button className='submit-btn-null'>
+                                                                        Submit
+                                                                        <div className='submit-btn-null-tooltip'>
+                                                                            Please enter required fields to submit
+                                                                        </div>
+                                                                    </button>
+                                                                </>
+                                                            )
+                                                        }
+                                                    </form>
+                                                </motion.div>
+                                            )
+                                            : (
+                                                <motion.div className="calendar-info"
+                                                    key='calendar-info'
+                                                    variants={xVariants}
+                                                    initial='initial'
+                                                    animate='animate'
+                                                    exit={{ x: -10, opacity: 0 }}
+                                                >
+
                                                     <div className="calendar-info-title">
                                                         <span />
-                                                        <h4>{appointmentInfo?.title}</h4>
+                                                        <h3>{appointmentInfo?.title}</h3>
                                                     </div>
-
-                                                    <h5>{new Date(appointmentInfo?.start).toLocaleDateString('en-US', {
-                                                        weekday: 'long',
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
-                                                    </h5>
+                                                    <div className="calendar-info-date">
+                                                        <CgCalendarToday size='24px' color='#737373' />
+                                                        <h5>{new Date(appointmentInfo?.start).toLocaleDateString('en-US', {
+                                                            weekday: 'long',
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric'
+                                                        })}
+                                                        </h5>
+                                                    </div>
                                                     {appointmentInfo?.allDay === false && (
-                                                        <div id='times'>
-                                                            <h5>{new Date(appointmentInfo?.start).toLocaleTimeString('en-US', {
-                                                                timeZone: 'America/New_York',
-                                                                hour12: true,
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                            })}
-                                                            </h5>
-                                                            <p>-</p>
-                                                            <h5>{new Date(appointmentInfo?.end).toLocaleTimeString('en-US', {
-                                                                timeZone: 'America/New_York',
-                                                                hour12: true,
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                            })}
-                                                            </h5>
+                                                        <div className='calendar-info-time'>
+                                                            <MdOutlineAccessTime size='24px' color='#737373' />
+                                                            <div id='time-text'>
+                                                                <h5>{new Date(appointmentInfo?.start).toLocaleTimeString('en-US', {
+                                                                    timeZone: 'America/New_York',
+                                                                    hour12: true,
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                })}
+                                                                </h5>
+                                                                <p>-</p>
+                                                                <h5>{new Date(appointmentInfo?.end).toLocaleTimeString('en-US', {
+                                                                    timeZone: 'America/New_York',
+                                                                    hour12: true,
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                })}
+                                                                </h5>
+                                                            </div>
                                                         </div>
                                                     )}
 
-                                                </div>
-                                                <div className="calendar-info-location">
-                                                    {/* <h6>Location:</h6> */}
-                                                    <MdLocationPin color='#737373' size='24px' />
-                                                    {appointmentInfo.location ?
-                                                        <p>{appointmentInfo?.location}</p>
-                                                        : !appointmentInfo?.location && !locationToggle
-                                                            ? <motion.button onClick={() => setLocationToggle(true)}>Add a location</motion.button>
-                                                            : !appointmentInfo?.location && locationToggle
-                                                                ? <motion.input
-                                                                    initial={{ opacity: 0.5, x: -10 }}
-                                                                    animate={{ opacity: 1, x: 0 }}
-                                                                    value={locationInput}
-                                                                    onChange={(e) => setLocationInput(e.target.value)}
-                                                                />
-                                                                : null}
-                                                </div>
-                                                <div className="calendar-info-description">
-                                                    {/* <h6>Description:</h6> */}
-                                                    <MdPerson color='#737373' size='24px' />
-                                                    <div className="calendar-info-description-value">
-                                                        {appointmentInfo?.description ?
-                                                            <p>{appointmentInfo?.description}</p>
-                                                            : !appointmentInfo?.description && !descriptionToggle
-                                                                ? <button onClick={() => setDescriptionToggle(true)}>Add clients</button>
-                                                                : !appointmentInfo?.description && descriptionToggle
-                                                                    ? <motion.input
-                                                                        initial={{ opacity: 0.5, x: -10 }}
-                                                                        animate={{ opacity: 1, x: 0 }}
-                                                                        value={descriptionInput}
-                                                                        onChange={(e) => setDescriptionInput(e.target.value)} />
-                                                                    : null}
-                                                    </div>
-                                                </div>
-                                                {appointmentInfo?.location && (
-                                                    <motion.div className='calendar-info-map'
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                    >
-                                                        <GoogleMap
-                                                            bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
-                                                            center={mapCoords}
-                                                            defaultZoom={12}
-                                                            options={{
-                                                                fullscreenControl: false,
-                                                                scrollwheel: true,
-                                                                zoomControl: false,
-                                                            }}
-                                                        >
-                                                            {mapMarker}
-                                                        </GoogleMap>
-                                                    </motion.div>
-                                                )}
-                                                <button className="view" onClick={() => window.open(appointmentInfo?.url)}>View in Google Calendar</button>
-                                            </motion.div>
-                                        )
-                                )
-                                : (
-                                    <form>
-                                        <label>Title *</label>
-                                        <input required={true} value={title} onChange={(e) => setTitle(e.target.value)}></input>
-                                        <div className='form-date-time'>
-                                            <span id='start-date-time'>
-                                                <label>Start Date *</label>
-                                                <input type="date" id="start-date"
-                                                    required={true}
-                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
-                                                    value={startDate}
-                                                    min="2022-01-01"
-                                                    max="2025-12-31"
-                                                    onChange={(e) => setStartDate(e.target.value)}
-                                                />
-                                                {allDay === false && (
-                                                    <>
-                                                        <label>Start Time</label>
-                                                        <input id="start-time" type="time"
-                                                            defaultValue="00:00"
-                                                            value={startTime}
-                                                            onChange={(e) => setStartTime(e.target.value)}
-                                                        />
-                                                    </>
-                                                )}
-                                            </span>
-                                            <span id='end-date-time'>
-                                                <label>End Date *</label>
-                                                <input type="date" id="end-date"
-                                                    required={true}
-                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
-                                                    value={endDate}
-                                                    min={startDate || "2022-01-01"}
-                                                    max="2025-12-31"
-                                                    onChange={(e) => setEndDate(e.target.value)}
-                                                />
-                                                {allDay === false && (
-                                                    <>
-                                                        <label>End Time</label>
-                                                        <input id="end-time" type="time"
-                                                            defaultValue="23:59"
-                                                            value={endTime}
-                                                            onChange={(e) => setEndTime(e.target.value)}
-                                                        />
-                                                    </>
-                                                )}
-                                            </span>
-                                        </div>
-                                        <div id='form-checkbox-allday'>
-                                            <input type="checkbox" id="all-day" checked={allDay} onChange={() => setAllDay(!allDay)} />
-                                            <label>All-Day</label>
-                                        </div>
-                                        <label>Location</label>
-                                        <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
-                                        <label>Client</label>
-                                        <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                        <p>* Required Fields</p>
-                                        {title && startDate && endDate
-                                            ? (
-                                                <button className='submit-btn' onClick={(e) => createAppointment(e)}>Submit</button>
-                                            )
-                                            : (
-                                                <>
-                                                    <button className='submit-btn-null'>
-                                                        Submit
-                                                        <div className='submit-btn-null-tooltip'>
-                                                            Please enter required fields to submit
+                                                    {appointmentInfo.location &&
+                                                        <div className="calendar-info-location">
+                                                            {/* <h6>Location:</h6> */}
+                                                            <MdLocationPin color='#737373' size='24px' />
+
+                                                            <p>{appointmentInfo?.location}</p>
                                                         </div>
-                                                    </button>
-                                                </>
+                                                    }
+                                                    {appointmentInfo?.description &&
+                                                        <div className="calendar-info-description">
+                                                            {/* <h6>Description:</h6> */}
+                                                            <MdPerson color='#737373' size='24px' />
+                                                            <div className="calendar-info-description-value">
+                                                                <p>{appointmentInfo?.description}</p>
+
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    {appointmentInfo?.location && (
+                                                        <motion.div className='calendar-info-map'
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                        >
+                                                            <GoogleMap
+                                                                bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
+                                                                center={mapCoords}
+                                                                defaultZoom={12}
+                                                                options={{
+                                                                    fullscreenControl: false,
+                                                                    scrollwheel: true,
+                                                                    zoomControl: false,
+                                                                }}
+                                                            >
+                                                                {mapMarker}
+                                                            </GoogleMap>
+                                                        </motion.div>
+                                                    )}
+                                                    <button className="btn-primary" style={{ width: 'fit-content' }} onClick={() => window.open(appointmentInfo?.url)}>View in Google Calendar</button>
+                                                </motion.div>
                                             )
-                                        }
-                                    </form>
-                                )}
+                                    )
+                                    : (
+                                        <form>
+                                            <label>Title *</label>
+                                            <input required={true} value={title} onChange={(e) => setTitle(e.target.value)}></input>
+                                            <div className='form-date-time'>
+                                                <span id='start-date-time'>
+                                                    <label>Start Date *</label>
+                                                    <input type="date" id="start-date"
+                                                        required={true}
+                                                        defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                        value={startDate}
+                                                        min="2022-01-01"
+                                                        max="2025-12-31"
+                                                        onChange={(e) => setStartDate(e.target.value)}
+                                                    />
+                                                    {allDay === false && (
+                                                        <>
+                                                            <label>Start Time</label>
+                                                            <input id="start-time" type="time"
+                                                                defaultValue="00:00"
+                                                                value={startTime}
+                                                                onChange={(e) => setStartTime(e.target.value)}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </span>
+                                                <span id='end-date-time'>
+                                                    <label>End Date *</label>
+                                                    <input type="date" id="end-date"
+                                                        required={true}
+                                                        defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                        value={endDate}
+                                                        min={startDate || "2022-01-01"}
+                                                        max="2025-12-31"
+                                                        onChange={(e) => setEndDate(e.target.value)}
+                                                    />
+                                                    {allDay === false && (
+                                                        <>
+                                                            <label>End Time</label>
+                                                            <input id="end-time" type="time"
+                                                                defaultValue="23:59"
+                                                                value={endTime}
+                                                                onChange={(e) => setEndTime(e.target.value)}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div id='form-checkbox-allday'>
+                                                <input type="checkbox" id="all-day" checked={allDay} onChange={() => setAllDay(!allDay)} />
+                                                <label>All-Day</label>
+                                            </div>
+                                            <label>Location</label>
+                                            <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
+                                            <label>Client</label>
+                                            <input value={client} onChange={(e) => setClient(e.target.value)}></input>
+                                            <p>* Required Fields</p>
+                                            {title && startDate && endDate
+                                                ? (
+                                                    <button className='btn-primary' onClick={(e) => createAppointment(e)}>Submit</button>
+                                                )
+                                                : (
+                                                    <>
+                                                        <button className='submit-btn-null'>
+                                                            Submit
+                                                            <div className='submit-btn-null-tooltip'>
+                                                                Please enter required fields to submit
+                                                            </div>
+                                                        </button>
+                                                    </>
+                                                )
+                                            }
+                                        </form>
+                                    )}
+                            </div>
                         </div>
                     </div>
                 </div>

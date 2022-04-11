@@ -12,6 +12,22 @@
   border-bottom: none !important;
 }
 
+/* .fc-view-harness {
+  border-radius: 5px;
+  border: 1px solid var(--grey-light);
+} */
+
+.fc-scroller-harness {
+  border-top: 1px solid var(--grey-light);
+}
+.fc-daygrid table thead {
+  background-color: none;
+}
+
+.fc-daygrid table tr:last-child td:first-child {
+  border-bottom-left-radius: 5px;
+}
+
 .fc-list {
   border: none !important;
 }
@@ -64,7 +80,12 @@
 
 .fc .fc-list-event-dot {
   border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid
-    var(--blue-primary);
+    var(--primary-light) !important;
+}
+
+.fc .fc-daygrid-event-dot {
+  border: calc(var(--fc-daygrid-event-dot-width, 8px) / 2) solid
+    var(--fc-event-border-color, var(--primary-light)) !important;
 }
 
 .fc .fc-list-event.fc-event-forced-url:hover a {
@@ -84,17 +105,29 @@
   color: black;
 }
 
+.fc .fc-toolbar {
+  align-items: flex-start;
+}
+
 .fc .fc-toolbar-title {
-  font-size: 22px !important;
+  font-size: 16px !important;
+  font-weight: 600;
 }
 
 .full-calendar-month .fc .fc-toolbar.fc-header-toolbar {
-  margin: 1rem 0;
+  padding: 0 1.5rem 1rem 1.5rem;
+  margin-bottom: 0;
 }
 
 .full-calendar-month .fc .fc-button-primary {
-  background-color: var(--blue-primary);
-  border-color: var(--blue-primary);
+  background-color: var(--primary);
+  border: none;
+  padding: 0 8px;
+  margin: 0 !important;
+}
+
+.full-calendar-month .fc .fc-button-primary:hover {
+  background-color: var(--primary-light);
 }
 
 .full-calendar-month .fc .fc-button-primary:focus {
@@ -105,8 +138,13 @@
   border: none !important;
 }
 
-.full-calendar-month .fc .fc-scrollgrid-section-header > th {
+/* .full-calendar-month .fc .fc-scrollgrid-section-header > th {
   border-bottom: 1px solid var(--grey-light) !important;
+} */
+
+.full-calendar-month .fc-col-header-cell-cushion {
+  font-weight: 500;
+  font-size: 12px;
 }
 
 .full-calendar-month .fc .fc-scrollgrid-section-header,
@@ -124,20 +162,22 @@
 }
 
 .full-calendar-month .fc-day-today {
-  background-color: var(--blue-light) !important;
+  background-color: var(--highlight) !important;
 }
 
 .full-calendar-month .fc-day-today:hover {
-  background-color: var(--blue-light) !important;
+  background-color: var(--highlight) !important;
 }
 
 .full-calendar-month .fc-h-event {
-  background-color: var(--blue-primary);
-  border: 1px solid var(--blue-primary);
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  transition: all 0.3s;
 }
 
 .full-calendar-month .fc-h-event:hover {
-  filter: brightness(0.9);
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
 }
 
 .full-calendar-month .fc .fc-highlight {
