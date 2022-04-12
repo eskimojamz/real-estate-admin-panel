@@ -62,7 +62,8 @@ img {
   --primary-light: #769ac5;
   --primary-superlight: #9cbee8;
   --primary-dark: #13345d;
-  --highlight: #9cbee8ad;
+  --highlight: rgba(156, 190, 232, 0.678);
+  --highlight-transparent: rgba(230, 240, 252, 0.899);
   --secondary: rgba(255, 85, 85, 1);
   --bg: rgba(249, 249, 249, 1);
   --grey: rgb(199, 199, 199);
@@ -2757,6 +2758,24 @@ em {
   max-width: 350px;
   border-bottom: 1px solid var(--grey-light);
   padding: 1rem;
+  position: relative;
+}
+
+.appointments-side-loading {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--highlight-transparent);
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .appointments-side-header {

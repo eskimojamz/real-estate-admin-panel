@@ -37,6 +37,7 @@
     "react-loading-skeleton": "^3.0.3",
     "react-router-dom": "^6.2.2",
     "react-scripts": "5.0.0",
+    "react-spinners": "^0.11.0",
     "react-swipeable": "^6.2.0",
     "recharts": "^2.1.9",
     "sass": "^1.49.9",

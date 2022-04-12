@@ -163,16 +163,22 @@
 }
 
 .full-calendar-month .fc-day-today {
-  background-color: var(--highlight) !important;
+  background-color: #fff !important;
 }
 
 .full-calendar-month .fc-day-today:hover {
-  background-color: var(--highlight) !important;
+  background-color: #f5f5f5 !important;
+}
+
+.full-calendar-month .fc-day-today .fc-daygrid-day-number {
+  background-color: var(--primary);
+  color: #fff;
+  border-radius: 5px;
 }
 
 .full-calendar-month .fc-h-event {
-  background-color: var(--primary);
-  border: 1px solid var(--primary);
+  background-color: var(--primary-light);
+  border: 1px solid var(--primary-light);
   transition: all 0.3s;
 }
 

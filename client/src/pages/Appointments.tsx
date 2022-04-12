@@ -13,6 +13,7 @@ import { CgCalendarToday } from 'react-icons/cg'
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import GoogleConnected from '../components/GoogleConnected';
+import { ScaleLoader } from 'react-spinners';
 
 interface MapMarkerProps {
     lat: number;
@@ -424,6 +425,17 @@ function Appointments() {
                                 : null}
                         </div>
                         <div className='appointments-side'>
+                            {/* loading overlay */}
+                            {fnLoading && (
+                                <motion.div className='appointments-side-loading'
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                >
+                                    <ScaleLoader color='#2c5990' />
+                                    <span>Sending appointment data to Google Contacts</span>
+                                </motion.div>
+                            )}
+
                             <div className='appointments-side-header'>
                                 {appointmentInfo
                                     ? (
@@ -482,8 +494,9 @@ function Appointments() {
                                             ? (
                                                 <motion.div className="calendar-edit"
                                                     key='calendar-edit'
-                                                    initial={{ x: 10, opacity: 0 }}
-                                                    animate={{ x: 0, opacity: 1 }}
+                                                    variants={xVariants}
+                                                    initial='initial'
+                                                    animate='animate'
                                                 >
                                                     <form>
                                                         <label>Title *</label>
@@ -544,9 +557,9 @@ function Appointments() {
                                                         <label>Client</label>
                                                         <input value={client} onChange={(e) => setClient(e.target.value)}></input>
                                                         <p>* Required Fields</p>
-                                                        {title && startDate && endDate
+                                                        {!fnLoading && title && startDate && endDate
                                                             ? (
-                                                                <button className='btn-primary' onClick={(e) => editAppointment(e, appointmentInfo?.id)}>Submit</button>
+                                                                <button className='btn-primary' disabled={fnLoading} onClick={(e) => editAppointment(e, appointmentInfo?.id)}>Submit</button>
                                                             )
                                                             : (
                                                                 <>
@@ -569,7 +582,6 @@ function Appointments() {
                                                     variants={xVariants}
                                                     initial='initial'
                                                     animate='animate'
-                                                    exit={{ x: -10, opacity: 0 }}
                                                 >
 
                                                     <div className="calendar-info-title">
@@ -658,7 +670,12 @@ function Appointments() {
                                     )
                                     // create appointment
                                     : (
-                                        <form>
+                                        <motion.form
+                                            key='appointments-form'
+                                            variants={xVariants}
+                                            initial='initial'
+                                            animate='animate'
+                                        >
                                             <label>Title *</label>
                                             <input required={true} value={title} onChange={(e) => setTitle(e.target.value)}></input>
                                             <div className='form-date-time'>
@@ -730,7 +747,7 @@ function Appointments() {
                                                     </>
                                                 )
                                             }
-                                        </form>
+                                        </motion.form>
                                     )}
                             </div>
                         </div>
