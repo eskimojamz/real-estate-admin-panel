@@ -5,7 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import '../utils/fullCalendar/fullCalendar.css'
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import React, { createRef, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 import { MdAddCircle, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
@@ -95,58 +95,92 @@ function Appointments() {
     }
 
     // edit calendar event
-    // const gCalendarEdit = async (eventId: string) => {
-    //     const reqBody = {}
-    //     if (descriptionInput) {
-    //         Object.assign(reqBody, { description: descriptionInput })
-    //     }
-    //     if (locationInput) {
-    //         Object.assign(reqBody, { location: locationInput })
-    //     }
-    //     await axios.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
-    //         reqBody
-    //     ).then(res => {
-    //         // console.log(res)
-    //         // update calendarInfo (cache state)
-    //         const calendarInfoRef = calendarInfo
-    //         if (descriptionInput) {
-    //             Object.assign(calendarInfoRef, {
-    //                 description: res.data.description
-    //             })
-    //         }
-    //         if (locationInput) {
-    //             Object.assign(calendarInfoRef, {
-    //                 location: res.data.location
-    //             })
-    //         }
-    //         setCalendarInfo(calendarInfoRef)
-    //         // update global state
-    //         const updatedEvent = calendarEvents.find((event: any) => event.id === eventId)
-    //         if (descriptionInput) {
-    //             Object.assign(updatedEvent, {
-    //                 extendedProps: {
-    //                     description: res.data.description
-    //                 }
-    //             })
-    //         }
-    //         if (locationInput) {
-    //             Object.assign(updatedEvent, {
-    //                 extendedProps: {
-    //                     location: res.data.location
-    //                 }
-    //             })
-    //         }
-    //         const otherEvents = calendarEvents.filter((event: any) => event.id !== eventId)
-    //         const updatedEvents = [...otherEvents, updatedEvent]
-    //         setCalendarEvents(updatedEvents)
-
-    //         // reset toggles and inputs states
-    //         setDescriptionToggle(false)
-    //         setDescriptionInput(undefined)
-    //         setLocationToggle(false)
-    //         setLocationInput(undefined)
-    //     })
-    // }
+    const editAppointment = async (e: any, eventId: string) => {
+        e.preventDefault()
+        setFnLoading(true)
+        // fullCalendar Api
+        let calendarApi = calRef.current.getApi()
+        // set editFields for GoogleApiCall
+        const editFields = {}
+        if (title) {
+            Object.assign(editFields, { summary: title })
+        }
+        if (allDay && startDate && endDate) {
+            Object.assign(editFields, {
+                start: {
+                    date: startDate,
+                    dateTime: null
+                },
+                end: {
+                    date: endDate,
+                    dateTime: null
+                }
+            })
+            Object.assign(editFields, { allDay: true })
+        } else if (!allDay && startTime && endTime) {
+            Object.assign(editFields, {
+                "start": {
+                    "date": null,
+                    "dateTime": new Date(startDate + " " + startTime).toISOString()
+                },
+                "end": {
+                    "date": null,
+                    "dateTime": new Date(endDate + " " + endTime).toISOString()
+                }
+            })
+            Object.assign(editFields, { allDay: false })
+        }
+        if (location) {
+            Object.assign(editFields, { location: location })
+        }
+        if (client) {
+            Object.assign(editFields, { description: client })
+        }
+        // patch to Google Api
+        await axios.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
+            editFields
+        ).then(res => {
+            const newAppointmentInfo = {
+                id: res?.data?.id,
+                title: res?.data?.summary,
+                start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                description: res?.data?.description,
+                location: res?.data?.location,
+                url: res?.data?.htmlLink,
+            }
+            if (title) {
+                calendarApi.getEventById(eventId).setProp('title', title)
+            }
+            if (allDay && startDate) {
+                calendarApi.getEventById(eventId).setDates(
+                    res?.data?.start?.date,
+                    res?.data?.end?.date,
+                    { allDay: true }
+                )
+                // assign allDay to appointmentInfo... not return as res from gApi
+                Object.assign(newAppointmentInfo, { allDay: true })
+            } else if (!allDay && startTime) {
+                calendarApi.getEventById(eventId).setDates(
+                    res?.data?.start?.dateTime,
+                    res?.data?.end?.dateTime,
+                    { allDay: false }
+                )
+                // assign allDay to appointmentInfo... not return as res from gApi
+                Object.assign(newAppointmentInfo, { allDay: false })
+            }
+            if (location) {
+                calendarApi.getEventById(eventId).setExtendedProp('location', res?.data?.location)
+            }
+            if (client) {
+                calendarApi.getEventById(eventId).setExtendedProp('description', res?.data?.description)
+            }
+            setAppointmentInfo(newAppointmentInfo)
+        }).then(() => {
+            setFnLoading(false)
+            setEditToggle(false)
+        }).catch(err => { throw new Error(err) })
+    }
 
     const createAppointment = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
@@ -163,16 +197,14 @@ function Appointments() {
         if (startTime && !allDay) {
             Object.assign(appointmentRef, {
                 "start": {
-                    "dateTime": new Date(startDate + " " + startTime).toISOString(),
-                    "timeZone": "America/New_York"
+                    "dateTime": new Date(startDate + " " + startTime).toISOString()
                 }
             })
         }
         if (endTime && !allDay) {
             Object.assign(appointmentRef, {
                 "end": {
-                    "dateTime": new Date(endDate + " " + endTime).toISOString(),
-                    "timeZone": "America/New_York"
+                    "dateTime": new Date(endDate + " " + endTime).toISOString()
                 }
             })
         }
@@ -183,7 +215,7 @@ function Appointments() {
         }
         if (client) {
             Object.assign(appointmentRef, {
-                "description": `Client: ${client}`
+                "description": client
             })
         }
         console.log(appointmentRef)
@@ -204,50 +236,46 @@ function Appointments() {
                     url: res?.data?.htmlLink,
                     allDay: res?.data?.start?.dateTime ? false : true
                 })
-                // setCalendarEvents((events: any) => [...events, {
-                //     id: res?.data?.id,
-                //     title: res?.data?.summary,
-                //     start: res?.data?.start?.date || res?.data?.start?.dateTime,
-                //     end: res?.data?.end?.date || res?.data?.end?.dateTime,
-                //     startStr: res?.data?.start?.dateTime,
-                //     endStr: res?.data?.end?.dateTime,
-                //     extendedProps: {
-                //         description: res?.data?.description,
-                //         location: res?.data?.location
-                //     },
-                //     url: res?.data?.htmlLink,
-                //     allDay: res?.data?.start?.dateTime ? false : true
-                // }])
             })
+            .catch(err => { throw new Error(err) })
     }
 
     const [appointmentInfo, setAppointmentInfo] = useState<any>()
     const [title, setTitle] = useState<string>()
-    const [startDate, setStartDate] = useState<string>(new Date().toISOString().substring(0, 10))
-    const [startTime, setStartTime] = useState<string>("00:00")
-    const [endDate, setEndDate] = useState<string>(new Date().toISOString().substring(0, 10))
-    const [endTime, setEndTime] = useState<string>("23:59")
+    const [startDate, setStartDate] = useState<string>(new Date().getFullYear().toString().padStart(4, '0') + '-' + (new Date().getMonth() + 1).toString().padStart(2, '0') + '-' + new Date().getDate().toString().padStart(2, '0'))
+    const [startTime, setStartTime] = useState<string>("12:00")
+    const [endDate, setEndDate] = useState<string>(new Date((new Date().setDate(new Date().getDate() + 1))).getFullYear().toString().padStart(4, '0') + '-' + (new Date((new Date().setDate(new Date().getDate() + 1))).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date((new Date().setDate(new Date().getDate() + 1))).getDate().toString().padStart(2, '0'))
+    const [endTime, setEndTime] = useState<string>("13:00")
     const [allDay, setAllDay] = useState<boolean>(true)
     const [location, setLocation] = useState<string>()
     const [client, setClient] = useState<string>()
-
-    const [descriptionToggle, setDescriptionToggle] = useState<boolean>(false)
-    const [descriptionInput, setDescriptionInput] = useState<string>()
-    const [locationToggle, setLocationToggle] = useState<boolean>(false)
-    const [locationInput, setLocationInput] = useState<string>()
+    console.log(appointmentInfo, startDate, endDate, startTime, endTime)
+    // const [descriptionToggle, setDescriptionToggle] = useState<boolean>(false)
+    // const [descriptionInput, setDescriptionInput] = useState<string>()
+    // const [locationToggle, setLocationToggle] = useState<boolean>(false)
+    // const [locationInput, setLocationInput] = useState<string>()
 
     const [editToggle, setEditToggle] = useState<boolean>()
-
+    const [fnLoading, setFnLoading] = useState(false)
     const resetForm = () => {
         setTitle(undefined)
         setAllDay(true)
-        setStartDate(new Date().toISOString().substring(0, 10))
-        setEndDate(new Date().toISOString().substring(0, 10))
-        setStartTime("00:00")
-        setEndTime("23:59")
+        setStartDate(new Date().getFullYear().toString().padStart(4, '0') + '-' + (new Date().getMonth() + 1).toString().padStart(2, '0') + '-' + new Date().getDate().toString().padStart(2, '0'))
+        setEndDate(new Date().getFullYear().toString().padStart(4, '0') + '-' + (new Date().getMonth() + 1).toString().padStart(2, '0') + '-' + new Date().getDate().toString().padStart(2, '0'))
+        setStartTime("12:00")
+        setEndTime("13:00")
         setLocation(undefined)
         setClient(undefined)
     }
+
+    // set endDate for every time allDay is checked/set 
+    useEffect(() => {
+        if (allDay) {
+            let d = new Date(startDate)
+            d.setDate(d.getDate() + 1)
+            setEndDate(d.getFullYear().toString().padStart(4, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0'))
+        }
+    }, [allDay])
 
     // set Google Maps Geocoding API
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
@@ -269,7 +297,7 @@ function Appointments() {
         if (isGLoggedIn && calendarId && !calendarEvents) {
             try {
 
-                const calItemsRef: { id: any; title: any; start: any; end: any; startStr: any; endStr: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
+                const calItemsRef: { id: any; title: any; start: any; end: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
 
                 // set time range for g calendar events fetch
                 const minDate = new Date()
@@ -283,7 +311,6 @@ function Appointments() {
                         singleEvents: true,
                         timeMin: minDate.toISOString(),
                         timeMax: maxDate.toISOString(),
-                        timeZone: 'America/New_York'
                     }
                 }).then(res => {
                     console.log(res.data.items)
@@ -292,10 +319,10 @@ function Appointments() {
                         calItemsRef.push({
                             id: item.id,
                             title: item.summary,
-                            start: item.start.date || item.start.dateTime,
-                            end: item.end.date || item.end.dateTime,
-                            startStr: item.start.dateTime,
-                            endStr: item.end.dateTime,
+                            start: item.start.dateTime || item.start.date,
+                            end: item.end.dateTime || item.end.date,
+                            // startStr: item.start.dateTime,
+                            // endStr: item.end.dateTime,
                             extendedProps: {
                                 description: item.description,
                                 location: item.location
@@ -361,25 +388,14 @@ function Appointments() {
                                                     center: '',
                                                     right: 'prev,next'
                                                 }}
-                                                // visibleRange={(currentDate) => {
-                                                //     console.log(currentDate)
-                                                //     const startDate = new Date(currentDate.valueOf());
-                                                //     const endDate = new Date(currentDate.valueOf());
-                                                //     // Adjust the start & end dates, respectively
-                                                //     startDate.setDate(startDate.getDate() - 1); // One day in the past
-                                                //     endDate.setDate(endDate.getDate() + 180); // Six months into the future
-                                                //     console.log(startDate, endDate)
-                                                //     return {start: startDate, end: endDate}
-                                                // }}
                                                 duration={{ 'days': 180 }}
-                                                timeZone='America/New_York'
                                                 dateClick={(info) => {
                                                     // if edit was on, reset form on clicking new date 
                                                     editToggle && resetForm()
                                                     // if editmode is on, toggle off
                                                     editToggle && setEditToggle(false)
                                                     setStartDate(info.dateStr)
-                                                    setEndDate(info.dateStr)
+                                                    setEndDate(new Date((new Date(info.dateStr).setDate(new Date(info.dateStr).getDate() + 1))).getFullYear().toString().padStart(4, '0') + '-' + (new Date((new Date(info.dateStr).setDate(new Date(info.dateStr).getDate() + 1))).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date((new Date(info.dateStr).setDate(new Date(info.dateStr).getDate() + 1))).getDate().toString().padStart(2, '0'))
                                                     setAppointmentInfo(undefined)
                                                 }}
                                                 eventClick={(info) => {
@@ -391,15 +407,14 @@ function Appointments() {
                                                     const infoRef = {
                                                         id: info.event.id,
                                                         title: info.event.title,
-                                                        start: info.event.startStr,
-                                                        end: info.event.endStr,
+                                                        start: info.event.start,
+                                                        end: info.event.end,
                                                         description: info.event.extendedProps.description,
                                                         location: info.event.extendedProps.location,
                                                         url: info.event.url,
                                                         allDay: info.event.allDay,
                                                     }
                                                     setAppointmentInfo(infoRef)
-
                                                 }}
                                                 selectable={true}
                                             />
@@ -421,18 +436,24 @@ function Appointments() {
                                                             // set form fields to appointmentInfo
                                                             setTitle(appointmentInfo?.title)
                                                             setAllDay(appointmentInfo?.allDay)
-                                                            setStartDate(appointmentInfo?.start.substring(0, 10))
-                                                            setEndDate(appointmentInfo?.end.substring(0, 10))
+                                                            if (appointmentInfo?.allDay) {
+                                                                setStartDate(new Date(appointmentInfo?.start).getFullYear().toString().padStart(4, '0') + '-' + (new Date(appointmentInfo?.start).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date(appointmentInfo?.start).getDate().toString().padStart(2, '0'))
+                                                                if (appointmentInfo?.end) {
+                                                                    setEndDate(new Date(appointmentInfo?.end).getFullYear().toString().padStart(4, '0') + '-' + (new Date(appointmentInfo?.end).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date(appointmentInfo?.end).getDate().toString().padStart(2, '0'))
+                                                                }
+                                                            }
                                                             if (!appointmentInfo?.allDay) {
+                                                                setStartDate(new Date(appointmentInfo?.start).getFullYear().toString().padStart(4, '0') + '-' + (new Date(appointmentInfo?.start).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date(appointmentInfo?.start).getDate().toString().padStart(2, '0'))
+                                                                if (appointmentInfo?.end) {
+                                                                    setEndDate(new Date(appointmentInfo?.end).getFullYear().toString().padStart(4, '0') + '-' + (new Date(appointmentInfo?.end).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date(appointmentInfo?.end).getDate().toString().padStart(2, '0'))
+                                                                }
                                                                 setStartTime(new Date(appointmentInfo?.start).toLocaleTimeString('en', {
                                                                     timeStyle: 'short',
                                                                     hour12: false,
-                                                                    timeZone: 'America/New_York'
                                                                 }))
                                                                 setEndTime(new Date(appointmentInfo?.end).toLocaleTimeString('en', {
                                                                     timeStyle: 'short',
                                                                     hour12: false,
-                                                                    timeZone: 'America/New_York'
                                                                 }))
                                                             }
                                                             setLocation(appointmentInfo?.location)
@@ -472,7 +493,6 @@ function Appointments() {
                                                                 <label>Start Date *</label>
                                                                 <input type="date" id="start-date"
                                                                     required={true}
-                                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
                                                                     value={startDate}
                                                                     min="2022-01-01"
                                                                     max="2025-12-31"
@@ -490,13 +510,13 @@ function Appointments() {
                                                                 )}
                                                             </span>
                                                             <span id='end-date-time'>
-                                                                <label>End Date *</label>
+                                                                <label>End Date</label>
                                                                 <input type="date" id="end-date"
                                                                     required={true}
-                                                                    defaultValue={startDate || new Date().toISOString().substring(0, 10)}
                                                                     value={endDate}
                                                                     min={startDate || "2022-01-01"}
                                                                     max="2025-12-31"
+                                                                    disabled={allDay}
                                                                     onChange={(e) => setEndDate(e.target.value)}
                                                                 />
                                                                 {allDay === false && (
@@ -512,7 +532,11 @@ function Appointments() {
                                                             </span>
                                                         </div>
                                                         <div id='form-checkbox-allday'>
-                                                            <input type="checkbox" id="all-day" checked={allDay} onChange={() => setAllDay(!allDay)} />
+                                                            <input type="checkbox" id="all-day" checked={allDay}
+                                                                onChange={() => {
+                                                                    setAllDay(!allDay)
+                                                                }}
+                                                            />
                                                             <label>All-Day</label>
                                                         </div>
                                                         <label>Location</label>
@@ -522,7 +546,7 @@ function Appointments() {
                                                         <p>* Required Fields</p>
                                                         {title && startDate && endDate
                                                             ? (
-                                                                <button className='btn-primary' onClick={(e) => createAppointment(e)}>Submit</button>
+                                                                <button className='btn-primary' onClick={(e) => editAppointment(e, appointmentInfo?.id)}>Submit</button>
                                                             )
                                                             : (
                                                                 <>
@@ -538,6 +562,7 @@ function Appointments() {
                                                     </form>
                                                 </motion.div>
                                             )
+                                            // appointment details / info
                                             : (
                                                 <motion.div className="calendar-info"
                                                     key='calendar-info'
@@ -561,28 +586,35 @@ function Appointments() {
                                                         })}
                                                         </h5>
                                                     </div>
-                                                    {appointmentInfo?.allDay === false && (
-                                                        <div className='calendar-info-time'>
-                                                            <MdOutlineAccessTime size='24px' color='#737373' />
-                                                            <div id='time-text'>
-                                                                <h5>{new Date(appointmentInfo?.start).toLocaleTimeString('en-US', {
-                                                                    timeZone: 'America/New_York',
-                                                                    hour12: true,
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit',
-                                                                })}
-                                                                </h5>
-                                                                <p>-</p>
-                                                                <h5>{new Date(appointmentInfo?.end).toLocaleTimeString('en-US', {
-                                                                    timeZone: 'America/New_York',
-                                                                    hour12: true,
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit',
-                                                                })}
-                                                                </h5>
-                                                            </div>
+
+                                                    <div className='calendar-info-time'>
+                                                        <MdOutlineAccessTime size='24px' color='#737373' />
+                                                        <div id='time-text'>
+                                                            {appointmentInfo?.allDay
+                                                                ? (
+                                                                    <h5>All-Day</h5>
+                                                                )
+                                                                : (
+                                                                    <>
+                                                                        <h5>{new Date(appointmentInfo?.start).toLocaleTimeString('en-US', {
+                                                                            hour12: true,
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                        })}
+                                                                        </h5>
+                                                                        <p>-</p>
+                                                                        <h5>{new Date(appointmentInfo?.end).toLocaleTimeString('en-US', {
+                                                                            hour12: true,
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit',
+                                                                        })}
+                                                                        </h5>
+                                                                    </>
+                                                                )
+                                                            }
+
                                                         </div>
-                                                    )}
+                                                    </div>
 
                                                     {appointmentInfo.location &&
                                                         <div className="calendar-info-location">
@@ -598,7 +630,6 @@ function Appointments() {
                                                             <MdPerson color='#737373' size='24px' />
                                                             <div className="calendar-info-description-value">
                                                                 <p>{appointmentInfo?.description}</p>
-
                                                             </div>
                                                         </div>
                                                     }
@@ -625,6 +656,7 @@ function Appointments() {
                                                 </motion.div>
                                             )
                                     )
+                                    // create appointment
                                     : (
                                         <form>
                                             <label>Title *</label>
@@ -634,7 +666,7 @@ function Appointments() {
                                                     <label>Start Date *</label>
                                                     <input type="date" id="start-date"
                                                         required={true}
-                                                        defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                        defaultValue={startDate}
                                                         value={startDate}
                                                         min="2022-01-01"
                                                         max="2025-12-31"
@@ -655,10 +687,11 @@ function Appointments() {
                                                     <label>End Date *</label>
                                                     <input type="date" id="end-date"
                                                         required={true}
-                                                        defaultValue={startDate || new Date().toISOString().substring(0, 10)}
+                                                        defaultValue={endDate}
                                                         value={endDate}
                                                         min={startDate || "2022-01-01"}
                                                         max="2025-12-31"
+                                                        disabled={allDay}
                                                         onChange={(e) => setEndDate(e.target.value)}
                                                     />
                                                     {allDay === false && (
