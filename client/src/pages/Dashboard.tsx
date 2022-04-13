@@ -1,15 +1,11 @@
-import React, { createRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion"
 
-import { GetUserDefaultCalendarDocument, GetUserDefaultContactGroupDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useSetDefaultCalendarMutation, useSetDefaultContactGroupMutation } from "../generated/graphql"
+import { GetUserDefaultCalendarDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-import { useLocation, useNavigate } from "react-router-dom";
-import { gapi } from 'gapi-script'
-import { SignInButton, useGoogleAuth, useGoogleUser } from "react-gapi-auth2";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import GoogleSignin from "../utils/GoogleSignIn";
-import { getGToken } from "../utils/gTokens";
 import FullCalendar from "@fullcalendar/react";
 import listPlugin from '@fullcalendar/list';
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -19,8 +15,8 @@ import Geocode from "react-geocode"
 import { GlobalContext } from "../App";
 import { MdLocationPin, MdPerson, MdArrowBack } from "react-icons/md"
 import { FaGoogle } from "react-icons/fa"
-import { IoCloseCircle } from "react-icons/io5"
 import GoogleConnected from "../components/GoogleConnected";
+import ContactGroups from "../components/ContactGroups";
 
 
 interface MapMarkerProps {
@@ -44,6 +40,7 @@ const MapMarker: React.FC<MapMarkerProps> = ({ listingId }) => {
 }
 
 const Dashboard: React.FC = () => {
+    const { isGLoggedIn, setIsGLoggedIn, calendarEvents, setCalendarEvents, contacts, setContacts } = useContext(GlobalContext)
     const navigate = useNavigate()
     const { data: allListingsData, loading } = useAllListingsQuery()
 
@@ -131,8 +128,6 @@ const Dashboard: React.FC = () => {
         return arr
     }, [allListingsData])
 
-    const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
-
     const googleAuth = async () => {
         try {
             const request = await fetch("http://localhost:4000/auth/google", {
@@ -189,12 +184,18 @@ const Dashboard: React.FC = () => {
         onError: (error) => console.log(error)
     })
 
+    const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
+        onError: (error: any) => console.log(error)
+    })
+
+    const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+
     const [calendars, setCalendars] = useState<any[] | null>()
     const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error)
     })
     const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
-    const { calendarEvents, setCalendarEvents } = useContext(GlobalContext)
+
     const [setDefaultCalendar] = useSetDefaultCalendarMutation({
         onError: (error) => {
             console.log(error)
@@ -306,53 +307,53 @@ const Dashboard: React.FC = () => {
     // console.log(mapMarkers)
     // console.log(allListingsData?.allListings)
 
-    const [contactGroups, setContactGroups] = useState<any[] | null>()
+    // const [contactGroups, setContactGroups] = useState<any[] | null>()
 
-    const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
-        onError: (error) => console.log(error)
-    })
-    const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
-    const { contacts, setContacts } = useContext(GlobalContext)
-    const [setDefaultContactGroup] = useSetDefaultContactGroupMutation({
-        onError: (error) => {
-            console.log(error)
-        }
-    })
-    const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
+    // const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
+    //     onError: (error) => console.log(error)
+    // })
+    // const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+    // const { contacts, setContacts } = useContext(GlobalContext)
+    // const [setDefaultContactGroup] = useSetDefaultContactGroupMutation({
+    //     onError: (error) => {
+    //         console.log(error)
+    //     }
+    // })
+    // const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
 
-    const getGContactGroupsList = async () => {
-        await axios.get('https://people.googleapis.com/v1/contactGroups')
-            .then(res => {
-                // console.log(res.data.contactGroups)
-                const groupsRef: any[] = []
-                // get user contact groups
-                res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
-                    if (group.groupType === 'USER_CONTACT_GROUP') {
-                        groupsRef.push({
-                            formattedName: group.formattedName,
-                            resourceName: group.resourceName
-                        })
-                    }
-                })
-                // set groups
-                groupsRef.length > 0 && (
-                    setContactGroups(groupsRef)
-                )
-            })
-            .catch(err => {
-                throw new Error(err)
-            })
-    }
-    console.log(userData)
-    const chooseContactGroup = async (cGroupId: string) => {
-        await setDefaultContactGroup({
-            variables: {
-                contactGroupId: cGroupId,
-                userId: userData?.displayUser?.id!
-            },
-            refetchQueries: [{ query: GetUserDefaultContactGroupDocument }]
-        })
-    }
+    // const getGContactGroupsList = async () => {
+    //     await axios.get('https://people.googleapis.com/v1/contactGroups')
+    //         .then(res => {
+    //             // console.log(res.data.contactGroups)
+    //             const groupsRef: any[] = []
+    //             // get user contact groups
+    //             res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
+    //                 if (group.groupType === 'USER_CONTACT_GROUP') {
+    //                     groupsRef.push({
+    //                         formattedName: group.formattedName,
+    //                         resourceName: group.resourceName
+    //                     })
+    //                 }
+    //             })
+    //             // set groups
+    //             groupsRef.length > 0 && (
+    //                 setContactGroups(groupsRef)
+    //             )
+    //         })
+    //         .catch(err => {
+    //             throw new Error(err)
+    //         })
+    // }
+    // console.log(userData)
+    // const chooseContactGroup = async (cGroupId: string) => {
+    //     await setDefaultContactGroup({
+    //         variables: {
+    //             contactGroupId: cGroupId,
+    //             userId: userData?.displayUser?.id!
+    //         },
+    //         refetchQueries: [{ query: GetUserDefaultContactGroupDocument }]
+    //     })
+    // }
 
     useEffect(() => {
         if (allListingsData) {
@@ -431,50 +432,50 @@ const Dashboard: React.FC = () => {
         }
     }, [isGLoggedIn, calendarId])
 
-    useEffect(() => {
-        if (isGLoggedIn && !contactGroupIdLoading && !contactGroupId) {
-            getGContactGroupsList()
-        }
-    }, [isGLoggedIn, contactGroupId])
+    // useEffect(() => {
+    //     if (isGLoggedIn && !contactGroupIdLoading && !contactGroupId) {
+    //         getGContactGroupsList()
+    //     }
+    // }, [isGLoggedIn, contactGroupId])
 
-    useMemo(() => {
-        if (isGLoggedIn && contactGroupId && !contacts) {
-            const contactsRef: string[] = []
-            axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
-                params: {
-                    maxMembers: 200
-                }
-            }).then((res) => {
-                console.log(res.data)
-                const gContactItems = res.data.memberResourceNames
-                gContactItems.map((cId: string) => {
-                    contactsRef.push(cId)
-                })
-            }).then(() => {
-                const paramsRef = new URLSearchParams()
-                contactsRef.map(c => {
-                    paramsRef.append("resourceNames", c)
-                })
-                paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
+    // useMemo(() => {
+    //     if (isGLoggedIn && contactGroupId && !contacts) {
+    //         const contactsRef: string[] = []
+    //         axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
+    //             params: {
+    //                 maxMembers: 200
+    //             }
+    //         }).then((res) => {
+    //             console.log(res.data)
+    //             const gContactItems = res.data.memberResourceNames
+    //             gContactItems.map((cId: string) => {
+    //                 contactsRef.push(cId)
+    //             })
+    //         }).then(() => {
+    //             const paramsRef = new URLSearchParams()
+    //             contactsRef.map(c => {
+    //                 paramsRef.append("resourceNames", c)
+    //             })
+    //             paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
 
-                axios.get('https://people.googleapis.com/v1/people:batchGet', {
-                    params: paramsRef
-                }).then(res => {
-                    const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
-                    const gContactsData = res.data.responses
-                    gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
-                        contactItemsRef.push({
-                            id: obj.person.resourceName,
-                            lastName: obj.person.names[0].familyName,
-                            firstName: obj.person.names[0].givenName,
-                            phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
-                        })
-                    })
-                    setContacts(contactItemsRef)
-                })
-            }).catch(err => console.log(err))
-        }
-    }, [isGLoggedIn, contactGroupId])
+    //             axios.get('https://people.googleapis.com/v1/people:batchGet', {
+    //                 params: paramsRef
+    //             }).then(res => {
+    //                 const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
+    //                 const gContactsData = res.data.responses
+    //                 gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
+    //                     contactItemsRef.push({
+    //                         id: obj.person.resourceName,
+    //                         lastName: obj.person.names[0].familyName,
+    //                         firstName: obj.person.names[0].givenName,
+    //                         phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
+    //                     })
+    //                 })
+    //                 setContacts(contactItemsRef)
+    //             })
+    //         }).catch(err => console.log(err))
+    //     }
+    // }, [isGLoggedIn, contactGroupId])
 
     // all component variables loaded ? else { skeletonloading...}
     return (
@@ -502,7 +503,10 @@ const Dashboard: React.FC = () => {
                 </>
             )}
             <div className="wrapper">
-                <motion.div className="dashboard-wrapper">
+                <motion.div className="dashboard-wrapper"
+                    initial={{ y: 10, opacity: 0.5 }}
+                    animate={{ y: 0, opacity: 1 }}
+                >
                     <motion.div className="page-header">
                         <h3>Dashboard</h3>
                         <span className="page-header-end">
@@ -755,37 +759,18 @@ const Dashboard: React.FC = () => {
                                                     {contacts.map((contact: any) => {
                                                         const contactId = contact.id.replace('people/', "")
                                                         return (
-                                                            <li onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>
-                                                                <div><h4>{contact.firstName}</h4><h4>{contact.lastName}</h4></div>
-                                                                <div><span /><p>{contact.phoneNumber}</p></div>
+                                                            <li>
+                                                                <div>
+                                                                    <h4 onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>{contact.firstName}</h4>
+                                                                    <h4 onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>{contact.lastName}</h4></div>
+                                                                <div><span /><p onClick={() => window.open(`https://contacts.google.com/person/${contactId}`)}>{contact.phoneNumber}</p></div>
                                                             </li>
                                                         )
                                                     })}
                                                 </ul>
                                             </>
                                             : !contactGroupIdLoading && !contactGroupId ?
-                                                <>
-                                                    <div className="contact-groups">
-                                                        <form>
-                                                            <h6>Create a new Google Contacts group:</h6>
-                                                            <input placeholder="Horizon Clients"
-                                                                value={contactsInput}
-                                                                onChange={(e) => setContactsInput(e.target.value)}
-                                                            />
-                                                            <button className="create-cgroup">Create Group</button>
-                                                        </form>
-                                                        {contactGroups &&
-                                                            <div className="contact-groups-list">
-                                                                <h6>Or choose an existing account contact group:</h6>
-                                                                <ul>
-                                                                    {contactGroups?.map((group, i) => {
-                                                                        return <li onClick={() => chooseContactGroup(group.resourceName)}><span style={{ backgroundColor: `${pieColorScale[i % 6]}` }}></span>{group.formattedName}</li>
-                                                                    })}
-                                                                </ul>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </>
+                                                <ContactGroups />
                                                 : null
                                     )
                                         : (

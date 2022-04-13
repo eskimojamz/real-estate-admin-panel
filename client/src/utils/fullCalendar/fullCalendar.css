@@ -79,8 +79,7 @@
 }
 
 .fc .fc-list-event-dot {
-  border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid
-    var(--primary-light) !important;
+  border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid var(--primary) !important;
 }
 
 .fc .fc-daygrid-event-dot {

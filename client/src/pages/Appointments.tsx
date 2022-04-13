@@ -15,29 +15,22 @@ import Geocode from "react-geocode"
 import GoogleConnected from '../components/GoogleConnected';
 import { BarLoader, ScaleLoader } from 'react-spinners';
 
-interface MapMarkerProps {
-    lat: number;
-    lng: number;
-}
-
-const MapMarker: React.FC<MapMarkerProps> = () => {
+const MapMarker: React.FC<any> = (props) => {
+    const { address } = props
+    const encodedAddress = encodeURIComponent(address).replace(/%20/g, "+")
     return (
         <>
             <motion.div className="map-marker"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', damping: 5, delay: 0.5 }}
+                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`)}
             />
         </>
     )
 }
 
 function Appointments() {
-    const yVariants = {
-        initial: { y: 10, opacity: 0.5 },
-        animate: { y: 0, opacity: 1 }
-    }
-
     const xVariants = {
         initial: { x: -10, opacity: 0.5 },
         animate: { x: 0, opacity: 1 }
@@ -398,7 +391,7 @@ function Appointments() {
                     const { lat, lng } = response.results[0].geometry.location;
                     // {lat, lng} are google-map-react component props
                     setMapCoords({ lat: lat, lng: lng })
-                    setMapMarker(<MapMarker lat={lat} lng={lng} />)
+                    setMapMarker(<MapMarker lat={lat} lng={lng} address={appointmentInfo?.location} />)
                 },
                 (error) => {
                     console.error(error);
@@ -409,7 +402,10 @@ function Appointments() {
     return (
         <>
             <div className='wrapper'>
-                <div className='appointments-wrapper'>
+                <motion.div className='appointments-wrapper'
+                    initial={{ y: 10, opacity: 0.5 }}
+                    animate={{ y: 0, opacity: 1 }}
+                >
                     <div className="page-header">
                         <h3>Appointments</h3>
                         {isGLoggedIn && (
@@ -421,18 +417,14 @@ function Appointments() {
                             {isGLoggedIn ? (
                                 calendarEvents && calendarId ?
                                     <>
-                                        <motion.div className="full-calendar-month"
-                                            key='full-calendar'
-                                            variants={yVariants}
-                                            initial='initial'
-                                            animate='animate'
+                                        <div className="full-calendar-month"
                                         >
                                             <FullCalendar
                                                 ref={calRef}
                                                 plugins={[dayGridPlugin, interactionPlugin]}
                                                 initialView="dayGridMonth"
                                                 initialEvents={calendarEvents}
-                                                height='auto'
+                                                height='100%'
                                                 headerToolbar={{
                                                     left: 'title',
                                                     center: '',
@@ -468,7 +460,7 @@ function Appointments() {
                                                 }}
                                                 selectable={true}
                                             />
-                                        </motion.div>
+                                        </div>
                                     </>
                                     : null)
                                 : null}
@@ -876,7 +868,7 @@ function Appointments() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </div >
         </>
     )

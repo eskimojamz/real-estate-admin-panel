@@ -40,7 +40,7 @@ function Home() {
     <>
       <div className="wrapper">
         <motion.div className="listings-wrapper"
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 10, opacity: 0.5 }}
           animate={{ y: 0, opacity: 1 }}
         >
           <div className="page-header">

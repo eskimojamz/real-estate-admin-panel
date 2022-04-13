@@ -1,8 +1,9 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, createContext, useMemo } from "react";
 import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
+import { useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 
 interface GlobalStateTypes {
   gAccountInfo: { email: any, photo: any } | undefined
@@ -35,6 +36,8 @@ export const App: React.FC = () => {
     contacts,
     setContacts,
   }
+
+
 
   useEffect(() => {
     fetch("http://localhost:4000/refresh_token", {
@@ -80,6 +83,50 @@ export const App: React.FC = () => {
       }
     })
   }, [])
+
+  const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
+    onError: (error: any) => console.log(error)
+  })
+  const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+
+  useMemo(() => {
+    if (isGLoggedIn && contactGroupId && !contacts) {
+      const contactsRef: string[] = []
+      axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
+        params: {
+          maxMembers: 200
+        }
+      }).then((res) => {
+        console.log(res.data)
+        const gContactItems = res.data.memberResourceNames
+        gContactItems.map((cId: string) => {
+          contactsRef.push(cId)
+        })
+      }).then(() => {
+        const paramsRef = new URLSearchParams()
+        contactsRef.map(c => {
+          paramsRef.append("resourceNames", c)
+        })
+        paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
+
+        axios.get('https://people.googleapis.com/v1/people:batchGet', {
+          params: paramsRef
+        }).then(res => {
+          const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
+          const gContactsData = res.data.responses
+          gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
+            contactItemsRef.push({
+              id: obj.person.resourceName,
+              lastName: obj.person.names[0].familyName,
+              firstName: obj.person.names[0].givenName,
+              phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
+            })
+          })
+          setContacts(contactItemsRef)
+        })
+      }).catch(err => console.log(err))
+    }
+  }, [isGLoggedIn, contactGroupId])
 
   return (
     <>
