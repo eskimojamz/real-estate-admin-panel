@@ -1834,14 +1834,23 @@ label {
 }
 
 .cancel-btn {
-  background: var(--grey-light);
-  border: none;
+  background-color: var(--grey-medium-light);
+  border: 1px solid var(--grey);
   border-radius: 5px;
   color: black;
   font-size: 13px;
   padding: 0.25rem 0.5rem;
   height: 30px;
   width: 75px;
+}
+
+.cancel-btn:hover {
+  border: 1px solid var(--grey);
+  background-color: var(--grey-superlight);
+}
+
+.cancel-btn:active {
+  background-color: var(--grey);
 }
 
 .submit-btn {
@@ -1962,13 +1971,23 @@ label {
 
 .delete-btn {
   background: var(--red-light);
-  border: none;
+  border: 1px solid var(--red-light);
   border-radius: 5px;
   color: var(--red-primary);
   font-size: 13px;
   padding: 0.25rem 0.5rem;
   height: 30px;
   width: 75px;
+}
+
+.delete-btn:hover {
+  border: 1px solid var(--red-primary);
+  background-color: var(--red-primary);
+  color: #fff;
+}
+
+.delete-btn:active {
+  filter: brightness(0.9);
 }
 
 .modal-backdrop {
@@ -2778,6 +2797,71 @@ em {
   font-weight: 400;
 }
 
+.appointments-side-loading .loading-div {
+  width: fit-content;
+  height: fit-content;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #fff;
+  border: 1px solid var(--grey-light);
+  border-radius: 10px;
+}
+
+.appointments-side .delete-modal-overlay {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--highlight-transparent);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.appointments-side .delete-modal {
+  height: fit-content;
+  width: fit-content;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  border: 1px solid var(--grey-light);
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.appointments-side .delete-modal p {
+  margin: 0;
+}
+
+.appointments-side .delete-modal em {
+  color: var(--red-primary);
+}
+
+.appointments-side .delete-modal span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appointments-side .delete-modal span:last-child {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .appointments-side-header {
   display: flex;
   justify-content: space-between;
@@ -2919,6 +3003,19 @@ em {
   border-width: 7px;
   border-style: solid;
   border-color: transparent transparent var(--grey-medium-light) transparent;
+}
+
+.appointments-side-body .error-div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--red-primary);
+}
+
+.appointments-side-body .error-div p {
+  margin: 0;
 }
 
 .appointments-side-body p {

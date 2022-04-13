@@ -8,12 +8,12 @@ import { motion } from 'framer-motion';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
-import { MdAddCircle, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
+import { MdAddCircle, MdDeleteOutline, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
 import { CgCalendarToday } from 'react-icons/cg'
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import GoogleConnected from '../components/GoogleConnected';
-import { ScaleLoader } from 'react-spinners';
+import { BarLoader, ScaleLoader } from 'react-spinners';
 
 interface MapMarkerProps {
     lat: number;
@@ -95,6 +95,13 @@ function Appointments() {
         })
     }
 
+    const [editToggle, setEditToggle] = useState<boolean>()
+    const [isDeleteModal, setIsDeleteModal] = useState<boolean>(false)
+    const [fnLoading, setFnLoading] = useState<boolean>(false)
+    const [deleteLoading, setDeleteLoading] = useState<boolean>(false)
+    const [isError, setIsError] = useState<boolean>(false)
+    const [isDeleteError, setIsDeleteError] = useState<boolean>(false)
+
     // edit calendar event
     const editAppointment = async (e: any, eventId: string) => {
         e.preventDefault()
@@ -149,6 +156,7 @@ function Appointments() {
                 description: res?.data?.description,
                 location: res?.data?.location,
                 url: res?.data?.htmlLink,
+                allDay: res?.data?.start?.dateTime ? false : true
             }
             if (title) {
                 calendarApi.getEventById(eventId).setProp('title', title)
@@ -180,11 +188,38 @@ function Appointments() {
         }).then(() => {
             setFnLoading(false)
             setEditToggle(false)
-        }).catch(err => { throw new Error(err) })
+        }).catch(err => {
+            setIsError(true)
+            throw new Error(err)
+        })
+    }
+
+    const deleteAppointment = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, eventId: string) => {
+        e.preventDefault()
+        setDeleteLoading(true)
+        let calendarApi = calRef.current.getApi()
+        await axios.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
+            .then(res => {
+                calendarApi.getEventById(eventId).remove()
+            })
+            .then(() => {
+                setDeleteLoading(false)
+                setIsDeleteModal(false)
+                setAppointmentInfo(undefined)
+                if (editToggle) {
+                    setEditToggle(false)
+                }
+            })
+            .catch((err) => {
+                setIsDeleteError(true)
+                setDeleteLoading(false)
+                throw new Error(err)
+            })
     }
 
     const createAppointment = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        setFnLoading(true)
         let calendarApi = calRef.current.getApi()
         const appointmentRef = {
             "start": {
@@ -223,6 +258,16 @@ function Appointments() {
         await axios.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
             .then(res => {
                 console.log(res)
+                const newAppointmentInfo = {
+                    id: res?.data?.id,
+                    title: res?.data?.summary,
+                    start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                    end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                    description: res?.data?.description,
+                    location: res?.data?.location,
+                    url: res?.data?.htmlLink,
+                    allDay: res?.data?.start?.dateTime ? false : true
+                }
                 calendarApi.addEvent({
                     id: res?.data?.id,
                     title: res?.data?.summary,
@@ -237,8 +282,15 @@ function Appointments() {
                     url: res?.data?.htmlLink,
                     allDay: res?.data?.start?.dateTime ? false : true
                 })
+                setAppointmentInfo(newAppointmentInfo)
             })
-            .catch(err => { throw new Error(err) })
+            .then(() => {
+                setFnLoading(false)
+            })
+            .catch(err => {
+                setIsError(true)
+                throw new Error(err)
+            })
     }
 
     const [appointmentInfo, setAppointmentInfo] = useState<any>()
@@ -250,19 +302,16 @@ function Appointments() {
     const [allDay, setAllDay] = useState<boolean>(true)
     const [location, setLocation] = useState<string>()
     const [client, setClient] = useState<string>()
-    console.log(appointmentInfo, startDate, endDate, startTime, endTime)
+    // console.log(appointmentInfo, startDate, endDate, startTime, endTime)
     // const [descriptionToggle, setDescriptionToggle] = useState<boolean>(false)
     // const [descriptionInput, setDescriptionInput] = useState<string>()
     // const [locationToggle, setLocationToggle] = useState<boolean>(false)
     // const [locationInput, setLocationInput] = useState<string>()
-
-    const [editToggle, setEditToggle] = useState<boolean>()
-    const [fnLoading, setFnLoading] = useState(false)
     const resetForm = () => {
         setTitle(undefined)
         setAllDay(true)
         setStartDate(new Date().getFullYear().toString().padStart(4, '0') + '-' + (new Date().getMonth() + 1).toString().padStart(2, '0') + '-' + new Date().getDate().toString().padStart(2, '0'))
-        setEndDate(new Date().getFullYear().toString().padStart(4, '0') + '-' + (new Date().getMonth() + 1).toString().padStart(2, '0') + '-' + new Date().getDate().toString().padStart(2, '0'))
+        setEndDate(new Date((new Date().setDate(new Date().getDate() + 1))).getFullYear().toString().padStart(4, '0') + '-' + (new Date((new Date().setDate(new Date().getDate() + 1))).getMonth() + 1).toString().padStart(2, '0') + '-' + new Date((new Date().setDate(new Date().getDate() + 1))).getDate().toString().padStart(2, '0'))
         setStartTime("12:00")
         setEndTime("13:00")
         setLocation(undefined)
@@ -276,7 +325,7 @@ function Appointments() {
             d.setDate(d.getDate() + 1)
             setEndDate(d.getFullYear().toString().padStart(4, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0'))
         }
-    }, [allDay])
+    }, [allDay, startDate])
 
     // set Google Maps Geocoding API
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
@@ -428,11 +477,67 @@ function Appointments() {
                             {/* loading overlay */}
                             {fnLoading && (
                                 <motion.div className='appointments-side-loading'
-                                    initial={{ opacity: 0 }}
+                                    initial={{ opacity: 0.5 }}
                                     animate={{ opacity: 1 }}
                                 >
-                                    <ScaleLoader color='#2c5990' />
-                                    <span>Sending appointment data to Google Contacts</span>
+                                    <div className='loading-div'>
+                                        <ScaleLoader color='#2c5990' />
+                                        <span>Sending appointment data to Google Calendar</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                            {/* delete modal */}
+                            {isDeleteModal && (
+                                <motion.div className='delete-modal-overlay'
+                                    initial={{ opacity: 0.5 }}
+                                    animate={{ opacity: 1 }}
+                                >
+                                    <motion.div className='delete-modal'
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                    >
+                                        {deleteLoading ? (
+                                            <>
+                                                <BarLoader color='#2c5990' />
+                                                <p>Deleting Appointment from Google Calendar</p>
+                                            </>
+                                        )
+                                            : isDeleteError
+                                                ? (
+                                                    <>
+                                                        <span>
+                                                            <p>There was an error.</p>
+                                                            <p>Please refresh the page and try again.</p>
+                                                        </span>
+                                                        <span>
+                                                            <button className='btn-primary'
+                                                                onClick={() => window.location.reload()}
+                                                            >
+                                                                Refresh Page
+                                                            </button>
+                                                        </span>
+                                                    </>
+                                                )
+                                                : (
+                                                    <>
+                                                        <span>
+                                                            <p>Are you sure you want to delete this appointment?</p>
+                                                            <em>This action cannot be undone!</em>
+                                                        </span>
+                                                        <span>
+                                                            <button className='cancel-btn'
+                                                                onClick={() => setIsDeleteModal(false)}
+                                                            >Cancel</button>
+                                                            <button className='delete-btn'
+                                                                onClick={(e) => {
+                                                                    deleteAppointment(e, appointmentInfo?.id)
+                                                                }}
+                                                            >Delete</button>
+                                                        </span>
+                                                    </>
+                                                )
+                                        }
+                                    </motion.div>
                                 </motion.div>
                             )}
 
@@ -442,6 +547,11 @@ function Appointments() {
                                         <>
                                             {editToggle ? <h4>Edit Appointment</h4> : <h4>Appointment Details</h4>}
                                             <span>
+                                                <MdDeleteOutline size='24px' color='#2c5990'
+                                                    onClick={() => {
+                                                        setIsDeleteModal(true)
+                                                    }}
+                                                />
                                                 {!editToggle &&
                                                     <MdEdit size='24px' color='#2c5990'
                                                         onClick={() => {
@@ -509,7 +619,9 @@ function Appointments() {
                                                                     value={startDate}
                                                                     min="2022-01-01"
                                                                     max="2025-12-31"
-                                                                    onChange={(e) => setStartDate(e.target.value)}
+                                                                    onChange={(e) => {
+                                                                        setStartDate(e.target.value)
+                                                                    }}
                                                                 />
                                                                 {allDay === false && (
                                                                     <>
@@ -572,6 +684,12 @@ function Appointments() {
                                                                 </>
                                                             )
                                                         }
+                                                        {isError && (
+                                                            <div className='error-div'>
+                                                                <p>Oops, there was an error.</p>
+                                                                <p>Refresh the page and try again.</p>
+                                                            </div>
+                                                        )}
                                                     </form>
                                                 </motion.div>
                                             )
@@ -747,13 +865,19 @@ function Appointments() {
                                                     </>
                                                 )
                                             }
+                                            {isError && (
+                                                <div className='error-div'>
+                                                    <p>Oops, there was an error.</p>
+                                                    <p>Refresh the page and try again.</p>
+                                                </div>
+                                            )}
                                         </motion.form>
                                     )}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }

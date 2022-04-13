@@ -183,8 +183,8 @@
 }
 
 .full-calendar-month .fc-h-event:hover {
-  background-color: var(--primary-light);
-  border-color: var(--primary-light);
+  background-color: var(--primary-superlight);
+  border-color: var(--primary-superlight);
 }
 
 .full-calendar-month .fc .fc-highlight {
