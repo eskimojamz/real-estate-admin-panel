@@ -107,19 +107,20 @@ export const App: React.FC = () => {
         contactsRef.map(c => {
           paramsRef.append("resourceNames", c)
         })
-        paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
+        paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses,photos')
 
         axios.get('https://people.googleapis.com/v1/people:batchGet', {
           params: paramsRef
         }).then(res => {
-          const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
+          const contactItemsRef: { id: string; lastName: string; firstName: string; phoneNumber: string; photo: string; }[] = []
           const gContactsData = res.data.responses
-          gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
+          gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; photos: { url: string; }[]; }; }) => {
             contactItemsRef.push({
               id: obj.person.resourceName,
               lastName: obj.person.names[0].familyName,
               firstName: obj.person.names[0].givenName,
               phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
+              photo: obj.person.photos[0].url
             })
           })
           setContacts(contactItemsRef)

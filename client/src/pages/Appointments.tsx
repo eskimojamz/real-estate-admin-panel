@@ -14,6 +14,8 @@ import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import GoogleConnected from '../components/GoogleConnected';
 import { BarLoader, ScaleLoader } from 'react-spinners';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const MapMarker: React.FC<any> = (props) => {
     const { address } = props
@@ -399,6 +401,7 @@ function Appointments() {
             );
     }, [appointmentInfo])
     console.log(appointmentInfo)
+    const a = false
     return (
         <>
             <div className='wrapper'>
@@ -462,8 +465,14 @@ function Appointments() {
                                             />
                                         </div>
                                     </>
-                                    : null)
-                                : null}
+                                    : (
+                                        <>
+                                            <Skeleton containerClassName='calendar-header-skeleton' count={2} inline={true} height='100%' width='30%' />
+                                            <Skeleton containerClassName='calendar-skeleton' count={6} height='100%' />
+
+                                        </>
+                                    )
+                            ) : null}
                         </div>
                         <div className='appointments-side'>
                             {/* loading overlay */}
