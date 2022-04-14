@@ -153,6 +153,7 @@ function Appointments() {
                 url: res?.data?.htmlLink,
                 allDay: res?.data?.start?.dateTime ? false : true
             }
+            // update FullCalendar events
             if (title) {
                 calendarApi.getEventById(eventId).setProp('title', title)
             }
@@ -179,6 +180,20 @@ function Appointments() {
             if (client) {
                 calendarApi.getEventById(eventId).setExtendedProp('description', res?.data?.description)
             }
+            // remove old event and add new, edited event.. then setCalendarEvents 
+            setCalendarEvents((events: any) => [...events.filter((ev: { id: string; }) => ev.id !== res?.data?.id), {
+                id: res?.data?.id,
+                title: res?.data?.summary,
+                start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                extendedProps: {
+                    description: res?.data?.description,
+                    location: res?.data?.location,
+                },
+                url: res?.data?.htmlLink,
+                allDay: res?.data?.start?.dateTime ? false : true
+            }])
+            // setAppointmentInfo for rendering new info data on screen
             setAppointmentInfo(newAppointmentInfo)
         }).then(() => {
             setFnLoading(false)
@@ -193,9 +208,13 @@ function Appointments() {
         e.preventDefault()
         setDeleteLoading(true)
         let calendarApi = calRef.current.getApi()
+        // delete event on Google Calendar
         await axios.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
-            .then(res => {
+            .then(() => {
+                // remove event from FullCalendar events
                 calendarApi.getEventById(eventId).remove()
+                // remove event from global state
+                setCalendarEvents((events: any[]) => [...events.filter(ev => ev.id !== eventId)])
             })
             .then(() => {
                 setDeleteLoading(false)
@@ -216,6 +235,7 @@ function Appointments() {
         e.preventDefault()
         setFnLoading(true)
         let calendarApi = calRef.current.getApi()
+        // assign fields to object for send to Google Calendar
         const appointmentRef = {
             "start": {
                 "date": startDate,
@@ -250,6 +270,7 @@ function Appointments() {
             })
         }
         console.log(appointmentRef)
+        // create new Event on Google Calendar
         await axios.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
             .then(res => {
                 console.log(res)
@@ -263,6 +284,7 @@ function Appointments() {
                     url: res?.data?.htmlLink,
                     allDay: res?.data?.start?.dateTime ? false : true
                 }
+                // add event to FullCalendar
                 calendarApi.addEvent({
                     id: res?.data?.id,
                     title: res?.data?.summary,
@@ -277,6 +299,20 @@ function Appointments() {
                     url: res?.data?.htmlLink,
                     allDay: res?.data?.start?.dateTime ? false : true
                 })
+                // add new appointment event data to calendarEvents global state
+                setCalendarEvents((events: any) => [...events, {
+                    id: res?.data?.id,
+                    title: res?.data?.summary,
+                    start: res?.data?.start?.date || res?.data?.start?.dateTime,
+                    end: res?.data?.end?.date || res?.data?.end?.dateTime,
+                    extendedProps: {
+                        description: res?.data?.description,
+                        location: res?.data?.location,
+                    },
+                    url: res?.data?.htmlLink,
+                    allDay: res?.data?.start?.dateTime ? false : true
+                }])
+                // set AppointmentInfo for immediate update on screen
                 setAppointmentInfo(newAppointmentInfo)
             })
             .then(() => {
@@ -527,6 +563,7 @@ function Appointments() {
                                                         </span>
                                                         <span>
                                                             <button className='btn-grey'
+                                                                style={{ width: 75 }}
                                                                 onClick={() => setIsDeleteModal(false)}
                                                             >Cancel</button>
                                                             <button className='delete-btn'
