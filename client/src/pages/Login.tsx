@@ -1,5 +1,5 @@
 import { useState } from "react"
-import logo from "../assets/logo.svg"
+import logoDark from "../assets/logoDark.svg"
 import { useNavigate } from "react-router-dom"
 import { useLoginMutation, DisplayUserDocument, DisplayUserQuery } from "../generated/graphql"
 import { ScaleLoader } from "react-spinners"
@@ -30,6 +30,9 @@ const Login: React.FC = () => {
                         displayUser: data.login.user
                     }
                 })
+            },
+            onError: (err) => {
+                throw new Error(err.message)
             }
         })
         console.log(response)
@@ -41,10 +44,9 @@ const Login: React.FC = () => {
         <div className='login-container'>
             <div className='login-wrapper'>
                 <div className='login-header'>
-                    <img className='login-header-logo' src={logo} alt='logo' />
+                    <img className='login-header-logo' src={logoDark} alt='logo' />
                     <div className='login-header-text'>
                         <h3>Admin Panel</h3>
-                        <h6>Please enter credentials</h6>
                     </div>
                 </div>
                 <form
@@ -58,7 +60,7 @@ const Login: React.FC = () => {
                             setUsername(e.target.value)
                         }}
                     />
-                    <label>Password</label>
+                    <label>PASSWORD</label>
                     <input
                         className='login-form-id'
                         type='password'
@@ -66,12 +68,13 @@ const Login: React.FC = () => {
                             setPassword(e.target.value)
                         }}
                     />
+                    {error &&
+                        <div className="login-form-error">
 
-                    <div className="login-form-error">
-                        {error &&
                             'Invalid credentials. Try again.'
-                        }
-                    </div>
+
+                        </div>
+                    }
                     <button type='submit'>
                         Login
                     </button>
