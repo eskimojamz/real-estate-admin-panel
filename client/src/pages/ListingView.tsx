@@ -11,6 +11,8 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { Img } from "react-image";
 import s3Upload from "../utils/s3Upload";
 import axios from "axios";
+import { MdOutlineChevronRight } from "react-icons/md";
+import { ScaleLoader } from "react-spinners";
 
 interface MapMarkerProps {
     lat: number;
@@ -134,8 +136,8 @@ function ListingView() {
 
     const [address1, setAddress1] = useState<string>()
     const [address2, setAddress2] = useState<string>()
-    const [price, setPrice] = useState<number>()
-    const [squareFt, setSquareFt] = useState<number>()
+    const [price, setPrice] = useState<string>()
+    const [squareFt, setSquareFt] = useState<string>()
     const [beds, setBeds] = useState<number>(1)
     const [baths, setBaths] = useState<number>(1)
     const [status, setStatus] = useState<string>("Active")
@@ -168,25 +170,6 @@ function ListingView() {
     // }
 
     const [editMutation, { data: editData }] = useEditMutation({
-        variables: {
-            editId: listingId!,
-            data: {
-                address1,
-                address2,
-                price,
-                squareFt,
-                beds,
-                baths,
-                status,
-                area,
-                description,
-                image1: allImages[0] ? allImages[0].url : null,
-                image2: allImages[1] ? allImages[1].url : null,
-                image3: allImages[2] ? allImages[2].url : null,
-                image4: allImages[3] ? allImages[3].url : null,
-                image5: allImages[4] ? allImages[4].url : null,
-            }
-        },
         refetchQueries: [{ query: AllListingsDocument }, { query: GetListingDocument, variables: { getListingId: listingId } }],
         awaitRefetchQueries: true,
         onError: error => {
@@ -216,7 +199,27 @@ function ListingView() {
 
         setLoading(true)
 
-        await editMutation()
+        await editMutation({
+            // variables: {
+            //     editId: listingId!,
+            //     data: {
+            //         address1,
+            //         address2,
+            //         price,
+            //         squareFt: parseInt(squareFt?.replace(/\D/g, '')),
+            //         beds,
+            //         baths,
+            //         status,
+            //         area,
+            //         description,
+            //         image1: allImages[0] ? allImages[0].url : null,
+            //         image2: allImages[1] ? allImages[1].url : null,
+            //         image3: allImages[2] ? allImages[2].url : null,
+            //         image4: allImages[3] ? allImages[3].url : null,
+            //         image5: allImages[4] ? allImages[4].url : null,
+            //     }
+            // },
+        })
             .then(() => {
                 // if s3UploadData... upload
                 s3UploadData && s3UploadData.forEach(async (data: any) => {
@@ -248,6 +251,7 @@ function ListingView() {
         loading ?
             <div className="create-loading-modal">
                 <div className="create-loading-modal-card">
+                    <ScaleLoader color='#2c5990' />
                     Submitting edited listing...
                 </div>
             </div>
@@ -350,15 +354,16 @@ function ListingView() {
                     animate={{ opacity: 1 }}
                 >
                     <div className="listing-view-header">
-                        <div className="listing-view-back">
-                            <button className="back-btn" onClick={() => navigate("/listings")}>
-                                ← Back to Listings
-                            </button>
+                        <div className="listing-view-title">
+                            <h5 onClick={() => navigate('/listings')}>Listings</h5>
+                            <MdOutlineChevronRight size='20px' color='#000' />
+                            <h5>Listing Details</h5>
                         </div>
                         {EditToolip}
                         <div className="listing-view-actions">
                             {editMode ?
-                                <motion.button className="cancel-btn"
+                                <motion.button className="btn-grey"
+                                    style={{ width: 75 }}
                                     initial="hidden"
                                     animate="visible"
                                     variants={scaleVariant}
@@ -378,7 +383,7 @@ function ListingView() {
                                 </button>
                             }
                             {editMode ?
-                                <motion.button className="edit-btn"
+                                <motion.button className="btn-primary edit-btn"
                                     onClick={(e) => submit(e)}
                                     initial="hidden"
                                     animate="visible"
@@ -386,7 +391,7 @@ function ListingView() {
                                 >
                                     Submit
                                 </motion.button>
-                                : <button className="edit-btn"
+                                : <button className="btn-primary edit-btn"
                                     onClick={() => {
                                         setEditMode(true)
                                     }

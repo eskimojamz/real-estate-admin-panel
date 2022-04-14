@@ -886,9 +886,13 @@ h6 {
   background-color: var(--blue-light);
 }
 
+.calendar-events .calendar-info {
+  padding: 8px 14px;
+}
+
 .calendar-info {
   width: inherit;
-  height: auto;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -904,7 +908,8 @@ h6 {
 
 .calendar-info-header h5 {
   color: var(--grey-dark);
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .calendar-info h4,
@@ -914,22 +919,23 @@ h6 {
   margin: 0;
 }
 
-.calendar-info-title-date {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: inherit;
-  padding-left: 1rem;
-}
-
-.calendar-info-title-date h4 {
-  font-size: 20px;
-}
-
-.calendar-info-title-date h5 {
-  font-size: 13px;
+.calendar-info p {
+  margin: 0 !important;
+  font-size: 12px;
   font-weight: 400;
-  padding-left: 34px;
+}
+
+.calendar-info div {
+  padding-left: 0;
+}
+
+.calendar-info-title span {
+  margin: 0 7px 0 7px;
+}
+
+.calendar-info-title h3 {
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .calendar-info-title {
@@ -972,7 +978,12 @@ h6 {
 
 #time-text {
   display: flex;
+  align-items: center;
   gap: 4px;
+}
+
+#time-text p {
+  margin: 0 !important;
 }
 
 .calendar-info-description {
@@ -982,42 +993,6 @@ h6 {
   gap: 10px;
 }
 
-.calendar-info-description h6 {
-  font-weight: 400;
-}
-
-.calendar-info-description-value p {
-  font-size: 15px;
-}
-
-.calendar-info-description-value button {
-  height: 30px;
-  width: 130px;
-  background-color: white;
-  border-radius: 5px;
-  border: 1px solid var(--blue-primary);
-  padding: 0 7px;
-  color: var(--blue-primary);
-}
-
-.calendar-info-description-value button:hover {
-  background-color: var(--blue-light) !important;
-  filter: brightness(1) !important;
-}
-
-.calendar-info-description-value button:focus {
-  filter: brightness(0.9) !important;
-}
-
-.calendar-info-description input {
-  background: var(--grey-superlight);
-  border-radius: 5px;
-  border: 1px solid var(--grey-light);
-  padding: 0.5rem;
-  height: 30px;
-  width: auto;
-}
-
 .calendar-info-location {
   padding-left: 1rem;
   display: flex;
@@ -1025,44 +1000,12 @@ h6 {
   gap: 10px;
 }
 
-.calendar-info-location p {
-  font-size: 15px;
-}
-
-.calendar-info-location button {
-  height: 30px;
-  width: 130px;
-  background-color: white;
-  border-radius: 5px;
-  border: 1px solid var(--blue-primary);
-  padding: 0 7px;
-  color: var(--blue-primary);
-}
-
-.calendar-info-location button:hover {
-  background-color: var(--blue-light) !important;
-  filter: brightness(1) !important;
-}
-
-.calendar-info-location button:focus {
-  filter: brightness(0.9) !important;
-}
-
-.calendar-info-location input {
-  background: var(--grey-superlight);
-  border-radius: 5px;
-  border: 1px solid var(--grey-light);
-  padding: 0.5rem;
-  height: 30px;
-  width: auto;
-}
-
-.calendar-info-edit-buttons {
+/* .calendar-info-edit-buttons {
   padding-left: 1rem;
   padding-top: 0.5rem;
   display: flex;
   justify-content: space-between;
-}
+} */
 
 .calendar-info-link {
   padding-left: 1rem;
@@ -1076,14 +1019,24 @@ h6 {
   color: white;
   border: none;
   border-radius: 5px;
-  height: 35px;
+  height: 30px;
   width: fit-content;
   padding: 0 1rem;
+  display: flex;
+  gap: 4px;
+}
+
+.calendar-info-link .view:hover {
+  background-color: #8babfd;
+}
+
+.calendar-info-link .view:active {
+  background-color: #426bd5;
 }
 
 .calendar-info-link .return {
-  height: 35px;
-  width: 35px;
+  height: 30px;
+  width: 30px;
   background-color: var(--grey-light);
   color: black;
   border: none;
@@ -1626,17 +1579,12 @@ td {
 
 /* Create listing page*/
 .create-container {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 12px;
-  border: 1px solid rgba(209, 213, 219, 0.3);
-
+  background-color: #fff;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: auto;
-  width: 85vw;
-  margin: 1rem auto;
-  padding: 1rem;
+  height: 100vh;
+  width: 100%;
   overflow: scroll;
 }
 
@@ -1653,23 +1601,30 @@ td {
   align-items: center;
 }
 
-.create-header-text h2 {
-  margin: 0;
+.create-header-text h5 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
 }
 
 .create-header-btns {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+.create-header-btns button {
+  width: 75px;
 }
 
 .create-wrapper {
   display: flex;
   flex-wrap: wrap;
+  height: 100%;
   width: 100%;
   justify-content: center;
-  padding-bottom: 1rem;
+  padding: 1rem 1.5rem;
 }
 
 .create-wrapper form {
@@ -1708,9 +1663,10 @@ td {
   border-style: dashed;
   border-width: 1px;
   border-color: var(--grey-light);
-  border-radius: 15px;
+  border-radius: 5px;
   padding: 1rem;
   color: var(--grey-dark);
+  font-size: 13px;
 }
 
 .dropzone p {
@@ -1725,22 +1681,21 @@ td {
   gap: 1rem;
   width: 100%;
   margin-top: 2rem;
-}
-
-.image-preview-aside:hover {
-  cursor: pointer;
+  border: 1px solid var(--grey-light);
+  border-radius: 5px;
+  background-color: var(--grey-superlight);
+  padding: 1rem;
 }
 
 .image-preview-img {
-  height: 150px;
-  width: 200px;
+  height: 50px;
+  width: 75px;
   object-fit: cover;
-  border-radius: 15px;
-  box-shadow: -5px 5px 10px rgb(131, 130, 130, 0.2);
-  transition: all 0.5s;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-/* Image preview hover effect */
+/* Image preview hover effect
 .image-preview-img:first-child {
   z-index: 6;
 }
@@ -1787,14 +1742,13 @@ td {
 
 .image-preview-aside:hover .image-preview-img:nth-child(5) {
   transform: translate(16px, 16px);
-}
+} */
 /* ---------------------- */
 
 .form-col-1 {
   width: 30%;
   display: flex;
   flex-direction: column;
-  padding: 0 1rem;
 }
 
 .form-col-1-bottom {
@@ -1860,7 +1814,7 @@ label {
 
 .dollar-placeholder {
   position: absolute;
-  top: 34px;
+  top: 32px;
   left: 10px;
   font-family: inherit;
   font-weight: 400;
@@ -1868,26 +1822,24 @@ label {
 }
 
 .price-input {
-  padding: 0.5rem 0.5rem 0.5rem 1.2rem !important;
+  padding: 0.5rem 0.5rem 0.5rem 1.5rem !important;
 }
 
-.cancel-btn {
-  background-color: var(--grey-medium-light);
-  border: 1px solid var(--grey);
+.btn-grey {
+  background-color: var(--grey-light);
   border-radius: 5px;
   color: black;
   font-size: 13px;
   padding: 0.25rem 0.5rem;
   height: 30px;
-  width: 75px;
+  width: fit-content;
 }
 
-.cancel-btn:hover {
-  border: 1px solid var(--grey);
-  background-color: var(--grey-superlight);
+.btn-grey:hover {
+  background-color: #ececec;
 }
 
-.cancel-btn:active {
+.btn-grey:active {
   background-color: var(--grey);
 }
 
@@ -1904,6 +1856,7 @@ label {
 
 .description {
   height: 100%;
+  max-height: 375px;
   border-radius: 5px;
   border: 1px solid var(--grey-light);
   background: var(--grey-superlight);
@@ -1929,14 +1882,18 @@ label {
 
 .create-loading-modal-card {
   z-index: 701 !important;
-  height: 200px;
-  width: 300px;
-  z-index: 101;
+  height: fit-content;
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 400;
   background: var(--bg);
   color: black;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
 }
 
 .edit-tooltip {
@@ -1948,8 +1905,8 @@ label {
   text-align: center;
   background-color: var(--blue-light);
   color: var(--blue-primary);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
   border-radius: 10px;
 }
 
@@ -1978,16 +1935,36 @@ label {
   align-items: center;
   height: 60.5px;
   width: calc(100% - 150px);
-  padding: 0 5px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   background: white;
   border-bottom: 1px solid var(--grey-light);
 }
 
-.listing-view-back {
+.listing-view-title {
   display: flex;
+  gap: 1rem;
   place-items: center;
+}
+
+.listing-view-title h5 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.listing-view-title h5:first-child {
+  color: var(--grey-dark);
+}
+
+.listing-view-title h5:first-child:hover {
+  color: var(--grey);
+}
+
+.listing-view-title h5:first-child:active {
+  color: #000;
 }
 
 .back-btn {
@@ -2079,7 +2056,7 @@ em {
   font-size: 13px;
   padding: 0.25rem 0.5rem;
   height: 30px;
-  width: 75px;
+  width: 75px !important;
 }
 
 /* Image Carousel */
@@ -2521,10 +2498,6 @@ em {
   width: 100%;
 }
 
-.listing-view-text-head span:nth-child(2) {
-  position: relative;
-}
-
 .listing-view-text-head .edit-address1,
 .edit-price {
   font-size: 18.7px;
@@ -2532,18 +2505,31 @@ em {
   color: black !important;
 }
 
-.edit-dollar {
-  position: absolute;
-  left: 20px;
-  font-size: 18.7px;
-  font-weight: 500;
-  color: var(--grey-dark);
+.edit-price-relative {
+  position: relative;
+  height: fit-content;
+  width: 135px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
 }
 
 .edit-price {
-  width: 125px;
-  margin-left: 3px;
+  position: relative;
+  width: 135px;
   text-align: right;
+  margin: 0 !important;
+  padding: 8px 8px 8px 24px !important;
+}
+
+.edit-dollar {
+  position: absolute;
+  z-index: 2;
+  left: 8px;
+  font-size: 18.7px;
+  font-weight: 500;
+  color: var(--grey-dark);
+  width: fit-content !important;
 }
 
 .edit-price::placeholder {
@@ -3081,44 +3067,14 @@ em {
   font-size: 12px;
 }
 
-.appointments-side-body .calendar-info p {
-  margin: 0;
-}
-
-.appointments-side-body .calendar-info div {
-  padding-left: 0;
-}
-
-.appointments-side-body .calendar-info-title span {
-  margin: 0 7px 0 7px;
-}
-
-.appointments-side-body .calendar-info-title h3 {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.appointments-side-body .calendar-info-title-date h5 {
-  padding-left: 34px;
-}
-
-.appointments-side-body .calendar-info-title-date #times {
-  display: flex;
-  gap: 3px;
-}
-
-.appointments-side-body .calendar-info-title-date #times h5:last-child {
-  padding-left: 0;
-}
-
-.calendar-info-map {
+.appointments-side-body .calendar-info-map {
   height: 250px;
   width: 100%;
   border-radius: 10px;
   margin: 1rem 0;
 }
 
-.calendar-info-map * {
+.appointments-side-body .calendar-info-map * {
   border-radius: 10px;
 }
 

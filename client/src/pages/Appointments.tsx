@@ -526,7 +526,7 @@ function Appointments() {
                                                             <em>This action cannot be undone!</em>
                                                         </span>
                                                         <span>
-                                                            <button className='cancel-btn'
+                                                            <button className='btn-grey'
                                                                 onClick={() => setIsDeleteModal(false)}
                                                             >Cancel</button>
                                                             <button className='delete-btn'

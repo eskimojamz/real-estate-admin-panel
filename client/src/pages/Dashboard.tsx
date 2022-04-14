@@ -13,10 +13,11 @@ import '../utils/fullCalendar/fullCalendar.css'
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
 import { GlobalContext } from "../App";
-import { MdLocationPin, MdPerson, MdArrowBack } from "react-icons/md"
+import { MdLocationPin, MdPerson, MdArrowBack, MdOutlineAccessTime } from "react-icons/md"
 import { FaGoogle } from "react-icons/fa"
 import GoogleConnected from "../components/GoogleConnected";
 import ContactGroups from "../components/ContactGroups";
+import { CgCalendarToday } from "react-icons/cg";
 
 
 interface MapMarkerProps {
@@ -606,6 +607,7 @@ const Dashboard: React.FC = () => {
                                                                     description: info.event.extendedProps.description,
                                                                     location: info.event.extendedProps.location,
                                                                     url: info.event.url,
+                                                                    allDay: info.event.allDay
                                                                 }
                                                                 setCalendarInfo(eventInfo)
 
@@ -625,13 +627,13 @@ const Dashboard: React.FC = () => {
                                                             <div className="calendar-info-header">
                                                                 <h5>Event Details</h5>
                                                             </div>
-                                                            <div className="calendar-info-title-date">
-                                                                <div className="calendar-info-title">
-                                                                    <span />
-                                                                    <h4>{calendarInfo.title}</h4>
-                                                                </div>
-
-                                                                <h5>{new Date(calendarInfo.start).toLocaleDateString('en-US', {
+                                                            <div className="calendar-info-title">
+                                                                <span />
+                                                                <h3>{calendarInfo?.title}</h3>
+                                                            </div>
+                                                            <div className="calendar-info-date">
+                                                                <CgCalendarToday size='24px' color='#737373' />
+                                                                <h5>{new Date(calendarInfo?.start).toLocaleDateString('en-US', {
                                                                     weekday: 'long',
                                                                     year: 'numeric',
                                                                     month: 'long',
@@ -639,72 +641,65 @@ const Dashboard: React.FC = () => {
                                                                 })}
                                                                 </h5>
                                                             </div>
-                                                            <div className="calendar-info-location">
-                                                                {/* <h6>Location:</h6> */}
-                                                                <MdLocationPin color='#737373' size='24px' />
-                                                                {calendarInfo.location ?
-                                                                    <p>{calendarInfo.location}</p>
-                                                                    : !calendarInfo.location && !locationToggle
-                                                                        ? <motion.button onClick={() => setLocationToggle(true)}>Add a location</motion.button>
-                                                                        : !calendarInfo.location && locationToggle
-                                                                            ? <motion.input
-                                                                                initial={{ opacity: 0.5, x: -10 }}
-                                                                                animate={{ opacity: 1, x: 0 }}
-                                                                                value={locationInput}
-                                                                                onChange={(e) => setLocationInput(e.target.value)}
-                                                                            />
-                                                                            : null}
-                                                            </div>
-                                                            <div className="calendar-info-description">
-                                                                {/* <h6>Description:</h6> */}
-                                                                <MdPerson color='#737373' size='24px' />
-                                                                <div className="calendar-info-description-value">
-                                                                    {calendarInfo.description ?
-                                                                        <p>{calendarInfo.description}</p>
-                                                                        : !calendarInfo.description && !descriptionToggle
-                                                                            ? <button onClick={() => setDescriptionToggle(true)}>Add clients</button>
-                                                                            : !calendarInfo.description && descriptionToggle
-                                                                                ? <motion.input
-                                                                                    initial={{ opacity: 0.5, x: -10 }}
-                                                                                    animate={{ opacity: 1, x: 0 }}
-                                                                                    value={descriptionInput}
-                                                                                    onChange={(e) => setDescriptionInput(e.target.value)} />
-                                                                                : null}
+
+                                                            <div className='calendar-info-time'>
+                                                                <MdOutlineAccessTime size='24px' color='#737373' />
+                                                                <div id='time-text'>
+                                                                    {calendarInfo?.allDay
+                                                                        ? (
+                                                                            <h5>All-Day</h5>
+                                                                        )
+                                                                        : (
+                                                                            <>
+                                                                                <h5>{new Date(calendarInfo?.start).toLocaleTimeString('en-US', {
+                                                                                    hour12: true,
+                                                                                    hour: '2-digit',
+                                                                                    minute: '2-digit',
+                                                                                })}
+                                                                                </h5>
+                                                                                <p>-</p>
+                                                                                <h5>{new Date(calendarInfo?.end).toLocaleTimeString('en-US', {
+                                                                                    hour12: true,
+                                                                                    hour: '2-digit',
+                                                                                    minute: '2-digit',
+                                                                                })}
+                                                                                </h5>
+                                                                            </>
+                                                                        )
+                                                                    }
+
                                                                 </div>
                                                             </div>
-                                                            {descriptionToggle || locationToggle
-                                                                ?
-                                                                <div className="calendar-info-edit-buttons">
-                                                                    <button className="cancel-btn"
-                                                                        onClick={() => {
-                                                                            // reset states
-                                                                            setDescriptionToggle(false)
-                                                                            setDescriptionInput(undefined)
-                                                                            setLocationToggle(false)
-                                                                            setLocationInput(undefined)
-                                                                        }}
-                                                                    >
-                                                                        Cancel
-                                                                    </button>
-                                                                    <button className="submit-btn"
-                                                                        onClick={() => gCalendarEdit(calendarInfo.id)}
-                                                                    >
-                                                                        Submit
-                                                                    </button>
-                                                                </div>
-                                                                :
-                                                                <div className="calendar-info-link">
-                                                                    <button className="return"
-                                                                        onClick={() => {
-                                                                            // null calendar info, returns to no-cal-view-all state <FullCalendar/>
-                                                                            setCalendarInfo(null)
-                                                                        }}
-                                                                    >
-                                                                        <MdArrowBack color="grey" size='18px' />
-                                                                    </button>
-                                                                    <button className="view" onClick={() => window.open(calendarInfo.url)}>View in Google Calendar</button>
+
+                                                            {calendarInfo.location &&
+                                                                <div className="calendar-info-location">
+                                                                    {/* <h6>Location:</h6> */}
+                                                                    <MdLocationPin color='#737373' size='24px' />
+
+                                                                    <p>{calendarInfo?.location}</p>
                                                                 </div>
                                                             }
+                                                            {calendarInfo?.description &&
+                                                                <div className="calendar-info-description">
+                                                                    {/* <h6>Description:</h6> */}
+                                                                    <MdPerson color='#737373' size='24px' />
+                                                                    <div className="calendar-info-description-value">
+                                                                        <p>{calendarInfo?.description}</p>
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                            <div className="calendar-info-link">
+                                                                <button className="return btn-grey"
+                                                                    onClick={() => {
+                                                                        // null calendar info, returns to no-cal-view-all state <FullCalendar/>
+                                                                        setCalendarInfo(null)
+                                                                    }}
+                                                                >
+                                                                    <MdArrowBack color="grey" size='18px' />
+                                                                </button>
+                                                                <button className="view" onClick={() => window.open(calendarInfo.url)}>View in <FaGoogle color='white' size='12px' /> Calendar</button>
+                                                            </div>
                                                         </motion.div>
                                                     </>
                                                     : !calendarIdLoading && !calendarId ?
