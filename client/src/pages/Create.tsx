@@ -216,7 +216,10 @@ const Create: React.FC = () => {
             {loadingModal}
 
             <div className="wrapper">
-                <div className="create-container">
+                <motion.div className="create-container"
+                    initial={{ opacity: 0.5, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
                     <div className="page-header">
                         <div className="create-header-text">
                             <h5>Create New Listing</h5>
@@ -328,7 +331,7 @@ const Create: React.FC = () => {
                             </div>
                             : null}
                     </div>
-                </div>
+                </motion.div>
             </div>
         </>
     )

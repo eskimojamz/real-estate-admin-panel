@@ -751,7 +751,7 @@ const Dashboard: React.FC = () => {
                                         contacts && contactGroupId ?
                                             <>
                                                 <ul className="clients-list">
-                                                    {contacts.map((contact: any) => {
+                                                    {contacts.sort((a: { firstName: string }, b: { firstName: string }) => a.firstName.localeCompare(b.firstName)).map((contact: any) => {
                                                         const contactId = contact.id.replace('people/', "")
                                                         return (
                                                             <li>
