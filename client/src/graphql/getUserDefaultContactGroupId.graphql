@@ -3,5 +3,6 @@ query GetUserDefaultContactGroup {
     id
     username
     defaultContactGroupId
+    defaultContactGroupName
   }
 }

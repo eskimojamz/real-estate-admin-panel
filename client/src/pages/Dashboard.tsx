@@ -18,6 +18,7 @@ import { FaGoogle } from "react-icons/fa"
 import GoogleConnected from "../components/GoogleConnected";
 import ContactGroups from "../components/ContactGroups";
 import { CgCalendarToday } from "react-icons/cg";
+import Calendars from "../components/Calendars";
 
 
 interface MapMarkerProps {
@@ -66,11 +67,6 @@ const Dashboard: React.FC = () => {
         return arr
     }, [activeDataFilled])
 
-    const yVariants = {
-        initial: { y: 10, opacity: 0.5 },
-        animate: { y: 0, opacity: 1 }
-    }
-
     const xVariants = {
         initial: { x: -10, opacity: 0.5 },
         animate: { x: 0, opacity: 1 }
@@ -91,7 +87,6 @@ const Dashboard: React.FC = () => {
     ]
 
     const renderActiveShape = (props: { cx: any; cy: any; innerRadius: any; outerRadius: any; startAngle: any; endAngle: any; fill: any; payload: any; }) => {
-
         const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload } = props;
 
         return (
@@ -181,123 +176,19 @@ const Dashboard: React.FC = () => {
 
     const [loginModal, setLoginModal] = useState<boolean>(true)
 
-    const { data: userData } = useDisplayUserQuery({
-        onError: (error) => console.log(error)
-    })
-
     const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
         onError: (error: any) => console.log(error)
     })
 
     const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
 
-    const [calendars, setCalendars] = useState<any[] | null>()
     const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error)
     })
     const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
 
-    const [setDefaultCalendar] = useSetDefaultCalendarMutation({
-        onError: (error) => {
-            console.log(error)
-        }
-    })
     const [calendarInfo, setCalendarInfo] = useState<any>()
 
-    // calendar appointments inputs
-    const [calendarInput, setCalendarInput] = useState<string>("Horizon Appointments")
-    const [descriptionToggle, setDescriptionToggle] = useState<boolean>(false)
-    const [descriptionInput, setDescriptionInput] = useState<string>()
-    const [locationToggle, setLocationToggle] = useState<boolean>(false)
-    const [locationInput, setLocationInput] = useState<string>()
-
-    const getGCalendarsList = async () => {
-        try {
-            await axios.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
-                .then(res => {
-                    console.log(res.data.items)
-                    const calendarsRef: any[] = []
-                    res.data.items.map((cal: { id: string, summary: string, backgroundColor: string }) => {
-                        calendarsRef.push({
-                            id: cal.id,
-                            name: cal.summary,
-                            color: cal.backgroundColor
-                        })
-                    })
-                    calendarsRef.length > 0 && (
-                        setCalendars(calendarsRef)
-                    )
-                })
-        } catch (error: any) {
-            console.log("Error getting calendar data", error);
-            return error.message;
-        }
-    };
-
-    // choose default calendar on first usage
-    const chooseCalendar = async (calId: string) => {
-        await setDefaultCalendar({
-            variables: {
-                calendarId: calId,
-                userId: userData?.displayUser?.id!
-            },
-            refetchQueries: [{ query: GetUserDefaultCalendarDocument }]
-        })
-    }
-
-    // edit calendar event
-    const gCalendarEdit = async (eventId: string) => {
-        const reqBody = {}
-        if (descriptionInput) {
-            Object.assign(reqBody, { description: descriptionInput })
-        }
-        if (locationInput) {
-            Object.assign(reqBody, { location: locationInput })
-        }
-        await axios.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
-            reqBody
-        ).then(res => {
-            // console.log(res)
-            // update calendarInfo (cache state)
-            const calendarInfoRef = calendarInfo
-            if (descriptionInput) {
-                Object.assign(calendarInfoRef, {
-                    description: res.data.description
-                })
-            }
-            if (locationInput) {
-                Object.assign(calendarInfoRef, {
-                    location: res.data.location
-                })
-            }
-            setCalendarInfo(calendarInfoRef)
-            // update global state
-            const updatedEvent = calendarEvents.find((event: any) => event.id === eventId)
-            if (descriptionInput) {
-                Object.assign(updatedEvent, {
-                    extendedProps: {
-                        description: res.data.description
-                    }
-                })
-            }
-            if (locationInput) {
-                Object.assign(updatedEvent, {
-                    extendedProps: {
-                        location: res.data.location
-                    }
-                })
-            }
-            const otherEvents = calendarEvents.filter((event: any) => event.id !== eventId)
-            const updatedEvents = [...otherEvents, updatedEvent]
-            setCalendarEvents(updatedEvents)
-
-            // reset toggles and inputs states
-            setDescriptionToggle(false)
-            setDescriptionInput(undefined)
-            setLocationToggle(false)
-            setLocationInput(undefined)
-        })
-    }
 
     // set Google Maps Geocoding API
     Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY!);
@@ -377,61 +268,61 @@ const Dashboard: React.FC = () => {
     }, [allListingsData])
 
     // after login success, get Calendars Lists, if there is no default Calendar
-    useEffect(() => {
-        if (isGLoggedIn && !calendarIdLoading && !calendarId) {
-            getGCalendarsList()
-        }
-    }, [isGLoggedIn, calendarId])
+    // useEffect(() => {
+    //     if (isGLoggedIn && !calendarIdLoading && !calendarId) {
+    //         getGCalendarsList()
+    //     }
+    // }, [isGLoggedIn, calendarId])
 
-    // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
-    useMemo(() => {
-        if (isGLoggedIn && calendarId && !calendarEvents) {
-            try {
+    // // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
+    // useMemo(() => {
+    //     if (isGLoggedIn && calendarId && !calendarEvents) {
+    //         try {
 
-                const calItemsRef: { id: any; title: any; start: any; end: any; startStr: any; endStr: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
+    //             const calItemsRef: { id: any; title: any; start: any; end: any; startStr: any; endStr: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
 
-                // set time range for g calendar events fetch
-                const minDate = new Date()
-                minDate.setDate(minDate.getDate() - 180)
-                const maxDate = new Date()
-                maxDate.setDate(maxDate.getDate() + 180)
+    //             // set time range for g calendar events fetch
+    //             const minDate = new Date()
+    //             minDate.setDate(minDate.getDate() - 180)
+    //             const maxDate = new Date()
+    //             maxDate.setDate(maxDate.getDate() + 180)
 
-                axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
-                    params: {
-                        orderBy: 'startTime',
-                        singleEvents: true,
-                        timeMin: minDate.toISOString(),
-                        timeMax: maxDate.toISOString(),
-                        timeZone: 'America/New_York'
-                    }
-                }).then(res => {
-                    console.log(res.data.items)
-                    const gCalItems = res.data.items
-                    gCalItems.map((item: any) => {
-                        calItemsRef.push({
-                            id: item.id,
-                            title: item.summary,
-                            start: item.start.date || item.start.dateTime,
-                            end: item.end.date || item.end.dateTime,
-                            startStr: item.start.dateTime,
-                            endStr: item.end.dateTime,
-                            extendedProps: {
-                                description: item.description,
-                                location: item.location
-                            },
-                            url: item.htmlLink,
-                            allDay: item.start.dateTime ? false : true
-                        })
-                    })
-                    console.log(calItemsRef)
-                    setCalendarEvents(calItemsRef)
-                })
-            } catch (error: any) {
-                console.log("Error getting calendar events")
-                return error.message
-            }
-        }
-    }, [isGLoggedIn, calendarId])
+    //             axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+    //                 params: {
+    //                     orderBy: 'startTime',
+    //                     singleEvents: true,
+    //                     timeMin: minDate.toISOString(),
+    //                     timeMax: maxDate.toISOString(),
+    //                     timeZone: 'America/New_York'
+    //                 }
+    //             }).then(res => {
+    //                 console.log(res.data.items)
+    //                 const gCalItems = res.data.items
+    //                 gCalItems.map((item: any) => {
+    //                     calItemsRef.push({
+    //                         id: item.id,
+    //                         title: item.summary,
+    //                         start: item.start.date || item.start.dateTime,
+    //                         end: item.end.date || item.end.dateTime,
+    //                         startStr: item.start.dateTime,
+    //                         endStr: item.end.dateTime,
+    //                         extendedProps: {
+    //                             description: item.description,
+    //                             location: item.location
+    //                         },
+    //                         url: item.htmlLink,
+    //                         allDay: item.start.dateTime ? false : true
+    //                     })
+    //                 })
+    //                 console.log(calItemsRef)
+    //                 setCalendarEvents(calItemsRef)
+    //             })
+    //         } catch (error: any) {
+    //             console.log("Error getting calendar events")
+    //             return error.message
+    //         }
+    //     }
+    // }, [isGLoggedIn, calendarId])
 
     // useEffect(() => {
     //     if (isGLoggedIn && !contactGroupIdLoading && !contactGroupId) {
@@ -704,28 +595,7 @@ const Dashboard: React.FC = () => {
                                                     </>
                                                     : !calendarIdLoading && !calendarId ?
                                                         <>
-                                                            <motion.div className="calendar-list"
-                                                                key='cal-list'
-                                                            >
-                                                                <form>
-                                                                    <h6>Create a new Google Calendar:</h6>
-                                                                    <input placeholder="Horizon Appointments"
-                                                                        value={calendarInput}
-                                                                        onChange={(e) => setCalendarInput(e.target.value)}
-                                                                    />
-                                                                    <button className="create-calendar">Create Calendar</button>
-                                                                </form>
-                                                                {calendars &&
-                                                                    <div className="calendar-list-existing">
-                                                                        <h6>Or choose an existing account calendar:</h6>
-                                                                        <ul>
-                                                                            {calendars?.map((cal: { id: string, name: string, color: string }) => {
-                                                                                return <li onClick={() => chooseCalendar(cal.id)}><span style={{ backgroundColor: `${cal.color}` }}></span>{cal.name}</li>
-                                                                            })}
-                                                                        </ul>
-                                                                    </div>
-                                                                }
-                                                            </motion.div>
+                                                            <Calendars />
                                                         </>
                                                         : null // skeleton loading?
                                         )

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Listings from "./pages/Listings";
 import ListingView from "./pages/ListingView";
 import Login from "./pages/Login";
+import Settings from "./pages/Settings";
 
 export const Router: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ export const Router: React.FC = () => {
               <Route path="listings/:listingId" element={<ListingView />} />
               <Route path="appointments" element={<Appointments />} />
               <Route path="clients" element={<Clients />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
         </BrowserRouter>

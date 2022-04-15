@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { MdHomeFilled, MdOutlineCalendarToday, MdOutlineHomeWork, MdOutlinePermContactCalendar, MdOutlineSpaceDashboard } from "react-icons/md"
 import { RiHome8Line } from "react-icons/ri"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { NavLink } from "react-router-dom"
 import logo from "../assets/logo.svg"
 import { useDisplayUserQuery } from "../generated/graphql"
 
 function Sidebar() {
     const { data: loggedIn } = useDisplayUserQuery()
-    console.log(loggedIn)
+    const navigate = useNavigate()
 
     return (
         <>
@@ -59,7 +59,9 @@ function Sidebar() {
                         <button className="site-preview-btn" onClick={() => window.open('http://horizon-development.plasmic.site/', '_blank')}>
                             Site Preview
                         </button>
-                        <div className="sidebar-profile">
+                        <div className="sidebar-profile"
+                            onClick={() => navigate('/settings')}
+                        >
                             {loggedIn ?
                                 <>
                                     <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" />

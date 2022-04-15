@@ -118,6 +118,7 @@ export type MutationSetDefaultCalendarArgs = {
 
 export type MutationSetDefaultContactGroupArgs = {
   contactGroupId: Scalars['String'];
+  contactGroupName: Scalars['String'];
   userId: Scalars['Float'];
 };
 
@@ -152,6 +153,7 @@ export type User = {
   __typename?: 'User';
   defaultCalendarId: Scalars['String'];
   defaultContactGroupId: Scalars['String'];
+  defaultContactGroupName: Scalars['String'];
   id: Scalars['Int'];
   username: Scalars['String'];
 };
@@ -203,7 +205,7 @@ export type GetUserDefaultCalendarQuery = { __typename?: 'Query', getUserDefault
 export type GetUserDefaultContactGroupQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserDefaultContactGroupQuery = { __typename?: 'Query', getUserDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string } };
+export type GetUserDefaultContactGroupQuery = { __typename?: 'Query', getUserDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string, defaultContactGroupName: string } };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
@@ -236,11 +238,12 @@ export type SetDefaultCalendarMutation = { __typename?: 'Mutation', setDefaultCa
 
 export type SetDefaultContactGroupMutationVariables = Exact<{
   contactGroupId: Scalars['String'];
+  contactGroupName: Scalars['String'];
   userId: Scalars['Float'];
 }>;
 
 
-export type SetDefaultContactGroupMutation = { __typename?: 'Mutation', setDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string } };
+export type SetDefaultContactGroupMutation = { __typename?: 'Mutation', setDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string, defaultContactGroupName: string } };
 
 export type SignS3MutationVariables = Exact<{
   filename: Scalars['String'];
@@ -559,6 +562,7 @@ export const GetUserDefaultContactGroupDocument = gql`
     id
     username
     defaultContactGroupId
+    defaultContactGroupName
   }
 }
     `;
@@ -726,11 +730,16 @@ export type SetDefaultCalendarMutationHookResult = ReturnType<typeof useSetDefau
 export type SetDefaultCalendarMutationResult = Apollo.MutationResult<SetDefaultCalendarMutation>;
 export type SetDefaultCalendarMutationOptions = Apollo.BaseMutationOptions<SetDefaultCalendarMutation, SetDefaultCalendarMutationVariables>;
 export const SetDefaultContactGroupDocument = gql`
-    mutation SetDefaultContactGroup($contactGroupId: String!, $userId: Float!) {
-  setDefaultContactGroup(contactGroupId: $contactGroupId, userId: $userId) {
+    mutation SetDefaultContactGroup($contactGroupId: String!, $contactGroupName: String!, $userId: Float!) {
+  setDefaultContactGroup(
+    contactGroupId: $contactGroupId
+    contactGroupName: $contactGroupName
+    userId: $userId
+  ) {
     id
     username
     defaultContactGroupId
+    defaultContactGroupName
   }
 }
     `;
@@ -750,6 +759,7 @@ export type SetDefaultContactGroupMutationFn = Apollo.MutationFunction<SetDefaul
  * const [setDefaultContactGroupMutation, { data, loading, error }] = useSetDefaultContactGroupMutation({
  *   variables: {
  *      contactGroupId: // value for 'contactGroupId'
+ *      contactGroupName: // value for 'contactGroupName'
  *      userId: // value for 'userId'
  *   },
  * });

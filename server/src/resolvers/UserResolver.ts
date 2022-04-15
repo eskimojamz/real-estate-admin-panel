@@ -7,7 +7,7 @@ import { sendRefreshToken } from "../sendRefreshToken";
 import { getConnection } from "typeorm";
 import { verify } from "jsonwebtoken";
 import { isAuth } from "../isAuth";
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 
 @ObjectType()
 class LoginResponse {
@@ -93,7 +93,7 @@ export class UserResolver {
       const authorization = context.req.headers["authorization"];
       // if not authorized, return null
       if (!authorization) {
-        return null;
+        throw new AuthenticationError('Unauthorized Access')
       }
 
       try {
@@ -101,11 +101,11 @@ export class UserResolver {
         const token = authorization.split(" ")[1];
         // verify token and set to payload const
         const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET!);
-        // return User but only query for defaultCalendarId on client-side
+        // return User, defaultCalendarId/Name on client-side
         return User.findOne(payload.userId)
       } catch (error) {
         console.log(error)
-        return null
+        throw new UserInputError(error)
       }
     }
 
@@ -113,11 +113,12 @@ export class UserResolver {
     @UseMiddleware(isAuth)
     async setDefaultContactGroup(
       @Arg("userId") userId: number,
-      @Arg("contactGroupId") contactGroupId: string
+      @Arg("contactGroupId") contactGroupId: string,
+      @Arg("contactGroupName") contactGroupName: string
       ) {
       try {
         // update defaultCalendarId
-        await User.update(userId, {defaultContactGroupId: contactGroupId})
+        await User.update(userId, {defaultContactGroupId: contactGroupId, defaultContactGroupName: contactGroupName})
         // return User
         return await User.findOne(userId)
       } catch (error) {

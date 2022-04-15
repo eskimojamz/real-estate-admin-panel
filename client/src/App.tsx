@@ -3,7 +3,7 @@ import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
-import { useGetUserDefaultContactGroupQuery } from "./generated/graphql";
+import { useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 
 interface GlobalStateTypes {
   gAccountInfo: { email: any, photo: any } | undefined
@@ -84,13 +84,67 @@ export const App: React.FC = () => {
     })
   }, [])
 
+  const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
+    onError: (error) => console.log(error)
+  })
+  const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
+
+  // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
+  useMemo(() => {
+    if (isGLoggedIn && calendarId && !calendarEvents) {
+      try {
+
+        const calItemsRef: { id: any; title: any; start: any; end: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
+
+        // set time range for g calendar events fetch
+        const minDate = new Date()
+        minDate.setDate(minDate.getDate() - 180)
+        const maxDate = new Date()
+        maxDate.setDate(maxDate.getDate() + 180)
+
+        axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+          params: {
+            orderBy: 'startTime',
+            singleEvents: true,
+            timeMin: minDate.toISOString(),
+            timeMax: maxDate.toISOString(),
+          }
+        }).then(res => {
+          console.log(res.data.items)
+          const gCalItems = res.data.items
+          gCalItems.map((item: any) => {
+            calItemsRef.push({
+              id: item.id,
+              title: item.summary,
+              start: item.start.dateTime || item.start.date,
+              end: item.end.dateTime || item.end.date,
+              // startStr: item.start.dateTime,
+              // endStr: item.end.dateTime,
+              extendedProps: {
+                description: item.description,
+                location: item.location
+              },
+              url: item.htmlLink,
+              allDay: item.start.dateTime ? false : true
+            })
+          })
+          console.log(calItemsRef)
+          setCalendarEvents(calItemsRef)
+        })
+      } catch (error: any) {
+        console.log("Error getting calendar events")
+        return error.message
+      }
+    }
+  }, [isGLoggedIn, calendarId])
+
   const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
     onError: (error: any) => console.log(error)
   })
   const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
 
   useMemo(() => {
-    if (isGLoggedIn && contactGroupId && !contacts) {
+    if (isGLoggedIn && contactGroupId) {
       const contactsRef: string[] = []
       axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
         params: {

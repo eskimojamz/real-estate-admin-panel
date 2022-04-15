@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { motion } from 'framer-motion'
 import React, { useContext, useEffect, useState } from 'react'
 import { ScaleLoader } from 'react-spinners'
 import { GlobalContext } from '../App'
@@ -11,16 +12,23 @@ function ContactGroups() {
     })
     const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
     const [contactGroups, setContactGroups] = useState<any[] | null>()
+    const [contactGroupId, setContactGroupId] = useState<string>()
+    const [contactGroupName, setContactGroupName] = useState<string>()
 
     const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
-        onError: (error: any) => console.log(error)
+        onError: (error) => console.log(error),
+        onCompleted: (data) => {
+            setContactGroupId(data.getUserDefaultContactGroup.defaultContactGroupId)
+            setContactGroupName(data.getUserDefaultContactGroup.defaultContactGroupName)
+        }
     })
-    const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
 
+    console.log(contactGroupId, contactGroupIdLoading)
     // const [contactGroupsLoading, setContactGroupsLoading] = useState<boolean>(false)
 
     const getGContactGroupsList = async () => {
         // setContactGroupsLoading(true)
+        console.log('getting contact groups')
         await axios.get('https://people.googleapis.com/v1/contactGroups')
             .then(res => {
                 // console.log(res.data.contactGroups)
@@ -52,10 +60,11 @@ function ContactGroups() {
         }
     })
 
-    const chooseContactGroup = async (cGroupId: string) => {
+    const chooseContactGroup = async (cGroupId: string, cGroupName: string) => {
         await setDefaultContactGroup({
             variables: {
                 contactGroupId: cGroupId,
+                contactGroupName: cGroupName,
                 userId: userData?.displayUser?.id!
             },
             refetchQueries: [{ query: GetUserDefaultContactGroupDocument }]
@@ -63,16 +72,30 @@ function ContactGroups() {
     }
 
     useEffect(() => {
-        if (isGLoggedIn && !contactGroupIdLoading && !contactGroupId) {
+        if (isGLoggedIn) {
             getGContactGroupsList()
         }
-    }, [isGLoggedIn, contactGroupId])
+    }, [isGLoggedIn])
 
     return (
         <>
-            <div className="contact-groups">
-                {contactGroups ? (
-                    <>
+            {contactGroups ? (
+                <>
+                    <motion.div className="contact-groups"
+                        key='c-groups'
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                    >
+                        {contactGroupId && contactGroupName && (
+                            <>
+                                <div className='contact-groups-current'>
+                                    <h6>Default Contact Group</h6>
+                                    <span>
+                                        {contactGroupName}
+                                    </span>
+                                </div>
+                            </>
+                        )}
                         <form>
                             <h6>Create a new Google Contacts group:</h6>
                             <input placeholder="Horizon Clients"
@@ -84,23 +107,23 @@ function ContactGroups() {
                         <div className="contact-groups-list">
                             <h6>Or choose an existing account contact group:</h6>
                             <ul>
-                                {contactGroups?.map((group: { resourceName: string; formattedName: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined }, i: number) => {
-                                    return <li onClick={() => chooseContactGroup(group.resourceName)}><span></span>{group.formattedName}</li>
+                                {contactGroups?.filter(group => group.resourceName !== contactGroupId).map((group: { resourceName: string; formattedName: string }) => {
+                                    return <li onClick={() => chooseContactGroup(group.resourceName, group.formattedName)}><span></span>{group.formattedName}</li>
                                 })}
                             </ul>
                         </div>
+                    </motion.div>
+                </>
+            )
+                : (
+                    <>
+                        <div className="contact-groups-loading">
+                            <ScaleLoader color='#2c5990' />
+                            <p>Loading Google Contact Groups</p>
+                        </div>
                     </>
                 )
-                    : (
-                        <>
-                            <div className="contact-groups-loading">
-                                <ScaleLoader color='#2c5990' />
-                                <p>Loading Google Contact Groups</p>
-                            </div>
-                        </>
-                    )
-                }
-            </div>
+            }
         </>
     )
 }
