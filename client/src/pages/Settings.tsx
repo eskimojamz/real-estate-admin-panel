@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import React, { useContext, useState } from 'react'
+import Skeleton from 'react-loading-skeleton'
 import { GlobalContext } from '../App'
+import Calendars from '../components/Calendars'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
 import { useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from '../generated/graphql'
@@ -23,6 +25,7 @@ function Settings() {
         })
     })
 
+    const [panelCategory, setPanelCategory] = useState<string>('admin')
     const [isModal, setIsModal] = useState<boolean>()
     const [modalCategory, setModalCategory] = useState<string>()
 
@@ -45,57 +48,82 @@ function Settings() {
                         )}
                     </div>
                     <div className='settings-body'>
-                        <div className="settings-body-admin settings-body-section">
-                            <h5>Admin Account</h5>
-                            <span>
-                                <h6>ID</h6>
-                                <p>{userData?.displayUser?.username}</p>
-                                <h6>PASSWORD</h6>
-                                <p>*******</p>
-                                <button className='btn-primary' onClick={() => handleModal('admin')}>Update Credentials</button>
+                        <div className="settings-side">
+                            <span onClick={() => setPanelCategory('admin')} className={panelCategory === 'admin' ? 'active' : 'inactive'}>
+                                <h5>Admin</h5>
                             </span>
+                            <span onClick={() => setPanelCategory('google')} className={panelCategory === 'google' ? 'active' : 'inactive'}>
+                                <h5>Google</h5>
+                            </span>
+                            <button className='btn-grey' style={{ width: '134px', margin: 'auto 0 0 0' }}>Logout</button>
                         </div>
-                        <div className="settings-body-google settings-body-section">
-                            <h5>Google Account</h5>
-                            <span>
-                                {isGLoggedIn ? (
-                                    <>
-                                        <img src={gAccountInfo?.photo} />
-                                        <h6>EMAIL</h6>
-                                        <p>{gAccountInfo?.email}</p>
-                                        <h6>CALENDAR ID</h6>
-                                        {calendarId ? (
-                                            <>
-                                                <span>
-                                                    <p>{calendarId}</p>
-                                                </span>
-                                                <button className='btn-primary' onClick={() => handleModal('calendar')}>Change Calendar</button>
-                                            </>
-                                        )
-                                            : (
-                                                <button className='btn-primary' onClick={() => handleModal('calendar')}>Set Calendar</button>
-                                            )}
-                                        <h6>CONTACTS GROUP</h6>
-                                        {contactGroupName ? (
-                                            <>
-                                                <span>
-                                                    <p>{contactGroupName}</p>
-                                                </span>
-                                                <button className='btn-primary' onClick={() => handleModal('contacts')}>Change Contact Group</button>
-                                            </>
-                                        )
-                                            : (
-                                                <button className='btn-primary' onClick={() => handleModal('contacts')}>Set Contact Group</button>
-                                            )}
-                                    </>
-                                )
-                                    : (
-                                        <p>Google Account not connected</p>
+                        <div className="settings-main">
+                            {panelCategory === 'admin' ? (
+                                <div className="settings-body-admin settings-body-section">
+                                    <span>
+                                        <h4>Admin Account</h4>
+                                    </span>
+                                    <span>
+                                        <h6>ID</h6>
+                                        <p>{userData?.displayUser?.username}</p>
+                                    </span>
+                                    <span>
+                                        <h6>PASSWORD</h6>
+                                        <p>*******</p>
+                                    </span>
+
+                                    <button className='btn-primary' style={{ marginTop: '1rem' }} onClick={() => handleModal('admin')}>Update Credentials</button>
+                                </div>
+                            ) : panelCategory === 'google' ? (
+                                <div className="settings-body-google settings-body-section">
+                                    <span>
+                                        <h4>Google Account</h4>
+                                    </span>
+
+                                    {isGLoggedIn ? (
+                                        <>
+                                            <span>
+                                                <img src={gAccountInfo?.photo} />
+                                                <h6>EMAIL</h6>
+                                                <p>{gAccountInfo?.email}</p>
+                                            </span>
+                                            <span>
+                                                <h6>CALENDAR ID</h6>
+                                                {calendarId ? (
+                                                    <>
+                                                        <p>{calendarId}</p>
+                                                        <button className='btn-primary' onClick={() => handleModal('calendar')}>Change Calendar</button>
+                                                    </>
+                                                )
+                                                    : (
+                                                        <button className='btn-primary' onClick={() => handleModal('calendar')}>Set Calendar</button>
+                                                    )}
+                                            </span>
+                                            <span>
+                                                <h6>CONTACTS GROUP</h6>
+                                                {contactGroupName ? (
+                                                    <>
+                                                        <p>{contactGroupName}</p>
+                                                        <button className='btn-primary' onClick={() => handleModal('contacts')}>Change Contact Group</button>
+                                                    </>
+                                                )
+                                                    : (
+                                                        <button className='btn-primary' onClick={() => handleModal('contacts')}>Set Contact Group</button>
+                                                    )
+                                                }
+                                            </span>
+                                        </>
                                     )
-                                }
-                            </span>
+                                        : (
+                                            <p>Google Account not connected</p>
+                                        )
+                                    }
+                                </div>
+                            ) : (
+                                <Skeleton />
+                            )}
                         </div>
-                        <button className='btn-grey'>Logout</button>
+
                         {isModal && (
                             <>
                                 <div className="settings-modal-overlay"
@@ -111,7 +139,9 @@ function Settings() {
                                         </>
                                     )
                                         : modalCategory === 'calendar' ? (
-                                            <></>
+                                            <>
+                                                <Calendars />
+                                            </>
                                         )
                                             // modalCategory === 'contacts'
                                             : (

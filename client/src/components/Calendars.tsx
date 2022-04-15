@@ -62,7 +62,7 @@ function Calendars() {
 
     // after login success, get Calendars Lists, if there is no default Calendar
     useEffect(() => {
-        if (isGLoggedIn && !calendarIdLoading && !calendarId) {
+        if (isGLoggedIn) {
             getGCalendarsList()
         }
     }, [isGLoggedIn, calendarId])
