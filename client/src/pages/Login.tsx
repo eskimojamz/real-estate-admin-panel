@@ -70,12 +70,10 @@ const Login: React.FC = () => {
                     />
                     {error &&
                         <div className="login-form-error">
-
-                            'Invalid credentials. Try again.'
-
+                            <p>Invalid credentials. Try again.</p>
                         </div>
                     }
-                    <button type='submit'>
+                    <button type='submit' className="btn-primary">
                         Login
                     </button>
                     {loading && (

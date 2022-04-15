@@ -165,7 +165,7 @@ svg {
 .login-header-text h3 {
   font-weight: 600;
   font-size: 18px;
-  margin: 16px 0 8px 0;
+  margin: 8px 0 4px 0;
   color: var(--grey-dark);
 }
 
@@ -247,6 +247,11 @@ textarea:focus {
   font-weight: 400;
   font-size: 12px;
   color: var(--secondary);
+  margin-top: 1rem;
+}
+
+.login-form-error p {
+  margin: 0;
 }
 
 .login-form button {
@@ -257,7 +262,6 @@ textarea:focus {
   color: white;
   font-weight: 500;
   font-size: 14px;
-  border: 1px solid var(--primary);
   border-radius: 5px;
   background: var(--primary);
 }

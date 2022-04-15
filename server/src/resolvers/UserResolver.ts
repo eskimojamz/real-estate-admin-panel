@@ -7,6 +7,7 @@ import { sendRefreshToken } from "../sendRefreshToken";
 import { getConnection } from "typeorm";
 import { verify } from "jsonwebtoken";
 import { isAuth } from "../isAuth";
+import { AuthenticationError } from "apollo-server-express";
 
 @ObjectType()
 class LoginResponse {
@@ -151,13 +152,13 @@ export class UserResolver {
       const user = await User.findOne({ where: { username } });
   
       if (!user) {
-        throw new Error("could not find user");
+        throw new AuthenticationError("could not find user");
       }
   
       const valid = await compare(password, user.password);
   
       if (!valid) {
-        throw new Error("bad password");
+        throw new AuthenticationError("bad password");
       }
   
       // login successful
