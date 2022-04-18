@@ -9,7 +9,7 @@ interface EditProps {
     setAllImages: (value: any) => void;
     handleImg: (index: number) => void;
     listingData: any;
-    editState: any;
+    editStateSetters: any;
     onDrop: any;
     s3UploadData: [];
     setS3UploadData: React.Dispatch<any>;
@@ -20,7 +20,7 @@ const editVariants = {
     visible: { y: 0, opacity: 1 }
 }
 
-const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleImg, listingData, editState, onDrop, s3UploadData, setS3UploadData }) => (
+const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleImg, listingData, editStateSetters, onDrop, s3UploadData, setS3UploadData }) => (
 
 
     <div className="listing-view">
@@ -133,14 +133,14 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                     <motion.h5>Address</motion.h5>
                     <motion.input className="edit-address1"
                         defaultValue={listingData?.address1}
-                        onChange={e => editState.setAddress1(e.target.value)}
+                        onChange={e => editStateSetters.setAddress1(e.target.value)}
                         initial="hidden"
                         animate="visible"
                         variants={editVariants}
                     />
                     <motion.input className="edit-address2"
                         defaultValue={listingData?.address2}
-                        onChange={e => editState.setAddress2(e.target.value)}
+                        onChange={e => editStateSetters.setAddress2(e.target.value)}
                         initial="hidden"
                         animate="visible"
                         variants={editVariants}
@@ -156,7 +156,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                         <motion.span className="edit-dollar">$</motion.span>
                         <motion.input className="edit-price"
                             defaultValue={listingData?.price.toString()}
-                            onChange={e => editState.setPrice(parseInt(e.target.value))}
+                            onChange={e => editStateSetters.setPrice(parseInt(e.target.value.replace(/\D/g, '')))}
 
                         />
                     </motion.div>
@@ -169,7 +169,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                             <motion.h5>Beds</motion.h5>
                             <motion.select
                                 defaultValue={listingData?.beds.toString()}
-                                onChange={e => editState.setBeds(parseInt(e.target.value))}
+                                onChange={e => editStateSetters.setBeds(parseInt(e.target.value))}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -186,7 +186,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                             <motion.h5>Baths</motion.h5>
                             <motion.select
                                 defaultValue={listingData?.baths.toString()}
-                                onChange={e => editState.setBaths(parseInt(e.target.value))}
+                                onChange={e => editStateSetters.setBaths(parseInt(e.target.value))}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -203,7 +203,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                             <motion.h5>Square Ft.</motion.h5>
                             <motion.input className="edit-squareFt"
                                 defaultValue={listingData?.squareFt.toString()}
-                                onChange={e => editState.setSquareFt(parseInt(e.target.value))}
+                                onChange={e => editStateSetters.setSquareFt(parseInt(e.target.value.replace(/\D/g, '')))}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -215,7 +215,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                             <motion.h5>Area</motion.h5>
                             <motion.select
                                 defaultValue={listingData?.area}
-                                onChange={e => editState.setArea(e.target.value)}
+                                onChange={e => editStateSetters.setArea(e.target.value)}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -233,7 +233,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                             <motion.h5>Status</motion.h5>
                             <motion.select
                                 defaultValue={listingData?.status}
-                                onChange={e => editState.setStatus(e.target.value)}
+                                onChange={e => editStateSetters.setStatus(e.target.value)}
                                 initial="hidden"
                                 animate="visible"
                                 variants={editVariants}
@@ -261,7 +261,7 @@ const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleI
                         <motion.h5>Description</motion.h5>
                         <motion.textarea
                             defaultValue={listingData?.description}
-                            onChange={e => editState.setDescription(e.target.value)}
+                            onChange={e => editStateSetters.setDescription(e.target.value)}
                             initial="hidden"
                             animate="visible"
                             variants={editVariants}

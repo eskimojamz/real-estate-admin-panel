@@ -155,6 +155,7 @@ function Appointments() {
             // setAppointmentInfo for rendering new info data on screen
             setAppointmentInfo(newAppointmentInfo)
         }).then(() => {
+            resetForm()
             setFnLoading(false)
             setEditToggle(false)
         }).catch(err => {
@@ -275,6 +276,7 @@ function Appointments() {
                 setAppointmentInfo(newAppointmentInfo)
             })
             .then(() => {
+                resetForm()
                 setFnLoading(false)
             })
             .catch(err => {

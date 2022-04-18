@@ -145,6 +145,18 @@ function ListingView() {
     const [description, setDescription] = useState<string>()
 
     const editState = {
+        address1,
+        address2,
+        price,
+        squareFt,
+        beds,
+        baths,
+        status,
+        area,
+        description,
+    }
+
+    const editStateSetters = {
         setAddress1,
         setAddress2,
         setPrice,
@@ -179,7 +191,7 @@ function ListingView() {
         }
     })
 
-    const EditToolip = (
+    const EditTooltip = (
         editMode ?
             <motion.div className="edit-tooltip"
                 initial={{ y: -10, opacity: 0 }}
@@ -196,29 +208,28 @@ function ListingView() {
 
     const submit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault()
-
         setLoading(true)
 
+        const editData: any = {}
+        // if editState variable was updated, send to edit mutation
+        Object.keys(editState).map((k) => {
+            if (editState[k as keyof typeof editState]) {
+                editData[k] = editState[k as keyof typeof editState]
+            }
+        })
+        // add images to edit mutation, if none: null
+        for (let i = 0; i < 4; i++) {
+            const keyStr = 'image' + (i + 1)
+            Object.assign(editData, {
+                [keyStr]: allImages[i] ? allImages[i].url : null
+            })
+        }
+        // edit mutation with listingId and editData
         await editMutation({
-            // variables: {
-            //     editId: listingId!,
-            //     data: {
-            //         address1,
-            //         address2,
-            //         price,
-            //         squareFt: parseInt(squareFt?.replace(/\D/g, '')),
-            //         beds,
-            //         baths,
-            //         status,
-            //         area,
-            //         description,
-            //         image1: allImages[0] ? allImages[0].url : null,
-            //         image2: allImages[1] ? allImages[1].url : null,
-            //         image3: allImages[2] ? allImages[2].url : null,
-            //         image4: allImages[3] ? allImages[3].url : null,
-            //         image5: allImages[4] ? allImages[4].url : null,
-            //     }
-            // },
+            variables: {
+                editId: listingId!,
+                data: editData,
+            },
         })
             .then(() => {
                 // if s3UploadData... upload
@@ -239,10 +250,13 @@ function ListingView() {
                         })
                 })
             })
-            .then(() => setLoading(false))
-            .then(() => navigate(0))
+            .then(() => {
+                setEditMode(false)
+                setLoading(false)
+            })
             .catch((err) => {
                 console.log(err)
+                setLoading(false)
                 throw new Error(err)
             })
     }
@@ -359,7 +373,7 @@ function ListingView() {
                             <MdOutlineChevronRight size='20px' color='#000' />
                             <h5>Listing Details</h5>
                         </div>
-                        {EditToolip}
+                        {EditTooltip}
                         <div className="listing-view-actions">
                             {editMode ?
                                 <motion.button className="btn-grey"
@@ -408,7 +422,7 @@ function ListingView() {
                             setAllImages={setAllImages}
                             handleImg={handleImg}
                             listingData={editListingData}
-                            editState={editState}
+                            editStateSetters={editStateSetters}
                             onDrop={onDrop}
                             s3UploadData={s3UploadData}
                             setS3UploadData={setS3UploadData}
