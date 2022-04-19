@@ -17,31 +17,31 @@ export class Listing extends BaseEntity {
     address2: string;
 		
 	@Field()
-    @Column("int")
+    @Column("int", {default: 0})
     price: number;
 
-    @Field()
-    @Column("int")
+    @Field({nullable: true})
+    @Column("int", {default: null})
     beds: number;
 
-    @Field()
-    @Column("int")
+    @Field({nullable: true})
+    @Column("int", {default: null})
     baths: number;
 
-    @Field()
-    @Column("int")
+    @Field({nullable: true})
+    @Column("int", {default: null})
     squareFt: number;
 
-    @Field()
-    @Column("text")
+    @Field({nullable: true})
+    @Column("text", {default: null})
     status: string;
 
-    @Field()
-    @Column("text")
+    @Field({nullable: true})
+    @Column("text", {default: null})
     area: string;
 
-    @Field()
-    @Column("text")
+    @Field({nullable: true})
+    @Column("text", {default: null})
     description: string;
 
     @Field()

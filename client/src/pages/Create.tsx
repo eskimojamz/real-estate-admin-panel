@@ -5,6 +5,7 @@ import { AllListingsDocument, useAllListingsQuery, useCreateMutation, useSignS3M
 import s3Upload from "../utils/s3Upload"
 import axios from "axios";
 import { motion } from "framer-motion";
+import * as async from "async";
 
 interface listing {
     id: string,
@@ -97,11 +98,11 @@ const Create: React.FC = () => {
                 }
             )
 
-            console.log(s3SignedRequest.data?.signS3.url)
+            // console.log(s3SignedRequest.data?.signS3.url)
 
-            await setImageUrls((imageUrls: []) => [...imageUrls, s3SignedRequest?.data?.signS3?.url])
+            setImageUrls((imageUrls: []) => [...imageUrls, s3SignedRequest?.data?.signS3?.url])
         })
-        console.log(uploads)
+        // console.log(uploads)
         setS3UploadData(uploads)
         return
     }, [])
@@ -109,13 +110,13 @@ const Create: React.FC = () => {
     // console.log(imageUrls)
 
 
-    const submit = async (e: any) => {
+    const submit = (e: any) => {
         e.preventDefault()
         setLoading(true)
 
         let redirectId: string | undefined
 
-        await createMutation({
+        createMutation({
             variables: {
                 data: {
                     address1,
@@ -137,39 +138,32 @@ const Create: React.FC = () => {
             refetchQueries: [{ query: AllListingsDocument }],
             awaitRefetchQueries: true,
             onCompleted: data => {
-                console.log(data)
+                // console.log(data)
                 redirectId = data.create?.id
             },
             onError: error => {
-                console.log(error)
+                // console.log(error)
                 setLoading(false)
                 throw new Error(error.toString())
             }
         })
-            .then(() => {
-                s3UploadData && s3UploadData.forEach(async (data: any) => {
-                    const options = {
-                        headers: {
-                            "Content-Type": data.file.type
-                        }
-                    };
-                    await axios.put(data.signedRequest, data.file, options)
-                        .then(res => {
-                            console.log(res);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            setLoading(false)
-                            setS3UploadError(true)
-                            throw new Error(err);
-                        });
-                })
-            })
-            .then(() => setLoading(false))
-            .then(() => navigate(`/listings/${redirectId}`))
-            .catch(err => {
-                console.log(err)
-                throw new Error(err)
+
+        s3UploadData &&
+            Promise.all(s3UploadData.map(async (data: any) => {
+                const options = {
+                    headers: {
+                        "Content-Type": data.file.type
+                    }
+                };
+                await axios.put(data.signedRequest, data.file, options)
+                    .catch((err) => {
+                        setLoading(false)
+                        setS3UploadError(true)
+                        throw new Error(err)
+                    })
+            })).then(() => {
+                setLoading(false)
+                navigate(`/listings/${redirectId}`)
             })
     }
 

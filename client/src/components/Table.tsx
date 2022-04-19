@@ -141,24 +141,24 @@ const Table: React.FC<Props> = ({ results }) => {
                             return (
                                 <>
                                     <tr id={listingId} onClick={() => navigate(`${listingId}`)}>
-                                        <td><img src={listing.image1} /></td>
+                                        <td><img src={listing?.image1} /></td>
                                         <td>
-                                            <p className="address1">{listing.address1}</p>
-                                            <p className="address2">{listing.address2}</p>
+                                            <p className="address1">{listing?.address1}</p>
+                                            <p className="address2">{listing?.address2}</p>
                                         </td>
                                         <td>
-                                            <p className="td-p-bold">$ {listing.price.toLocaleString('en-US')}</p>
+                                            <p className="td-p-bold">$ {listing?.price?.toLocaleString('en-US')}</p>
                                         </td>
                                         <td>
-                                            <p className="td-p-bold">{listing.beds}</p>
+                                            <p className="td-p-bold">{listing?.beds}</p>
                                         </td>
                                         <td>
-                                            <p className="td-p-bold">{listing.baths}</p>
+                                            <p className="td-p-bold">{listing?.baths}</p>
                                         </td>
-                                        <td><p className={`td-p-bold ${listing.status == "Active" ? "status-active" : "status-sold"}`}>{listing.status}</p></td>
-                                        <td><p className="td-p-bold">{listing.area}</p></td>
-                                        <td><p className="td-p-bold">{new Date(listing.dateCreated).toLocaleDateString()}</p></td>
-                                        <td><p className="td-p-bold">{listing.lastEdited !== null && new Date(listing.lastEdited).toLocaleDateString()}</p></td>
+                                        <td><p className={`td-p-bold ${listing?.status == "Active" ? "status-active" : "status-sold"}`}>{listing?.status}</p></td>
+                                        <td><p className="td-p-bold">{listing?.area}</p></td>
+                                        <td><p className="td-p-bold">{new Date(listing?.dateCreated).toLocaleDateString()}</p></td>
+                                        <td><p className="td-p-bold">{listing?.lastEdited !== null && new Date(listing?.lastEdited).toLocaleDateString()}</p></td>
                                         {/* <td>
                             <button id={listingId} className="table-view-btn" onClick={() => navigate(listingId)}></button>
                         </td> */}
