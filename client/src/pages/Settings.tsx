@@ -1,15 +1,20 @@
+import axios from 'axios'
 import { motion } from 'framer-motion'
 import React, { useContext, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
+import { useNavigate } from 'react-router-dom'
+import { BarLoader } from 'react-spinners'
 import { GlobalContext } from '../App'
 import Calendars from '../components/Calendars'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
-import { useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from '../generated/graphql'
+import { useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useLogoutMutation, DisplayUserDocument } from '../generated/graphql'
 
 function Settings() {
+    const navigate = useNavigate()
     const { data: userData } = useDisplayUserQuery()
-    const { isGLoggedIn, gAccountInfo } = useContext(GlobalContext)
+    const { setIsLoggedIn, isGLoggedIn, setIsGLoggedIn, gAccountInfo } = useContext(GlobalContext)
+    const [logout] = useLogoutMutation()
     const [calendarId, setCalendarId] = useState<string>()
     const [contactGroupId, setContactGroupId] = useState<string>()
     const [contactGroupName, setContactGroupName] = useState<string>()
@@ -34,6 +39,33 @@ function Settings() {
         setIsModal(true)
     }
 
+    const handleLogout = async (e: { preventDefault: () => void }) => {
+        e.preventDefault()
+        setModalCategory('logout')
+        setIsModal(true)
+        await axios.get("http://localhost:4000/auth/google/logout", {
+            withCredentials: true
+        }).then(() => {
+            setIsGLoggedIn(false)
+        }).then(() => {
+            logout({
+                refetchQueries: [{ query: DisplayUserDocument }],
+                awaitRefetchQueries: true,
+                onError: (err) => {
+                    setModalCategory(undefined)
+                    setIsModal(false)
+                    throw new Error(err.message)
+                }
+            }).then(() => {
+                setIsLoggedIn(false)
+            })
+        }).catch(err => {
+            setModalCategory(undefined)
+            setIsModal(false)
+            throw new Error(err)
+        })
+    }
+
     return (
         <>
             <div className='wrapper'>
@@ -55,7 +87,10 @@ function Settings() {
                             <span onClick={() => setPanelCategory('google')} className={panelCategory === 'google' ? 'active' : 'inactive'}>
                                 <h5>Google</h5>
                             </span>
-                            <button className='btn-grey' style={{ width: '134px', margin: 'auto 0 0 0' }}>Logout</button>
+                            <button className='btn-grey'
+                                style={{ width: '134px', margin: 'auto 0 0 0' }}
+                                onClick={(e) => handleLogout(e)}
+                            >Logout</button>
                         </div>
                         <div className="settings-main">
                             {panelCategory === 'admin' ? (
@@ -143,12 +178,17 @@ function Settings() {
                                                 <Calendars />
                                             </>
                                         )
-                                            // modalCategory === 'contacts'
-                                            : (
+                                            : modalCategory === 'contacts' ? (
                                                 <>
                                                     <ContactGroups />
                                                 </>
-                                            )
+                                            ) : // logout modal 
+                                                (
+                                                    <>
+                                                        <p>Logging out...</p>
+                                                        <BarLoader />
+                                                    </>
+                                                )
                                     }
                                 </div>
                             </>

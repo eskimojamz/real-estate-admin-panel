@@ -19,6 +19,7 @@ import GoogleConnected from "../components/GoogleConnected";
 import ContactGroups from "../components/ContactGroups";
 import { CgCalendarToday } from "react-icons/cg";
 import Calendars from "../components/Calendars";
+import { googleAuth } from "../utils/googleAuth";
 
 
 interface MapMarkerProps {
@@ -124,20 +125,6 @@ const Dashboard: React.FC = () => {
         return arr
     }, [allListingsData])
 
-    const googleAuth = async () => {
-        try {
-            const request = await fetch("http://localhost:4000/auth/google", {
-                method: "POST",
-            });
-            const response = await request.json();
-            console.log(response)
-            window.location.href = response.url;
-        } catch (error: any) {
-            console.log("App.js 12 | error", error);
-            throw new Error(error.message);
-        }
-    }
-
     // const handleTokenFromQueryParams = () => {
     //     console.log(query)
     //     const expirationDate = newExpirationDate();
@@ -161,18 +148,6 @@ const Dashboard: React.FC = () => {
     //     localStorage.setItem("gExpirationDate", expirationDate.toDateString());
     //     console.log(accessToken, refreshToken)
     // };
-
-    const gLogOut = async () => {
-        await axios.get("http://localhost:4000/auth/google/logout", {
-            withCredentials: true
-        }).then(() => {
-            setIsGLoggedIn(false)
-            console.log(isGLoggedIn)
-        }).catch(err => {
-            console.log(err)
-            throw new Error(err)
-        })
-    };
 
     const [loginModal, setLoginModal] = useState<boolean>(true)
 
@@ -601,7 +576,8 @@ const Dashboard: React.FC = () => {
                                         )
                                             : isGLoggedIn === false ?
                                                 <>
-                                                    <div className="calendar-events-login">
+                                                    <div className="dashboard-g-login">
+                                                        <p>Connect your Google Account to access Calendars</p>
                                                         <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
                                                     </div>
                                                 </> : null
@@ -638,9 +614,14 @@ const Dashboard: React.FC = () => {
                                                 <ContactGroups />
                                                 : null
                                     )
-                                        : (
-                                            null
-                                        )
+                                        : isGLoggedIn === false ? (
+                                            <>
+                                                <div className="dashboard-g-login">
+                                                    <p>Connect your Google Account to access Contacts</p>
+                                                    <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                                                </div>
+                                            </>
+                                        ) : null
                                     }
                                 </div>
                             </div>

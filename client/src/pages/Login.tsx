@@ -1,11 +1,13 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import logoDark from "../assets/logoDark.svg"
 import { useNavigate } from "react-router-dom"
 import { useLoginMutation, DisplayUserDocument, DisplayUserQuery } from "../generated/graphql"
 import { ScaleLoader } from "react-spinners"
 import { motion } from "framer-motion"
+import { GlobalContext } from "../App"
 
 const Login: React.FC = () => {
+    const { setIsLoggedIn } = useContext(GlobalContext)
     const navigate = useNavigate()
 
     const [username, setUsername] = useState('')
@@ -14,7 +16,7 @@ const Login: React.FC = () => {
 
     const submit = async (e: any) => {
         e.preventDefault();
-        const response = await login({
+        await login({
             variables: {
                 username,
                 password
@@ -34,15 +36,21 @@ const Login: React.FC = () => {
             onError: (err) => {
                 throw new Error(err.message)
             }
+        }).then(() => {
+            setIsLoggedIn(true)
+            navigate("/dashboard", { replace: true })
         })
-        console.log(response)
-
-        navigate("/dashboard", { replace: true })
     }
 
     return (
-        <div className='login-container'>
-            <div className='login-wrapper'>
+        <motion.div className='login-container'
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+        >
+            <motion.div className='login-wrapper'
+                initial={{ opacity: 0.5, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+            >
                 <div className='login-header'>
                     <img className='login-header-logo' src={logoDark} alt='logo' />
                     <div className='login-header-text'>
@@ -86,8 +94,8 @@ const Login: React.FC = () => {
                         </motion.div>
                     )}
                 </form>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }
 

@@ -36,7 +36,7 @@ import fetch from "node-fetch"
         // grab refresh token from cookies
         const token = req.cookies.jid
         if (!token) {
-            return res.send({ ok: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "" })
         }
 
         let payload: any = null;
@@ -45,7 +45,7 @@ import fetch from "node-fetch"
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
         } catch(err) {
             console.log(err)
-            return res.send({ ok: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "" })
         }
 
         // refresh token is valid 
@@ -54,20 +54,20 @@ import fetch from "node-fetch"
         const user = await User.findOne({ id: payload.userId })
 
         if (!user) {
-            return res.send({ ok: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "" })
         }
 
         // if tokenVersion doesn't match, don't send refresh or access token
         // used for blocking invalid logins
         if (user.tokenVersion !== payload.tokenVersion) {
-            return res.send({ ok: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "" })
         }
 
         // create new refresh token and set to cookies
         sendRefreshToken(res, createRefreshToken(user));
         
         // create new access token and send to apollo client
-        return res.send({ok: true, accessToken: createAccessToken(user)})
+        return res.send({authorized: true, accessToken: createAccessToken(user)})
     })
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{

@@ -17,6 +17,8 @@ import { BarLoader, ScaleLoader } from 'react-spinners';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css'
 import Calendars from '../components/Calendars';
+import { FaGoogle } from 'react-icons/fa';
+import { googleAuth } from '../utils/googleAuth';
 
 const MapMarker: React.FC<any> = (props) => {
     const { address } = props
@@ -818,7 +820,12 @@ function Appointments() {
                             </>
                         ) : isGLoggedIn && !calendarId ? (
                             <><Calendars /></>
-                        ) : null
+                        ) : isGLoggedIn === false ? (
+                            <div className="dashboard-g-login">
+                                <p>Connect your Google Account to access Contacts</p>
+                                <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                            </div>
+                        ) : null //skeleton
                         }
                     </div>
                 </motion.div>

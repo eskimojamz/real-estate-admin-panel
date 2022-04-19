@@ -1,6 +1,7 @@
 import { AnimatePresence } from "framer-motion";
-import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { GlobalContext } from "./App";
 import Sidebar from "./components/Sidebar";
 import Appointments from "./pages/Appointments";
 import Clients from "./pages/Clients";
@@ -11,6 +12,16 @@ import ListingView from "./pages/ListingView";
 import Login from "./pages/Login";
 import Settings from "./pages/Settings";
 
+function RequireAuth({ children }: { children: any }) {
+  const { isLoggedIn } = useContext(GlobalContext)
+
+  return isLoggedIn === true ? (
+    children
+  ) : (
+    <Navigate to="/login" replace />
+  );
+}
+
 export const Router: React.FC = () => {
   return (
     <AnimatePresence exitBeforeEnter>
@@ -18,9 +29,16 @@ export const Router: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route element={<WithoutSidebar />} >
-              <Route path="login" element={<Login />} />
+              <Route path="login"
+                element={<Login />} />
             </Route>
-            <Route element={<WithSidebar />} >
+            <Route
+              element={
+                <RequireAuth>
+                  <WithSidebar />
+                </RequireAuth>
+              }
+            >
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="listings" element={<Listings />} />
               <Route path="listings/create" element={<Create />} />

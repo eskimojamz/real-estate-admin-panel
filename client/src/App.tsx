@@ -4,8 +4,11 @@ import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
 import { useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
+import Login from "./pages/Login";
 
 interface GlobalStateTypes {
+  isLoggedIn: boolean | undefined;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean | undefined>>;
   gAccountInfo: { email: any, photo: any } | undefined
   setGAccountInfo: React.Dispatch<React.SetStateAction<any>>
   isGLoggedIn: boolean | undefined;
@@ -21,12 +24,15 @@ export const GlobalContext: React.Context<any> = createContext(null)
 export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>()
   const [isGLoggedIn, setIsGLoggedIn] = useState<boolean>()
   const [gAccountInfo, setGAccountInfo] = useState<any>()
   const [calendarEvents, setCalendarEvents] = useState<any | null>()
   const [contacts, setContacts] = useState<any | null>()
 
   const globalState: GlobalStateTypes = {
+    isLoggedIn,
+    setIsLoggedIn,
     gAccountInfo,
     setGAccountInfo,
     isGLoggedIn,
@@ -37,17 +43,15 @@ export const App: React.FC = () => {
     setContacts,
   }
 
-
-
   useEffect(() => {
     fetch("http://localhost:4000/refresh_token", {
       method: "POST",
       credentials: "include"
-    }).then(async x => {
-      const { accessToken } = await x.json();
+    }).then(async (res) => {
+      const { authorized, accessToken } = await res.json();
       setAccessToken(accessToken);
-      setLoading(false);
-    });
+      setIsLoggedIn(authorized)
+    })
   }, []);
 
   useEffect(() => {
@@ -186,7 +190,7 @@ export const App: React.FC = () => {
   return (
     <>
       <GlobalContext.Provider value={globalState}>
-        {loading ? null : <Router />}
+        <Router />
       </GlobalContext.Provider>
     </>
   )
