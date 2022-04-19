@@ -20,16 +20,16 @@ export class Listing extends BaseEntity {
     @Column("int", {default: 0})
     price: number;
 
-    @Field({nullable: true})
-    @Column("int", {default: null})
+    @Field()
+    @Column("int", {default: 0})
     beds: number;
 
-    @Field({nullable: true})
-    @Column("int", {default: null})
+    @Field()
+    @Column("int", {default: 0})
     baths: number;
 
-    @Field({nullable: true})
-    @Column("int", {default: null})
+    @Field()
+    @Column("int", {default: 0})
     squareFt: number;
 
     @Field({nullable: true})

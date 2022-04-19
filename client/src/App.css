@@ -68,10 +68,6 @@ svg {
 }
 
 :root {
-  /* --primary: rgba(252, 176, 28, 1);
-  --primary-light: rgba(255, 233, 191, 0.75);
-  --primary-superlight: rgba(255, 245, 228, 0.75);
-  --primary-dark: #d68f02; */
   --primary: #2c5990;
   --primary-light: #769ac5;
   --primary-superlight: #9cbee8;
@@ -1687,8 +1683,6 @@ td {
 }
 
 .create-wrapper {
-  display: flex;
-  flex-wrap: wrap;
   height: 100%;
   width: 100%;
   justify-content: center;
@@ -1697,6 +1691,7 @@ td {
 
 .create-wrapper form {
   display: flex;
+  height: fit-content;
   width: 100%;
   gap: 1rem;
   justify-content: space-between;
@@ -1931,6 +1926,14 @@ label {
   padding: 0.5rem;
 }
 
+.create-wrapper .form-required {
+  margin: 1rem auto;
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--grey-dark);
+}
+
 .error-div {
   margin-top: 1rem;
   color: var(--red-primary);
@@ -1958,10 +1961,15 @@ label {
   color: black;
   border-radius: 5px;
   display: flex;
+  gap: 0.5rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 1rem;
+}
+
+.create-loading-modal-card em {
+  color: var(--red-primary);
 }
 
 .edit-tooltip {

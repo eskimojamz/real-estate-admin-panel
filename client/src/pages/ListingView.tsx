@@ -82,7 +82,7 @@ function ListingView() {
     Geocode.setLanguage("en");
     Geocode.setRegion("us");
 
-    const [deleteMutation, { loading: deleteLoading }] = useDeleteMutation({
+    const [deleteMutation] = useDeleteMutation({
         variables: {
             deleteId: listingId!
         },
@@ -169,25 +169,16 @@ function ListingView() {
     }
 
     const [allImages, setAllImages] = useState([] as any)
-    // const [prevImages, setPrevImages] = useState<string[] | []>([])
+    const [loading, setLoading] = useState<boolean>(false)
+    const [error, setError] = useState<boolean>()
 
-    // const setImagesForEdit = () => {
-    //     const unchangedImages = [] as any
-    //     Object.values(listingImages).filter(val => val !== null).forEach((imageUrl, i) => {
-    //         if (imageUrl == allImages[i]) {
-    //             unchangedImages.push(imageUrl)
-    //         }
-    //     })
-    //     setPrevImages(unchangedImages)
-    // }
-
-    const [editMutation, { data: editData }] = useEditMutation({
+    const [editMutation] = useEditMutation({
         refetchQueries: [{ query: AllListingsDocument }, { query: GetListingDocument, variables: { getListingId: listingId } }],
         awaitRefetchQueries: true,
         onError: error => {
-            console.log(error)
             setLoading(false)
-            throw new Error(error.toString())
+            setError(true)
+            throw new Error(error.message)
         }
     })
 
@@ -202,11 +193,10 @@ function ListingView() {
             : null
     )
 
-    const [loading, setLoading] = useState<boolean>(false)
     const [s3Sign] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([] as any)
 
-    const submit = async (e: { preventDefault: () => void; }) => {
+    const submit = (e: { preventDefault: () => void; }) => {
         e.preventDefault()
         setLoading(true)
 
@@ -225,40 +215,34 @@ function ListingView() {
             })
         }
         // edit mutation with listingId and editData
-        await editMutation({
+        editMutation({
             variables: {
                 editId: listingId!,
                 data: editData,
             },
-        })
-            .then(() => {
-                // if s3UploadData... upload
-                s3UploadData && s3UploadData.forEach(async (data: any) => {
-                    const options = {
-                        headers: {
-                            "Content-Type": data.file.type
-                        }
+        }).then(() => {
+            // if s3UploadData... upload
+            s3UploadData && Promise.all(s3UploadData.map(async (data: any) => {
+                const options = {
+                    headers: {
+                        "Content-Type": data.file.type
                     }
-                    await axios.put(data.signedRequest, data.file, options)
-                        .then((res) => {
-                            console.log(res)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            setLoading(false)
-                            throw new Error(err)
-                        })
-                })
-            })
-            .then(() => {
+                }
+                await axios.put(data.signedRequest, data.file, options)
+                    .catch(err => {
+                        setLoading(false)
+                        setError(true)
+                        throw new Error(err)
+                    })
+            })).then(() => {
+                // on success
                 setEditMode(false)
+                if (error) {
+                    setError(false)
+                }
                 setLoading(false)
             })
-            .catch((err) => {
-                console.log(err)
-                setLoading(false)
-                throw new Error(err)
-            })
+        })
     }
 
     const loadingModal = (
@@ -278,7 +262,7 @@ function ListingView() {
 
         // const images = [...allImages] 
         // console.log(images)
-        await acceptedFiles.forEach(async (acceptedFile) => {
+        acceptedFiles.forEach(async (acceptedFile) => {
             const s3SignedRequest = await s3Sign({
                 variables: {
                     filename: acceptedFile.name,
@@ -334,7 +318,18 @@ function ListingView() {
         setAllImages(images)
     }
 
-    console.log(allImages)
+    const errorModal = (
+        error ?
+            <div className="create-loading-modal">
+                <div className="create-loading-modal-card">
+                    <em>Oops! There was a problem with the edited listing!</em>
+                    <p>Make sure all required fields are filled and try again.</p>
+                    <button className="btn-grey" onClick={() => setError(false)}>Okay</button>
+                </div>
+            </div>
+            : null
+    )
+
     useEffect(() => {
         const images = [] as any
         Object.values(listingImages).filter(val => val !== null).forEach(imageUrl => {
@@ -361,6 +356,7 @@ function ListingView() {
             {imageCarousel}
             {deleteModal}
             {loadingModal}
+            {errorModal}
             {/* -------------------------- */}
             <div className="wrapper">
                 <motion.div className="listing-view-wrapper"

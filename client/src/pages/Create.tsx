@@ -6,6 +6,7 @@ import s3Upload from "../utils/s3Upload"
 import axios from "axios";
 import { motion } from "framer-motion";
 import * as async from "async";
+import { BarLoader } from "react-spinners";
 
 interface listing {
     id: string,
@@ -38,17 +39,15 @@ const Create: React.FC = () => {
 
     const [s3Sign, { loading: s3SignLoading }] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([])
-    const [s3UploadError, setS3UploadError] = useState<boolean>(false)
+    const [createMutation] = useCreateMutation({})
 
-    const [createMutation, { data: createData, error: createError, loading: createLoading }] = useCreateMutation({})
-    const [createUpload, setCreateUpload] = useState<boolean>(false)
-
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>()
+    const [error, setError] = useState<boolean>()
 
     const [address1, setAddress1] = useState<string>()
     const [address2, setAddress2] = useState<string>()
-    const [price, setPrice] = useState<any>()
-    const [squareFt, setSquareFt] = useState<any>()
+    const [price, setPrice] = useState<string>('0')
+    const [squareFt, setSquareFt] = useState<string>('0')
     const [beds, setBeds] = useState<number>(1)
     const [baths, setBaths] = useState<number>(1)
     const [status, setStatus] = useState<string>("Active")
@@ -115,16 +114,15 @@ const Create: React.FC = () => {
         setLoading(true)
 
         let redirectId: string | undefined
-
         createMutation({
             variables: {
                 data: {
                     address1,
                     address2,
-                    price: parseInt(price?.toString().replace(/\D/g, '')),
+                    price: parseInt(price?.replace(/\D/g, '')),
                     beds,
                     baths,
-                    squareFt: parseInt(squareFt?.toString().replace(/\D/g, '')),
+                    squareFt: parseInt(squareFt?.replace(/\D/g, '')),
                     status,
                     area,
                     description,
@@ -144,27 +142,29 @@ const Create: React.FC = () => {
             onError: error => {
                 // console.log(error)
                 setLoading(false)
+                setError(true)
                 throw new Error(error.toString())
             }
-        })
+        }).then(() => {
+            s3UploadData &&
+                Promise.all(s3UploadData.map(async (data: any) => {
 
-        s3UploadData &&
-            Promise.all(s3UploadData.map(async (data: any) => {
-                const options = {
-                    headers: {
-                        "Content-Type": data.file.type
-                    }
-                };
-                await axios.put(data.signedRequest, data.file, options)
-                    .catch((err) => {
-                        setLoading(false)
-                        setS3UploadError(true)
-                        throw new Error(err)
-                    })
-            })).then(() => {
-                setLoading(false)
-                navigate(`/listings/${redirectId}`)
-            })
+                    const options = {
+                        headers: {
+                            "Content-Type": data.file.type
+                        }
+                    };
+                    await axios.put(data.signedRequest, data.file, options)
+                        .catch((err) => {
+                            setLoading(false)
+                            setError(true)
+                            throw new Error(err)
+                        })
+                })).then(() => {
+                    setLoading(false)
+                    navigate(`/listings/${redirectId}`)
+                })
+        })
     }
 
     const {
@@ -199,7 +199,8 @@ const Create: React.FC = () => {
         loading ?
             <div className="create-loading-modal">
                 <div className="create-loading-modal-card">
-                    Creating listing...
+                    <p>Creating Listing...</p>
+                    <BarLoader color="#2c5990" />
                 </div>
             </div>
             : null
@@ -245,21 +246,21 @@ const Create: React.FC = () => {
 
                             <section className="form-col-2">
                                 <div className="label-group">
-                                    <label>Address</label>
-                                    <input className="input-mb" placeholder="123 Street" onChange={e => setAddress1(e.target.value)}></input>
-                                    <input placeholder="Bayside, NY 11364" onChange={e => setAddress2(e.target.value)}></input>
+                                    <label>Address *</label>
+                                    <input className="input-mb" required={true} placeholder="123 Street" onChange={e => setAddress1(e.target.value)}></input>
+                                    <input required={true} placeholder="Bayside, NY 11364" onChange={e => setAddress2(e.target.value)}></input>
                                 </div>
 
                                 <div className="label-group-row">
                                     <div className="label-group w-50 label-group-gap">
                                         <div className="label-input">
                                             <label>Price</label>
-                                            <span className="dollar-placeholder">$</span><input className="price-input" onChange={e => setPrice(parseInt(e.target.value))}></input>
+                                            <span className="dollar-placeholder">$</span><input className="price-input" onChange={e => setPrice(e.target.value)}></input>
                                         </div>
 
                                         <div className="label-input">
                                             <label htmlFor="squareFt">Square Ft.</label>
-                                            <input id="squareFt" name="squareFt" onChange={e => setSquareFt(parseInt(e.target.value))}></input>
+                                            <input id="squareFt" name="squareFt" onChange={e => setSquareFt(e.target.value)}></input>
                                         </div>
                                     </div>
 
@@ -319,7 +320,10 @@ const Create: React.FC = () => {
                                 <textarea className="description" id="description" onChange={e => setDescription(e.target.value)}></textarea>
                             </section>
                         </form>
-                        {createError || s3UploadError ?
+                        <div className="form-required">
+                            <p>*Required Fields</p>
+                        </div>
+                        {error ?
                             <div className="error-div">
                                 <em>There was an error. Please input all required fields and try again.</em>
                             </div>
