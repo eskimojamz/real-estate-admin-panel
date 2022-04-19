@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import Table from "../components/Table"
 import Map from "../components/Map";
 import { useAllListingsQuery } from "../generated/graphql";
 
 import searchLogo from "../assets/search.svg"
-import { MdOutlineSearch } from "react-icons/md";
+import { MdOutlineChevronRight, MdOutlineSearch } from "react-icons/md";
 
 function Home() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const areaParam = searchParams.get('area')
   const navigate = useNavigate()
 
   const { data, loading }: any = useAllListingsQuery()
@@ -32,8 +34,11 @@ function Home() {
 
   useEffect(() => {
     data && setListings(data?.allListings)
-    setResults(data?.allListings)
-    console.log(data)
+    if (areaParam) {
+      setResults(data?.allListings?.filter((listing: { area: string; }) => listing.area === areaParam))
+    } else {
+      setResults(data?.allListings)
+    }
   }, [data])
 
   return (
@@ -45,7 +50,21 @@ function Home() {
         >
           <div className="page-header">
             <span className="listings-header-text">
-              <h5>Listings</h5>
+              <h5 style={{
+                color: areaParam ? '#737373' : '#000',
+                cursor: areaParam ? 'pointer' : 'default'
+              }}
+                onClick={() => {
+                  setSearchParams({})
+                  setResults(listings)
+                }}
+              >Listings</h5>
+              {areaParam && (
+                <>
+                  <MdOutlineChevronRight size='20px' color='#000' />
+                  <h5>{areaParam.replace('_', ' ')}</h5>
+                </>
+              )}
             </span>
             <button className="btn-primary" onClick={() => navigate("/listings/create")}>Create Listing</button>
           </div>

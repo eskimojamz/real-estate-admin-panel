@@ -109,7 +109,8 @@ function ListingView() {
                         <motion.em className="secondary">Deletions cannot be undone!</motion.em>
                     </motion.span>
                     <motion.span>
-                        <motion.button className="cancel-btn"
+                        <motion.button className="btn-grey"
+                            style={{ width: 75 }}
                             onClick={() => setDeleteConfirm(false)}
                         >
                             Cancel
