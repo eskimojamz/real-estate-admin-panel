@@ -7,7 +7,7 @@ import { sendRefreshToken } from "../sendRefreshToken";
 import { getConnection } from "typeorm";
 import { verify } from "jsonwebtoken";
 import { isAuth } from "../isAuth";
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-express";
 
 @ObjectType()
 class LoginResponse {
@@ -104,9 +104,11 @@ export class UserResolver {
         // return User, defaultCalendarId/Name on client-side
         return User.findOne(payload.userId)
       } catch (error) {
-        console.log(error)
-        throw new UserInputError(error)
+        if (error) {
+          throw new Error('No default contact group')
+        }
       }
+      return
     }
 
     @Mutation(() => User)

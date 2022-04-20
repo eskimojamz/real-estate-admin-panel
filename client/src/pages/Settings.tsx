@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { motion } from 'framer-motion'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BarLoader } from 'react-spinners'
 import { GlobalContext } from '../App'
 import Calendars from '../components/Calendars'
@@ -12,6 +12,8 @@ import { useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultC
 
 function Settings() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const categoryParam = searchParams.get('category')
     const { data: userData } = useDisplayUserQuery()
     const { setIsLoggedIn, isGLoggedIn, setIsGLoggedIn, gAccountInfo } = useContext(GlobalContext)
     const [logout] = useLogoutMutation()
@@ -65,6 +67,13 @@ function Settings() {
             throw new Error(err)
         })
     }
+
+    useEffect(() => {
+        if (categoryParam) {
+            setPanelCategory('google')
+        }
+    }, [])
+
 
     return (
         <>

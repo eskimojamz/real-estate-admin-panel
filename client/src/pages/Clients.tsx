@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { motion } from 'framer-motion'
 import React, { useContext, useState } from 'react'
+import { FaGoogle } from 'react-icons/fa'
 import { MdAddCircle, MdDeleteOutline, MdEdit } from 'react-icons/md'
 import Skeleton from 'react-loading-skeleton'
 import { ScaleLoader } from 'react-spinners'
@@ -8,6 +9,7 @@ import { GlobalContext } from '../App'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
 import { useGetUserDefaultContactGroupQuery } from '../generated/graphql'
+import { googleAuth } from '../utils/googleAuth'
 
 function Clients() {
     const { isGLoggedIn, contacts, setContacts } = useContext(GlobalContext)
@@ -269,7 +271,13 @@ function Clients() {
                                 (
                                     <ContactGroups />
                                 )
-                                : null //gLogin prompt
+                                : isGLoggedIn === false ?
+                                    (
+                                        <div className="dashboard-g-login">
+                                            <p>Connect your Google Account to access Contacts</p>
+                                            <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
+                                        </div>
+                                    ) : null //skeleton
                         }
 
                     </div>

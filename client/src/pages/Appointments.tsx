@@ -343,7 +343,7 @@ function Appointments() {
                 }
             );
     }, [appointmentInfo])
-
+    console.log(isGLoggedIn)
     return (
         <>
             <div className='wrapper'>

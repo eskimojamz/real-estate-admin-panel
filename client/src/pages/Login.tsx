@@ -5,6 +5,7 @@ import { useLoginMutation, DisplayUserDocument, DisplayUserQuery } from "../gene
 import { ScaleLoader } from "react-spinners"
 import { motion } from "framer-motion"
 import { GlobalContext } from "../App"
+import { setAccessToken } from "../utils/accessToken"
 
 const Login: React.FC = () => {
     const { setIsLoggedIn } = useContext(GlobalContext)
@@ -25,7 +26,7 @@ const Login: React.FC = () => {
                 if (!data) {
                     return null
                 }
-
+                setAccessToken(data.login.accessToken)
                 store.writeQuery<DisplayUserQuery>({
                     query: DisplayUserDocument,
                     data: {

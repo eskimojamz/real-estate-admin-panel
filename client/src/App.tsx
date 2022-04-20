@@ -5,6 +5,7 @@ import "./App.css"
 import axios from "axios";
 import { useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 import Login from "./pages/Login";
+import { Navigate } from "react-router-dom";
 
 interface GlobalStateTypes {
   isLoggedIn: boolean | undefined;
@@ -47,7 +48,7 @@ export const App: React.FC = () => {
     fetch("http://localhost:4000/refresh_token", {
       method: "POST",
       credentials: "include"
-    }).then(async (res) => {
+    }).then(async (res: any) => {
       const { authorized, accessToken } = await res.json();
       setAccessToken(accessToken);
       setIsLoggedIn(authorized)

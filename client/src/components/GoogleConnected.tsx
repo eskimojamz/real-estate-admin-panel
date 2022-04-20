@@ -3,8 +3,10 @@ import { GlobalContext } from "../App"
 import { FcGoogle } from "react-icons/fc"
 import { MdSettings } from "react-icons/md"
 import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 
 const GoogleConnected = () => {
+    const navigate = useNavigate()
     const { gAccountInfo, setGAccountInfo } = useContext(GlobalContext)
     const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -20,6 +22,7 @@ const GoogleConnected = () => {
                         <motion.div className="google-connected-expand"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
+                            onClick={() => navigate('/settings/?category=google')}
                         >
                             <img src={gAccountInfo.photo} />
                             <h6>{gAccountInfo.email}</h6>

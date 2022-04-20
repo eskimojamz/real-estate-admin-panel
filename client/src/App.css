@@ -512,7 +512,8 @@ h6 {
 }
 
 .appointments-wrapper .google-connected-expand:before,
-.clients-wrapper .google-connected-expand:before {
+.clients-wrapper .google-connected-expand:before,
+.settings-wrapper .google-connected-expand:before {
   right: 10px;
 }
 
@@ -538,7 +539,8 @@ h6 {
 }
 
 .appointments-wrapper .google-connected-expand,
-.clients-wrapper .google-connected-expand {
+.clients-wrapper .google-connected-expand,
+.settings-wrapper .google-connected-expand {
   right: -1px;
 }
 
@@ -2869,12 +2871,24 @@ em {
   margin: 0;
 }
 
+.appointments-body .dashboard-g-login {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  height: fit-content;
+  width: fit-content;
+  margin: auto;
+}
+
 .appointments-body {
   display: grid;
   grid-template-columns: 1fr 350px;
   margin: 0 auto;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .appointments-body .calendars-loading {
@@ -3194,6 +3208,17 @@ em {
 .clients-wrapper {
   height: 100%;
   width: 100%;
+}
+
+.clients-body .dashboard-g-login {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  height: fit-content;
+  width: fit-content;
+  margin: auto;
 }
 
 .clients-body {

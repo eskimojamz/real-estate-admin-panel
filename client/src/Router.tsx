@@ -1,8 +1,11 @@
 import { AnimatePresence } from "framer-motion";
-import React, { useContext } from "react";
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import jwtDecode from "jwt-decode";
+import React, { useContext, useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom";
+import { ScaleLoader } from "react-spinners";
 import { GlobalContext } from "./App";
 import Sidebar from "./components/Sidebar";
+import { useDisplayUserQuery } from "./generated/graphql";
 import Appointments from "./pages/Appointments";
 import Clients from "./pages/Clients";
 import Create from "./pages/Create";
@@ -11,18 +14,35 @@ import Listings from "./pages/Listings";
 import ListingView from "./pages/ListingView";
 import Login from "./pages/Login";
 import Settings from "./pages/Settings";
+import { getAccessToken } from "./utils/accessToken";
 
 function RequireAuth({ children }: { children: any }) {
-  const { isLoggedIn } = useContext(GlobalContext)
-
-  return isLoggedIn === true ? (
-    children
-  ) : (
-    <Navigate to="/login" replace />
-  );
+  // check if authenticated, accesstoken not expired
+  const isAuth = () => {
+    const token = getAccessToken()
+    try {
+      const { exp }: any = jwtDecode(token)
+      if (Date.now() >= exp * 1000) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      return false;
+    }
+  };
+  // redirect to login if not authed
+  if (isAuth()) {
+    return children
+  } else if (isAuth() === false) {
+    return <Navigate to='/login' replace />
+  } else {
+    return null
+  }
 }
 
 export const Router: React.FC = () => {
+
   return (
     <AnimatePresence exitBeforeEnter>
       <div className="container">

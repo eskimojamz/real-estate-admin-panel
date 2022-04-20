@@ -7,12 +7,12 @@ import {
   InMemoryCache,
   HttpLink,
   ApolloLink,
-  Observable, 
+  Observable,
 } from '@apollo/client'
-import { setContext } from "@apollo/client/link/context"
 import { onError } from "@apollo/client/link/error";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
+import { Navigate, Router } from "react-router-dom";
 
 // define cache
 const cache = new InMemoryCache({});
@@ -48,20 +48,6 @@ const requestLink = new ApolloLink(
       };
     })
 );
-// const authLink = new ApolloLink((operation, forward) => {
-//   const accessToken = getAccessToken();
-//   console.log("called auth link")
-//   console.log(accessToken)
-//   const authorizationHeader = accessToken ? `Bearer ${accessToken}` : null
-//   operation.setContext({
-//     headers: {
-//       authorization: authorizationHeader,
-//     },
-//   });
-
-//   return forward(operation);
-//  });
-
 
 // Check for expired tokens; link to get and set new refresh token and access token
 const tokenRefreshLink: any = new TokenRefreshLink({
@@ -77,12 +63,9 @@ const tokenRefreshLink: any = new TokenRefreshLink({
     // is token expired?
     try {
       // decode the token, get its expiration
-      const { expiration }: any = jwtDecode(token) as {
-        expiration: number;
-      };
+      const { exp }: any = jwtDecode(token)
       // compare to current date, if greater, then it's expired
-      if (Date.now() >= expiration * 1000) {
-        console.log("invalid")
+      if (Date.now() >= exp * 1000) {
         return false;
       } else {
         return true;
@@ -115,8 +98,14 @@ const client = new ApolloClient({
   link: ApolloLink.from([
     tokenRefreshLink,
     onError(({ graphQLErrors, networkError }) => {
-      console.log(graphQLErrors);
-      console.log(networkError);
+      if (graphQLErrors) {
+        for (let err of graphQLErrors) {
+          if (err.message.includes('Not Authenticated')) {
+            setAccessToken("")
+            return
+          }
+        }
+      }
     }),
     requestLink,
     new HttpLink({
