@@ -9,6 +9,7 @@ import Calendars from '../components/Calendars'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
 import { useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useLogoutMutation, DisplayUserDocument } from '../generated/graphql'
+import { setAccessToken } from '../utils/accessToken'
 
 function Settings() {
     const navigate = useNavigate()
@@ -59,7 +60,8 @@ function Settings() {
                     throw new Error(err.message)
                 }
             }).then(() => {
-                setIsLoggedIn(false)
+                setAccessToken('')
+                navigate('/login')
             })
         }).catch(err => {
             setModalCategory(undefined)

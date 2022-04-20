@@ -17,24 +17,30 @@ import Settings from "./pages/Settings";
 import { getAccessToken } from "./utils/accessToken";
 
 function RequireAuth({ children }: { children: any }) {
-  // check if authenticated, accesstoken not expired
+  // global isLoggedIn state from first app render, server fetch
+  const { isLoggedIn } = useContext(GlobalContext)
+  // check auth app state
   const isAuth = () => {
     const token = getAccessToken()
     try {
+      // decode the token, get its expiration
       const { exp }: any = jwtDecode(token)
+      // compare to current date, if greater, then it's expired
       if (Date.now() >= exp * 1000) {
+        document.cookie = "jid=; path=/refresh_token;"
         return false;
       } else {
         return true;
       }
-    } catch (err) {
+    } catch {
+      document.cookie = "jid=; path=/refresh_token;"
       return false;
     }
-  };
+  }
   // redirect to login if not authed
-  if (isAuth()) {
+  if (isLoggedIn || isAuth()) {
     return children
-  } else if (isAuth() === false) {
+  } else if (isLoggedIn === false && isAuth() === false) {
     return <Navigate to='/login' replace />
   } else {
     return null
