@@ -19,7 +19,7 @@ import { getAccessToken } from "./utils/accessToken";
 function RequireAuth({ children }: { children: any }) {
   // global isLoggedIn state from first app render, server fetch
   const { isLoggedIn } = useContext(GlobalContext)
-  // check auth app state
+  // check auth app state, if token is expired
   const isAuth = () => {
     const token = getAccessToken()
     try {

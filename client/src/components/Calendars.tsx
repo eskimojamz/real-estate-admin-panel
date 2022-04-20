@@ -56,7 +56,8 @@ function Calendars() {
                 calendarId: calId,
                 userId: userData?.displayUser?.id!
             },
-            refetchQueries: [{ query: GetUserDefaultCalendarDocument }]
+            refetchQueries: [{ query: GetUserDefaultCalendarDocument }],
+            awaitRefetchQueries: true,
         })
     }
 

@@ -96,7 +96,7 @@ export const App: React.FC = () => {
 
   // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
   useMemo(() => {
-    if (isGLoggedIn && calendarId && !calendarEvents) {
+    if (isGLoggedIn && calendarId) {
       try {
 
         const calItemsRef: { id: any; title: any; start: any; end: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
