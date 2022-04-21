@@ -6,7 +6,7 @@ import { GlobalContext } from '../App'
 import { GetUserDefaultContactGroupDocument, useDisplayUserQuery, useGetUserDefaultContactGroupQuery, useSetDefaultContactGroupMutation } from '../generated/graphql'
 
 function ContactGroups() {
-    const { isGLoggedIn } = useContext(GlobalContext)
+    const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
     const { data: userData } = useDisplayUserQuery({
         onError: (error: any) => console.log(error)
     })
@@ -15,7 +15,7 @@ function ContactGroups() {
     const [contactGroupId, setContactGroupId] = useState<string>()
     const [contactGroupName, setContactGroupName] = useState<string>()
 
-    const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
+    const { } = useGetUserDefaultContactGroupQuery({
         onError: (error) => console.log(error),
         onCompleted: (data) => {
             setContactGroupId(data.getUserDefaultContactGroup.defaultContactGroupId)
@@ -23,36 +23,56 @@ function ContactGroups() {
         }
     })
 
-    console.log(contactGroupId, contactGroupIdLoading)
-    // const [contactGroupsLoading, setContactGroupsLoading] = useState<boolean>(false)
+    const axiosInstance = axios.create()
 
     const getGContactGroupsList = async () => {
-        // setContactGroupsLoading(true)
-        console.log('getting contact groups')
-        await axios.get('https://people.googleapis.com/v1/contactGroups')
+        await axiosInstance.get('https://people.googleapis.com/v1/contactGroups')
             .then(res => {
-                // console.log(res.data.contactGroups)
-                const groupsRef: any[] = []
-                // get user contact groups
-                res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
-                    if (group.groupType === 'USER_CONTACT_GROUP') {
-                        groupsRef.push({
-                            formattedName: group.formattedName,
-                            resourceName: group.resourceName
-                        })
-                    }
-                })
-                // set groups
-                groupsRef.length > 0 && (
-                    setContactGroups(groupsRef)
-                )
-                // setContactGroupsLoading(false)
+                if (res.status === 200) {
+                    const groupsRef: any[] = []
+                    // get user contact groups
+                    res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
+                        if (group.groupType === 'USER_CONTACT_GROUP') {
+                            groupsRef.push({
+                                formattedName: group.formattedName,
+                                resourceName: group.resourceName
+                            })
+                        }
+                    })
+                    // set groups
+                    groupsRef.length > 0 && (
+                        setContactGroups(groupsRef)
+                    )
+                }
             })
             .catch(err => {
                 // setContactGroupsLoading(false)
                 throw new Error(err)
             })
     }
+
+    // if Calendar fetch fails, get new gAccessToken and retry
+    axiosInstance.interceptors.response.use((response) => {
+        return response
+    }, async function (error) {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            // originalRequest._retry = true;
+            axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+                withCredentials: true
+            }).then((res) => {
+                const { gAccessToken } = res.data
+                console.log(gAccessToken)
+                if (gAccessToken) {
+                    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+                    return axiosInstance.request(originalRequest);
+                } else {
+                    setIsGLoggedIn(false)
+                }
+            })
+        }
+        return Promise.reject(error);
+    });
 
     const [setDefaultContactGroup] = useSetDefaultContactGroupMutation({
         onError: (error: any) => {

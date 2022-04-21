@@ -5,8 +5,9 @@ import { ScaleLoader } from 'react-spinners';
 import { GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 
+
 function Calendars() {
-    const { isGLoggedIn } = useContext(GlobalContext)
+    const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
     const { data: userData } = useDisplayUserQuery({
         onError: (error) => console.log(error)
     })
@@ -14,34 +15,61 @@ function Calendars() {
     const [calendarInput, setCalendarInput] = useState<string>("Horizon Appointments")
     const [calendars, setCalendars] = useState<any>()
     const [calendarId, setCalendarId] = useState<string>()
-
+    console.log(calendars)
     const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error),
         onCompleted: (data) => setCalendarId(data.getUserDefaultCalendar.defaultCalendarId)
     })
 
+    const axiosInstance = axios.create()
+
     const getGCalendarsList = async () => {
         try {
-            await axios.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
+            await axiosInstance.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
                 .then(res => {
-                    console.log(res.data.items)
-                    const calendarsRef: any[] = []
-                    res.data.items.map((cal: { id: string, summary: string, backgroundColor: string }) => {
-                        calendarsRef.push({
-                            id: cal.id,
-                            name: cal.summary,
-                            color: cal.backgroundColor
+                    if (res.status === 200) {
+                        const calendarsRef: any[] = []
+                        res.data.items.map((cal: { id: string, summary: string, backgroundColor: string }) => {
+                            calendarsRef.push({
+                                id: cal.id,
+                                name: cal.summary,
+                                color: cal.backgroundColor
+                            })
                         })
-                    })
-                    calendarsRef.length > 0 && (
-                        setCalendars(calendarsRef)
-                    )
+                        calendarsRef.length > 0 && (
+                            setCalendars(calendarsRef)
+                        )
+                    }
+                    return
                 })
         } catch (error: any) {
             console.log("Error getting calendar data", error);
             return error.message;
         }
     };
+
+    // if Calendar fetch fails, get new gAccessToken and retry
+    axiosInstance.interceptors.response.use((response) => {
+        return response
+    }, async function (error) {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            // originalRequest._retry = true;
+            axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+                withCredentials: true
+            }).then((res) => {
+                const { gAccessToken } = res.data
+                console.log(gAccessToken)
+                if (gAccessToken) {
+                    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+                    return axiosInstance.request(originalRequest);
+                } else {
+                    setIsGLoggedIn(false)
+                }
+            })
+        }
+        return Promise.reject(error);
+    });
 
     const [setDefaultCalendar] = useSetDefaultCalendarMutation({
         onError: (error) => {
