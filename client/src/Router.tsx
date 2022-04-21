@@ -54,6 +54,14 @@ export const Router: React.FC = () => {
       <div className="container">
         <BrowserRouter>
           <Routes>
+            <Route
+              path='/'
+              element={
+                <RequireAuth>
+                  <Navigate to='/dashboard' replace />
+                </RequireAuth>
+              }
+            />
             <Route element={<WithoutSidebar />} >
               <Route path="login"
                 element={<Login />} />

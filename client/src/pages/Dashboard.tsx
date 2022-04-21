@@ -243,109 +243,6 @@ const Dashboard: React.FC = () => {
         }
     }, [allListingsData])
 
-    // after login success, get Calendars Lists, if there is no default Calendar
-    // useEffect(() => {
-    //     if (isGLoggedIn && !calendarIdLoading && !calendarId) {
-    //         getGCalendarsList()
-    //     }
-    // }, [isGLoggedIn, calendarId])
-
-    // // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
-    // useMemo(() => {
-    //     if (isGLoggedIn && calendarId && !calendarEvents) {
-    //         try {
-
-    //             const calItemsRef: { id: any; title: any; start: any; end: any; startStr: any; endStr: any; extendedProps: { description: any; location: any; }; url: any; allDay: boolean }[] = []
-
-    //             // set time range for g calendar events fetch
-    //             const minDate = new Date()
-    //             minDate.setDate(minDate.getDate() - 180)
-    //             const maxDate = new Date()
-    //             maxDate.setDate(maxDate.getDate() + 180)
-
-    //             axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
-    //                 params: {
-    //                     orderBy: 'startTime',
-    //                     singleEvents: true,
-    //                     timeMin: minDate.toISOString(),
-    //                     timeMax: maxDate.toISOString(),
-    //                     timeZone: 'America/New_York'
-    //                 }
-    //             }).then(res => {
-    //                 console.log(res.data.items)
-    //                 const gCalItems = res.data.items
-    //                 gCalItems.map((item: any) => {
-    //                     calItemsRef.push({
-    //                         id: item.id,
-    //                         title: item.summary,
-    //                         start: item.start.date || item.start.dateTime,
-    //                         end: item.end.date || item.end.dateTime,
-    //                         startStr: item.start.dateTime,
-    //                         endStr: item.end.dateTime,
-    //                         extendedProps: {
-    //                             description: item.description,
-    //                             location: item.location
-    //                         },
-    //                         url: item.htmlLink,
-    //                         allDay: item.start.dateTime ? false : true
-    //                     })
-    //                 })
-    //                 console.log(calItemsRef)
-    //                 setCalendarEvents(calItemsRef)
-    //             })
-    //         } catch (error: any) {
-    //             console.log("Error getting calendar events")
-    //             return error.message
-    //         }
-    //     }
-    // }, [isGLoggedIn, calendarId])
-
-    // useEffect(() => {
-    //     if (isGLoggedIn && !contactGroupIdLoading && !contactGroupId) {
-    //         getGContactGroupsList()
-    //     }
-    // }, [isGLoggedIn, contactGroupId])
-
-    // useMemo(() => {
-    //     if (isGLoggedIn && contactGroupId && !contacts) {
-    //         const contactsRef: string[] = []
-    //         axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
-    //             params: {
-    //                 maxMembers: 200
-    //             }
-    //         }).then((res) => {
-    //             console.log(res.data)
-    //             const gContactItems = res.data.memberResourceNames
-    //             gContactItems.map((cId: string) => {
-    //                 contactsRef.push(cId)
-    //             })
-    //         }).then(() => {
-    //             const paramsRef = new URLSearchParams()
-    //             contactsRef.map(c => {
-    //                 paramsRef.append("resourceNames", c)
-    //             })
-    //             paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses')
-
-    //             axios.get('https://people.googleapis.com/v1/people:batchGet', {
-    //                 params: paramsRef
-    //             }).then(res => {
-    //                 const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; }[] = []
-    //                 const gContactsData = res.data.responses
-    //                 gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; }; }) => {
-    //                     contactItemsRef.push({
-    //                         id: obj.person.resourceName,
-    //                         lastName: obj.person.names[0].familyName,
-    //                         firstName: obj.person.names[0].givenName,
-    //                         phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
-    //                     })
-    //                 })
-    //                 setContacts(contactItemsRef)
-    //             })
-    //         }).catch(err => console.log(err))
-    //     }
-    // }, [isGLoggedIn, contactGroupId])
-
-    // all component variables loaded ? else { skeletonloading...}
     return (
         <>
             {isGLoggedIn === false && loginModal && (
@@ -359,9 +256,6 @@ const Dashboard: React.FC = () => {
                         initial={{ opacity: 0.5, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
                     >
-                        {/* <div className="close-btn">
-                        <IoCloseCircle color="red" size="18px" />
-                    </div> */}
                         <span>
                             <h6>Connect your Google Account</h6>
                             <h6>to access Calendars and Contacts</h6>
@@ -385,8 +279,6 @@ const Dashboard: React.FC = () => {
                         </span>
                     </motion.div>
                     <motion.div className="dashboard-body">
-                        {/* <motion.div className="dashboard-row-top"> */}
-
                         <motion.div className="dashboard-info-card pie">
                             <AnimatePresence>
                                 <div className="dashboard-card-header">
@@ -418,7 +310,7 @@ const Dashboard: React.FC = () => {
                                                 </PieChart>
                                             </ResponsiveContainer>
                                         </>
-                                    ) : null}
+                                    ) : <Skeleton containerClassName="dashboard-card-skeleton" height='100%' width='100%' count={1} circle={true} />}
                                 </div>
                             </AnimatePresence>
                         </motion.div>
@@ -432,7 +324,7 @@ const Dashboard: React.FC = () => {
                                 <div className="calendar-events">
                                     <LayoutGroup>
                                         {isGLoggedIn ? (
-                                            calendarEvents && calendarId && !calendarInfo ?
+                                            calendarEvents?.length && calendarId && !calendarInfo ?
                                                 <>
                                                     <motion.div className="full-calendar"
                                                         key='full-calendar'
@@ -573,7 +465,16 @@ const Dashboard: React.FC = () => {
                                                         <>
                                                             <Calendars />
                                                         </>
-                                                        : null // skeleton loading?
+                                                        : calendarEvents?.length === 0 && calendarId && !calendarInfo ?
+                                                            <div className="calendar-events-empty">
+                                                                <span>
+                                                                    <h6>Looks like there are no appointments yet...</h6>
+                                                                    <button className="btn-primary" onClick={() => navigate('/appointments')}>
+                                                                        Create a new appointment
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                            : <Skeleton containerClassName="dashboard-card-skeleton" height='30px' width='100%' count={10} />
                                         )
                                             : isGLoggedIn === false ?
                                                 <>
@@ -581,7 +482,7 @@ const Dashboard: React.FC = () => {
                                                         <p>Connect your Google Account to access Calendars</p>
                                                         <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
                                                     </div>
-                                                </> : null
+                                                </> : <Skeleton containerClassName="dashboard-card-skeleton" height='30px' width='100%' count={10} />
                                         }
                                     </LayoutGroup>
                                 </div>
@@ -622,7 +523,7 @@ const Dashboard: React.FC = () => {
                                                             </button>
                                                         </span>
                                                     </div>
-                                                ) : <Skeleton />
+                                                ) : <Skeleton containerClassName="dashboard-card-skeleton" height='30px' width='100%' count={10} />
                                     )
                                         : isGLoggedIn === false ? (
                                             <>
@@ -631,7 +532,7 @@ const Dashboard: React.FC = () => {
                                                     <motion.button className="g-login-btn" onClick={googleAuth}><FaGoogle color='white' size='18px' />Sign in with Google</motion.button>
                                                 </div>
                                             </>
-                                        ) : null
+                                        ) : <Skeleton containerClassName="dashboard-card-skeleton" height='30px' width='100%' count={10} />
                                     }
                                 </div>
                             </div>
@@ -643,7 +544,7 @@ const Dashboard: React.FC = () => {
                                 <h4>Recent Listings</h4>
                             </div>
                             <div className="dashboard-card-body">
-                                {dashboardListings &&
+                                {dashboardListings ?
                                     <>
 
                                         <table>
@@ -688,7 +589,7 @@ const Dashboard: React.FC = () => {
                                                 })}
                                             </tbody>
                                         </table>
-                                    </>
+                                    </> : <Skeleton containerClassName="dashboard-card-skeleton" height='55px' width='100%' count={3} />
                                 }
                             </div>
                         </motion.div>
