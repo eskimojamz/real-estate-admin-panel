@@ -157,34 +157,44 @@ export const App: React.FC = () => {
         }
       }).then((res) => {
         console.log(res.data)
-        const gContactItems = res.data.memberResourceNames
-        gContactItems.map((cId: string) => {
-          contactsRef.push(cId)
-        })
-      }).then(() => {
-        const paramsRef = new URLSearchParams()
-        contactsRef.map(c => {
-          paramsRef.append("resourceNames", c)
-        })
-        paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses,photos')
-
-        axios.get('https://people.googleapis.com/v1/people:batchGet', {
-          params: paramsRef
-        }).then(res => {
-          const contactItemsRef: { id: string; lastName: string; firstName: string; phoneNumber: string; photo: string; }[] = []
-          const gContactsData = res.data.responses
-          gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { canonicalForm: string; }[]; photos: { url: string; }[]; }; }) => {
-            contactItemsRef.push({
-              id: obj.person.resourceName,
-              lastName: obj.person.names[0].familyName,
-              firstName: obj.person.names[0].givenName,
-              phoneNumber: obj.person.phoneNumbers[0].canonicalForm,
-              photo: obj.person.photos[0].url
-            })
+        if (res.data.memberResourceNames) {
+          const gContactItems = res.data.memberResourceNames
+          gContactItems.map((cId: string) => {
+            contactsRef.push(cId)
           })
-          setContacts(contactItemsRef)
-        })
-      }).catch(err => console.log(err))
+        } else {
+          setContacts(null)
+        }
+      }).then(() => {
+        if (contactsRef.length) {
+          const paramsRef = new URLSearchParams()
+          contactsRef.map(c => {
+            paramsRef.append("resourceNames", c)
+          })
+          paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses,photos')
+
+          axios.get('https://people.googleapis.com/v1/people:batchGet', {
+            params: paramsRef
+          }).then(res => {
+            const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; photo: string | null; }[] = []
+            const gContactsData = res.data.responses
+            gContactsData.forEach((obj: { person: { resourceName: string, names: { givenName: string, familyName: string }[]; phoneNumbers: { value: string; }[]; photos: { url: string; }[]; }; }) => {
+              contactItemsRef.push({
+                id: obj.person.resourceName ? obj.person.resourceName : null,
+                lastName: obj.person.names[0].familyName ? obj.person.names[0].familyName : null,
+                firstName: obj.person.names[0].givenName ? obj.person.names[0].givenName : null,
+                phoneNumber: obj.person.phoneNumbers ? obj.person.phoneNumbers[0].value : null,
+                photo: obj.person.photos[0]?.url ? obj.person.photos[0]?.url : null
+              })
+            })
+            setContacts(contactItemsRef)
+          })
+        }
+        return
+      }).catch(err => {
+        setContacts(null)
+        throw new Error(err)
+      })
     }
   }, [isGLoggedIn, contactGroupId])
 

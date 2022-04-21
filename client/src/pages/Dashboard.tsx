@@ -20,6 +20,7 @@ import ContactGroups from "../components/ContactGroups";
 import { CgCalendarToday } from "react-icons/cg";
 import Calendars from "../components/Calendars";
 import { googleAuth } from "../utils/googleAuth";
+import Skeleton from "react-loading-skeleton";
 
 
 interface MapMarkerProps {
@@ -612,7 +613,16 @@ const Dashboard: React.FC = () => {
                                             </>
                                             : !contactGroupIdLoading && !contactGroupId ?
                                                 <ContactGroups />
-                                                : null
+                                                : contacts === null ? (
+                                                    <div className='clients-list-empty'>
+                                                        <span>
+                                                            <h6>It looks like there are no clients yet...</h6>
+                                                            <button className="btn-primary" onClick={() => navigate('/clients')}>
+                                                                Add a new client
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                ) : <Skeleton />
                                     )
                                         : isGLoggedIn === false ? (
                                             <>

@@ -66,7 +66,7 @@ function Clients() {
                     id: res.data.resourceName.replace('people/', ""),
                     firstName: res.data.names[0].givenName,
                     lastName: res.data.names[0].familyName,
-                    phoneNumber: res.data.phoneNumbers[0].canonicalForm,
+                    phoneNumber: res.data.phoneNumbers[0].value,
                     photo: res.data.photos[0].url
                 })
                 axios.post(`https://people.googleapis.com/v1/${contactGroupId}/members:modify`,
@@ -76,14 +76,18 @@ function Clients() {
                 ).then(res => {
                     console.log(res)
                     if (res.status === 200) {
-                        setContacts((contacts: any) => [...contacts, createdContact])
+                        if (contacts) {
+                            setContacts((contacts: any) => [...contacts, createdContact])
+                        } else {
+                            setContacts([createdContact])
+                        }
                     }
                 }).then(() => {
                     setClientInfo({
                         id: res.data.resourceName.replace('people/', ""),
                         firstName: res.data.names[0].givenName,
                         lastName: res.data.names[0].familyName,
-                        phoneNumber: res.data.phoneNumbers[0].canonicalForm,
+                        phoneNumber: res.data.phoneNumbers[0].value,
                         photo: res.data.photos[0].url
                     })
                     setFnLoading(false)
@@ -160,7 +164,14 @@ function Clients() {
                                             })}
                                         </ul>
                                     )
-                                        : <Skeleton containerClassName='clients-list-container-skeleton' count={20} height='35px' width='100%' />
+                                        : contacts === null ? (
+                                            <div className='clients-list-empty'>
+                                                <h6>It looks like there are no clients yet...</h6>
+                                                <h6>Add a new client!</h6>
+                                            </div>
+                                        ) : (
+                                            <Skeleton containerClassName='clients-list-container-skeleton' count={20} height='35px' width='100%' />
+                                        )
                                     }
                                 </div>
                                 <div className="clients-side">

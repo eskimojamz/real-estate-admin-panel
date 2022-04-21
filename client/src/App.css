@@ -1298,6 +1298,44 @@ h6 {
   margin: 0;
 }
 
+.clients-list-empty {
+  background-image: url("./assets/Blob.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-info-card .clients-list-empty {
+  background: none;
+}
+
+.clients-list-empty span {
+  background-color: var(--grey-superlight);
+  border: 1px solid var(--grey-light);
+  border-radius: 5px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clients-list-empty h6 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dashboard-info-card .clients-list-empty h6 {
+  font-size: 14px;
+  font-weight: 400;
+}
 .dashboard-header-mb-0 {
   margin-bottom: 0;
 }

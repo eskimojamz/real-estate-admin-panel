@@ -7,10 +7,11 @@ import { GetUserDefaultContactGroupDocument, useDisplayUserQuery, useGetUserDefa
 
 function ContactGroups() {
     const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
+    const [loading, setLoading] = useState<boolean>(true)
     const { data: userData } = useDisplayUserQuery({
         onError: (error: any) => console.log(error)
     })
-    const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
+    const [newContactGroup, setNewContactGroup] = useState<string>("Horizon Clients")
     const [contactGroups, setContactGroups] = useState<any[] | null>()
     const [contactGroupId, setContactGroupId] = useState<string>()
     const [contactGroupName, setContactGroupName] = useState<string>()
@@ -43,7 +44,9 @@ function ContactGroups() {
                     groupsRef.length > 0 && (
                         setContactGroups(groupsRef)
                     )
+                    setLoading(false)
                 }
+                return
             })
             .catch(err => {
                 // setContactGroupsLoading(false)
@@ -87,7 +90,26 @@ function ContactGroups() {
                 contactGroupName: cGroupName,
                 userId: userData?.displayUser?.id!
             },
-            refetchQueries: [{ query: GetUserDefaultContactGroupDocument }]
+            refetchQueries: [{ query: GetUserDefaultContactGroupDocument }],
+            awaitRefetchQueries: true,
+        })
+    }
+
+    const createGContactGroup = (e: { preventDefault: () => void }) => {
+        e.preventDefault()
+        setLoading(true)
+        axiosInstance.post('https://people.googleapis.com/v1/contactGroups', {
+            contactGroup: {
+                name: newContactGroup,
+            }
+        }).then((res) => {
+            console.log(res)
+            if (res.status === 200) {
+                setContactGroupId(res.data.resourceName)
+                setContactGroupName(res.data.formattedName)
+                chooseContactGroup(res.data.resourceName, res.data.formattedName)
+                setLoading(false)
+            }
         })
     }
 
@@ -119,10 +141,10 @@ function ContactGroups() {
                         <form>
                             <h6>Create a new Google Contacts group:</h6>
                             <input placeholder="Horizon Clients"
-                                value={contactsInput}
-                                onChange={(e) => setContactsInput(e.target.value)}
+                                value={newContactGroup}
+                                onChange={(e) => setNewContactGroup(e.target.value)}
                             />
-                            <button className="btn-primary">Create Group</button>
+                            <button className="btn-primary" onClick={(e) => createGContactGroup(e)}>Create Group</button>
                         </form>
                         <div className="contact-groups-list">
                             <h6>Or choose an existing account contact group:</h6>
