@@ -7,14 +7,15 @@ import { GetUserDefaultContactGroupDocument, useDisplayUserQuery, useGetUserDefa
 
 function ContactGroups() {
     const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
-    const [loading, setLoading] = useState<boolean>(true)
+    const [loadingGroups, setLoadingGroups] = useState<boolean>(true)
+    const [loadingCreate, setLoadingCreate] = useState<boolean>()
     const { data: userData } = useDisplayUserQuery({
         onError: (error: any) => console.log(error)
     })
     const [newContactGroup, setNewContactGroup] = useState<string>("Horizon Clients")
     const [contactGroups, setContactGroups] = useState<any[] | null>()
-    const [contactGroupId, setContactGroupId] = useState<string>()
-    const [contactGroupName, setContactGroupName] = useState<string>()
+    const [contactGroupId, setContactGroupId] = useState<string | null>()
+    const [contactGroupName, setContactGroupName] = useState<string | null>()
 
     const { } = useGetUserDefaultContactGroupQuery({
         onError: (error) => console.log(error),
@@ -44,12 +45,12 @@ function ContactGroups() {
                     groupsRef.length > 0 && (
                         setContactGroups(groupsRef)
                     )
-                    setLoading(false)
+                    setLoadingGroups(false)
                 }
                 return
             })
             .catch(err => {
-                // setContactGroupsLoading(false)
+                setLoadingGroups(false)
                 throw new Error(err)
             })
     }
@@ -97,19 +98,21 @@ function ContactGroups() {
 
     const createGContactGroup = (e: { preventDefault: () => void }) => {
         e.preventDefault()
-        setLoading(true)
+        setLoadingCreate(true)
         axiosInstance.post('https://people.googleapis.com/v1/contactGroups', {
             contactGroup: {
                 name: newContactGroup,
             }
         }).then((res) => {
-            console.log(res)
             if (res.status === 200) {
                 setContactGroupId(res.data.resourceName)
                 setContactGroupName(res.data.formattedName)
                 chooseContactGroup(res.data.resourceName, res.data.formattedName)
-                setLoading(false)
+                setLoadingCreate(false)
             }
+        }).catch((err) => {
+            setLoadingCreate(false)
+            throw new Error(err)
         })
     }
 
@@ -121,7 +124,7 @@ function ContactGroups() {
 
     return (
         <>
-            {contactGroups ? (
+            {loadingGroups === false && !loadingCreate && contactGroups ? (
                 <>
                     <motion.div className="contact-groups"
                         key='c-groups'
@@ -161,7 +164,12 @@ function ContactGroups() {
                     <>
                         <div className="contact-groups-loading">
                             <ScaleLoader color='#2c5990' />
-                            <p>Loading Google Contact Groups</p>
+                            {loadingGroups ? (
+                                <p>Loading Google Contact Groups</p>
+                            ) : loadingCreate ? (
+                                <p>Creating Google Contact Group</p>
+                            ) : null
+                            }
                         </div>
                     </>
                 )

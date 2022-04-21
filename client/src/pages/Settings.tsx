@@ -18,19 +18,23 @@ function Settings() {
     const { data: userData } = useDisplayUserQuery()
     const { setIsLoggedIn, isGLoggedIn, setIsGLoggedIn, gAccountInfo } = useContext(GlobalContext)
     const [logout] = useLogoutMutation()
-    const [calendarId, setCalendarId] = useState<string>()
-    const [contactGroupId, setContactGroupId] = useState<string>()
-    const [contactGroupName, setContactGroupName] = useState<string>()
-    const { data: calendarData } = useGetUserDefaultCalendarQuery({
+    const [calendarId, setCalendarId] = useState<string | null>()
+    const [calendarName, setCalendarName] = useState<string | null>()
+    const [contactGroupId, setContactGroupId] = useState<string | null>()
+    const [contactGroupName, setContactGroupName] = useState<string | null>()
+    const { } = useGetUserDefaultCalendarQuery({
         onError: (err) => console.log(err),
-        onCompleted: (data => setCalendarId(data.getUserDefaultCalendar.defaultCalendarId))
+        onCompleted: data => {
+            setCalendarId(data.getUserDefaultCalendar.defaultCalendarId)
+            setCalendarName(data.getUserDefaultCalendar.defaultCalendarName)
+        }
     })
-    const { data: contactsData } = useGetUserDefaultContactGroupQuery({
+    const { } = useGetUserDefaultContactGroupQuery({
         onError: (err) => console.log(err),
-        onCompleted: (data => {
+        onCompleted: data => {
             setContactGroupId(data.getUserDefaultContactGroup.defaultContactGroupId)
             setContactGroupName(data.getUserDefaultContactGroup.defaultContactGroupName)
-        })
+        }
     })
 
     const [panelCategory, setPanelCategory] = useState<string>('admin')
@@ -137,7 +141,7 @@ function Settings() {
                                                 <h6>CALENDAR ID</h6>
                                                 {calendarId ? (
                                                     <>
-                                                        <p>{calendarId}</p>
+                                                        <p>{calendarName}</p>
                                                         <button className='btn-primary' onClick={() => handleModal('calendar')}>Change Calendar</button>
                                                     </>
                                                 )
@@ -147,7 +151,7 @@ function Settings() {
                                             </span>
                                             <span>
                                                 <h6>CONTACTS GROUP</h6>
-                                                {contactGroupName ? (
+                                                {contactGroupId ? (
                                                     <>
                                                         <p>{contactGroupName}</p>
                                                         <button className='btn-primary' onClick={() => handleModal('contacts')}>Change Contact Group</button>

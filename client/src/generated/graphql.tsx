@@ -19,11 +19,11 @@ export type Listing = {
   __typename?: 'Listing';
   address1: Scalars['String'];
   address2: Scalars['String'];
-  area: Scalars['String'];
+  area?: Maybe<Scalars['String']>;
   baths: Scalars['Float'];
   beds: Scalars['Float'];
   dateCreated: Scalars['String'];
-  description: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   image1?: Maybe<Scalars['String']>;
   image2?: Maybe<Scalars['String']>;
@@ -33,7 +33,7 @@ export type Listing = {
   lastEdited?: Maybe<Scalars['String']>;
   price: Scalars['Float'];
   squareFt: Scalars['Float'];
-  status: Scalars['String'];
+  status?: Maybe<Scalars['String']>;
 };
 
 export type ListingInput = {
@@ -112,6 +112,7 @@ export type MutationRevokeRefreshTokensForUserArgs = {
 
 export type MutationSetDefaultCalendarArgs = {
   calendarId: Scalars['String'];
+  calendarName: Scalars['String'];
   userId: Scalars['Float'];
 };
 
@@ -151,9 +152,10 @@ export type S3Response = {
 
 export type User = {
   __typename?: 'User';
-  defaultCalendarId: Scalars['String'];
-  defaultContactGroupId: Scalars['String'];
-  defaultContactGroupName: Scalars['String'];
+  defaultCalendarId?: Maybe<Scalars['String']>;
+  defaultCalendarName?: Maybe<Scalars['String']>;
+  defaultContactGroupId?: Maybe<Scalars['String']>;
+  defaultContactGroupName?: Maybe<Scalars['String']>;
   id: Scalars['Int'];
   username: Scalars['String'];
 };
@@ -161,14 +163,14 @@ export type User = {
 export type AllListingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null }> };
+export type AllListingsQuery = { __typename?: 'Query', allListings: Array<{ __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status?: string | null, area?: string | null, description?: string | null, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null }> };
 
 export type CreateMutationVariables = Exact<{
   data: ListingInput;
 }>;
 
 
-export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
+export type CreateMutation = { __typename?: 'Mutation', create?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status?: string | null, area?: string | null, description?: string | null, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type DeleteMutationVariables = Exact<{
   deleteId: Scalars['String'];
@@ -188,24 +190,24 @@ export type EditMutationVariables = Exact<{
 }>;
 
 
-export type EditMutation = { __typename?: 'Mutation', edit?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
+export type EditMutation = { __typename?: 'Mutation', edit?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status?: string | null, area?: string | null, description?: string | null, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type GetListingQueryVariables = Exact<{
   getListingId: Scalars['String'];
 }>;
 
 
-export type GetListingQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status: string, area: string, description: string, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
+export type GetListingQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: string, address1: string, address2: string, price: number, beds: number, baths: number, squareFt: number, status?: string | null, area?: string | null, description?: string | null, dateCreated: string, lastEdited?: string | null, image1?: string | null, image2?: string | null, image3?: string | null, image4?: string | null, image5?: string | null } | null };
 
 export type GetUserDefaultCalendarQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserDefaultCalendarQuery = { __typename?: 'Query', getUserDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
+export type GetUserDefaultCalendarQuery = { __typename?: 'Query', getUserDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId?: string | null, defaultCalendarName?: string | null } };
 
 export type GetUserDefaultContactGroupQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserDefaultContactGroupQuery = { __typename?: 'Query', getUserDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string, defaultContactGroupName: string } };
+export type GetUserDefaultContactGroupQuery = { __typename?: 'Query', getUserDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId?: string | null, defaultContactGroupName?: string | null } };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
@@ -230,11 +232,12 @@ export type RegisterMutation = { __typename?: 'Mutation', register: boolean };
 
 export type SetDefaultCalendarMutationVariables = Exact<{
   calendarId: Scalars['String'];
+  calendarName: Scalars['String'];
   userId: Scalars['Float'];
 }>;
 
 
-export type SetDefaultCalendarMutation = { __typename?: 'Mutation', setDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId: string } };
+export type SetDefaultCalendarMutation = { __typename?: 'Mutation', setDefaultCalendar: { __typename?: 'User', id: number, username: string, defaultCalendarId?: string | null, defaultCalendarName?: string | null } };
 
 export type SetDefaultContactGroupMutationVariables = Exact<{
   contactGroupId: Scalars['String'];
@@ -243,7 +246,7 @@ export type SetDefaultContactGroupMutationVariables = Exact<{
 }>;
 
 
-export type SetDefaultContactGroupMutation = { __typename?: 'Mutation', setDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId: string, defaultContactGroupName: string } };
+export type SetDefaultContactGroupMutation = { __typename?: 'Mutation', setDefaultContactGroup: { __typename?: 'User', id: number, username: string, defaultContactGroupId?: string | null, defaultContactGroupName?: string | null } };
 
 export type SignS3MutationVariables = Exact<{
   filename: Scalars['String'];
@@ -526,6 +529,7 @@ export const GetUserDefaultCalendarDocument = gql`
     id
     username
     defaultCalendarId
+    defaultCalendarName
   }
 }
     `;
@@ -694,11 +698,16 @@ export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const SetDefaultCalendarDocument = gql`
-    mutation SetDefaultCalendar($calendarId: String!, $userId: Float!) {
-  setDefaultCalendar(calendarId: $calendarId, userId: $userId) {
+    mutation SetDefaultCalendar($calendarId: String!, $calendarName: String!, $userId: Float!) {
+  setDefaultCalendar(
+    calendarId: $calendarId
+    calendarName: $calendarName
+    userId: $userId
+  ) {
     id
     username
     defaultCalendarId
+    defaultCalendarName
   }
 }
     `;
@@ -718,6 +727,7 @@ export type SetDefaultCalendarMutationFn = Apollo.MutationFunction<SetDefaultCal
  * const [setDefaultCalendarMutation, { data, loading, error }] = useSetDefaultCalendarMutation({
  *   variables: {
  *      calendarId: // value for 'calendarId'
+ *      calendarName: // value for 'calendarName'
  *      userId: // value for 'userId'
  *   },
  * });

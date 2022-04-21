@@ -304,7 +304,6 @@ function ListingView() {
                 toggleCarousel={toggleCarousel}
                 setToggleCarousel={setToggleCarousel}
                 currentIndex={currentIndex!}
-                listingImages={listingImages}
                 imagesCount={imagesCount}
             />
             : null

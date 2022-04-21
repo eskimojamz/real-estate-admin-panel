@@ -1988,6 +1988,11 @@ label {
   color: var(--red-primary);
 }
 
+.create-wrapper .error-div {
+  width: fit-content;
+  margin: 1rem auto;
+}
+
 .create-loading-modal {
   z-index: 700 !important;
   position: fixed;

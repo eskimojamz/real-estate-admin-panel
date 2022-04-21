@@ -74,11 +74,15 @@ export class UserResolver {
     @UseMiddleware(isAuth)
     async setDefaultCalendar(
       @Arg("userId") userId: number,
-      @Arg("calendarId") calendarId: string
+      @Arg("calendarId") calendarId: string,
+      @Arg("calendarName") calendarName: string
       ) {
       try {
         // update defaultCalendarId
-        await User.update(userId, {defaultCalendarId: calendarId})
+        await User.update(userId, {
+          defaultCalendarId: calendarId,
+          defaultCalendarName: calendarName
+        })
         // return User
         return await User.findOne(userId)
       } catch (error) {

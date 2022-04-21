@@ -7,37 +7,12 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import * as async from "async";
 import { BarLoader } from "react-spinners";
-
-interface listing {
-    id: string,
-    address1: string
-    address2: string,
-    price: number,
-    beds: number,
-    baths: number,
-    squareFt: number,
-    status: string,
-    area: string,
-    description: string,
-    dateCreated: string,
-    lastEdited: string,
-    image1: string,
-    image2: string,
-    image3: string,
-    image4: string,
-    image5: string,
-}
-
-// interface s3UploadData {
-//     signedRequest: string,
-//     file: File,
-//     url: string,
-// }
+import ImageCarousel from "../components/ImageCarousel";
 
 const Create: React.FC = () => {
     const navigate = useNavigate()
 
-    const [s3Sign, { loading: s3SignLoading }] = useSignS3Mutation()
+    const [s3Sign] = useSignS3Mutation()
     const [s3UploadData, setS3UploadData] = useState([])
     const [createMutation] = useCreateMutation({})
 
@@ -58,9 +33,11 @@ const Create: React.FC = () => {
     const [images, setImages] = useState([] as any)
 
     const onDrop: any = useCallback((acceptedFiles: [File]) => {
-        setImages(acceptedFiles)
-        console.log(acceptedFiles)
-        console.log(images)
+        const imageSrcs: any = []
+        acceptedFiles.map((file, i) => {
+            imageSrcs.push({ key: i, src: URL.createObjectURL(file) })
+        })
+        setImages(imageSrcs)
         const uploads = [] as any
 
         acceptedFiles.forEach(async (file: File) => {
@@ -105,9 +82,6 @@ const Create: React.FC = () => {
         setS3UploadData(uploads)
         return
     }, [])
-    console.log(images)
-    // console.log(imageUrls)
-
 
     const submit = (e: any) => {
         e.preventDefault()
@@ -188,12 +162,33 @@ const Create: React.FC = () => {
         </li>
     ));
 
-    const imagePreviews = images.map((image: File) => (
+    const [toggleCarousel, setToggleCarousel] = useState<boolean>(false)
+    const [currentIndex, setCurrentIndex] = useState<number>()
+
+    const handleImg = (index: number) => {
+        setCurrentIndex(index)
+        setToggleCarousel(true)
+    }
+
+    const imagePreviews = images.map((image: { src: string }, i: number) => (
         <motion.img className="image-preview-img"
-            src={URL.createObjectURL(image)}
+            src={image.src}
             whileHover={{ scale: 1.1, boxShadow: '-5px 5px 10px rgb(131, 130, 130, 0.2)', transition: { duration: 0.25 } }}
+            onClick={() => handleImg(i)}
         />
     ))
+
+    const imageCarousel = (
+        toggleCarousel ?
+            <ImageCarousel
+                allImages={images}
+                toggleCarousel={toggleCarousel}
+                setToggleCarousel={setToggleCarousel}
+                currentIndex={currentIndex!}
+                imagesCount={images.length}
+            />
+            : null
+    )
 
     const loadingModal = (
         loading ?
@@ -208,8 +203,10 @@ const Create: React.FC = () => {
 
     return (
         <>
+            {/* Event conditional components */}
+            {imageCarousel}
             {loadingModal}
-
+            {/*  */}
             <div className="wrapper">
                 <motion.div className="create-container"
                     initial={{ opacity: 0.5, y: 10 }}
@@ -234,6 +231,7 @@ const Create: React.FC = () => {
                                         <p>Drag and drop up to five (5) image files here, or click to select files</p>
                                         <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
                                     </div>
+                                    {/* {imagePreviews || fileRejections && ( */}
                                     <motion.aside className="image-preview-aside"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
@@ -241,6 +239,7 @@ const Create: React.FC = () => {
                                         {imagePreviews}
                                         {fileRejections && fileRejectionItems}
                                     </motion.aside>
+                                    {/* )} */}
                                 </div>
                             </section>
 

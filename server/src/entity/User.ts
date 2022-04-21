@@ -24,6 +24,10 @@ export class User extends BaseEntity {
 
     @Field({nullable: true})
     @Column("text", { default: null})
+    defaultCalendarName: string
+
+    @Field({nullable: true})
+    @Column("text", { default: null})
     defaultContactGroupId: string
 
     @Field({nullable: true})
