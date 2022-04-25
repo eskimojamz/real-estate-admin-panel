@@ -132,7 +132,7 @@ import { clientURL, serverURL } from "./utils/urls";
                 httpOnly: true,
             })
             console.log("New token credentials granted: ", token)
-            res.redirect(`${clientURL}/dashboard/`)
+            res.redirect(clientURL)
         })
     })
 
