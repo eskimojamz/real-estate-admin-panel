@@ -2,7 +2,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import React, { useContext, useEffect, useState } from 'react'
 import { ScaleLoader } from 'react-spinners';
-import { GlobalContext } from '../App';
+import { axiosGoogle, GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 
 
@@ -27,11 +27,9 @@ function Calendars() {
         }
     })
 
-    const axiosInstance = axios.create()
-
     const getGCalendarsList = async () => {
         try {
-            await axiosInstance.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
+            await axiosGoogle.get('https://www.googleapis.com/calendar/v3/users/me/calendarList')
                 .then(res => {
                     if (res.status === 200) {
                         const calendarsRef: any[] = []
@@ -56,20 +54,20 @@ function Calendars() {
     };
 
     // if Calendar fetch fails, get new gAccessToken and retry
-    axiosInstance.interceptors.response.use((response) => {
+    axiosGoogle.interceptors.response.use((response) => {
         return response
     }, async function (error) {
         const originalRequest = error.config;
         if (error.response.status === 401 && !originalRequest._retry) {
             // originalRequest._retry = true;
-            axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+            axios.post('https://horizon-admin-panel.herokuapp.com/auth/google/silent-refresh', {}, {
                 withCredentials: true
             }).then((res) => {
                 const { gAccessToken } = res.data
                 console.log(gAccessToken)
                 if (gAccessToken) {
-                    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
-                    return axiosInstance.request(originalRequest);
+                    axiosGoogle.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+                    return axiosGoogle.request(originalRequest);
                 } else {
                     setIsGLoggedIn(false)
                 }
@@ -100,7 +98,7 @@ function Calendars() {
     const createGCalendar = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         setLoadingCreate(true)
-        axiosInstance.post('https://www.googleapis.com/calendar/v3/calendars', {
+        axiosGoogle.post('https://www.googleapis.com/calendar/v3/calendars', {
             summary: newCalendarName,
         }).then((res) => {
             if (res.status === 200) {
