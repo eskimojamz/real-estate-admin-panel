@@ -26,7 +26,7 @@ import { clientURL, serverURL } from "./utils/urls";
 
     app.use(
         cors({
-          origin: [clientURL, 'https://studio.apollographql.com'],
+          origin: [`${clientURL}/`],
           credentials: true
         })
     );
