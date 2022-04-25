@@ -1,0 +1,16 @@
+mutation SetDefaultCalendar(
+  $calendarId: String!
+  $calendarName: String!
+  $userId: Float!
+) {
+  setDefaultCalendar(
+    calendarId: $calendarId
+    calendarName: $calendarName
+    userId: $userId
+  ) {
+    id
+    username
+    defaultCalendarId
+    defaultCalendarName
+  }
+}

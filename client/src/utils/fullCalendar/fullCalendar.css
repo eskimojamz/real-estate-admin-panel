@@ -1,0 +1,191 @@
+.fc {
+  height: auto;
+  width: 100%;
+}
+
+.fc table {
+  font-size: 14px !important;
+}
+
+.fc tbody > tr {
+  height: auto !important;
+  border-bottom: none !important;
+}
+
+/* .fc-view-harness {
+  border-radius: 5px;
+  border: 1px solid var(--grey-light);
+} */
+
+.fc-scroller-harness {
+  border-top: 1px solid var(--grey-light);
+}
+.fc-daygrid table thead {
+  background-color: none;
+}
+
+.fc-daygrid table tr:last-child td:first-child {
+  border-bottom-left-radius: 5px;
+}
+
+.fc-list {
+  border: none !important;
+}
+
+.fc-list-day,
+.fc-list-day > th {
+  border-radius: 5px;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: none;
+}
+
+.fc-list-day:hover {
+  cursor: default;
+}
+
+.fc-list-day > * {
+  background-color: white !important;
+  color: black;
+  z-index: 2;
+}
+
+.fc-list-day-cushion {
+  background: none;
+  border-bottom: 1px solid var(--grey-light) !important;
+}
+
+.fc-list-day-text {
+  font-weight: 500;
+}
+
+.fc .fc-cell-shaded,
+.fc .fc-day-disabled {
+  background: none;
+}
+
+.fc .fc-list-sticky .fc-list-day > * {
+  background: none;
+}
+
+.fc-list-event {
+  transition: background-color 0.2s;
+}
+
+.fc-list-event:hover {
+  background-color: var(--grey-mediumlight) !important;
+}
+
+.fc .fc-list-event-dot {
+  border: calc(var(--fc-list-event-dot-width, 10px) / 2) solid var(--primary) !important;
+}
+
+.fc .fc-daygrid-event-dot {
+  border: calc(var(--fc-daygrid-event-dot-width, 8px) / 2) solid
+    var(--fc-event-border-color, var(--primary-light)) !important;
+}
+
+.fc .fc-list-event.fc-event-forced-url:hover a {
+  transition: color 0.2s;
+}
+
+.fc .fc-list-event.fc-event-forced-url:hover a {
+  text-decoration: none !important;
+  color: var(--blue-primary);
+}
+
+.calendar-events .full-calendar .fc-list-day-cushion {
+  background-color: #f9fafb;
+}
+
+:visited,
+:link {
+  color: var(--primary);
+}
+
+.fc .fc-toolbar {
+  align-items: flex-start;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 16px !important;
+  font-weight: 600;
+}
+
+.full-calendar-month .fc .fc-toolbar.fc-header-toolbar {
+  padding: 0 1.5rem 1rem 1.5rem;
+  margin-bottom: 0;
+}
+
+.full-calendar-month .fc .fc-button-primary {
+  background-color: var(--primary);
+  border: none;
+  padding: 0 8px;
+  margin: 0 !important;
+}
+
+.full-calendar-month .fc .fc-button-primary:hover {
+  background-color: var(--primary-light);
+}
+
+.full-calendar-month .fc .fc-button-primary:focus {
+  box-shadow: none !important;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: none !important;
+}
+
+/* .full-calendar-month .fc .fc-scrollgrid-section-header > th {
+  border-bottom: 1px solid var(--grey-light) !important;
+} */
+
+.full-calendar-month .fc-col-header-cell-cushion {
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.full-calendar-month .fc .fc-scrollgrid-section-header,
+.full-calendar-month .fc .fc-scrollgrid-section-header * {
+  height: 22px !important;
+}
+
+.full-calendar-month tbody tr:hover {
+  background: none !important;
+}
+
+.full-calendar-month .fc-day-past:hover,
+.full-calendar-month .fc-day-future:hover {
+  background-color: #f5f5f5;
+}
+
+.full-calendar-month .fc-day-today {
+  background-color: #fff !important;
+}
+
+.full-calendar-month .fc-day-today:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.full-calendar-month .fc-day-today .fc-daygrid-day-number {
+  background-color: var(--primary);
+  color: #fff;
+  border-radius: 5px;
+}
+
+.full-calendar-month .fc-h-event {
+  background-color: var(--primary-light);
+  border: 1px solid var(--primary-light);
+  transition: all 0.3s;
+}
+
+.full-calendar-month .fc-h-event:hover {
+  background-color: var(--primary-superlight);
+  border-color: var(--primary-superlight);
+}
+
+.full-calendar-month .fc .fc-highlight {
+  background-color: #f5f5f5;
+}

@@ -1,0 +1,6 @@
+query displayUser {
+  displayUser {
+    id
+    username
+  }
+}

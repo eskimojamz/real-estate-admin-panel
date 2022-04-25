@@ -1,0 +1,21 @@
+query GetListing($getListingId: String!) {
+  getListing(id: $getListingId) {
+    id
+    address1
+    address2
+    price
+    beds
+    baths
+    squareFt
+    status
+    area
+    description
+    dateCreated
+    lastEdited
+    image1
+    image2
+    image3
+    image4
+    image5
+  }
+}
