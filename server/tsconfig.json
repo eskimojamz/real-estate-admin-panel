@@ -18,7 +18,8 @@
     "allowSyntheticDefaultImports": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "baseUrl": ".."
+    "esModuleInterop": true,
+    "baseUrl": "."
   },
   "include": [
     "src/**/*.ts"
