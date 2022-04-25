@@ -217,7 +217,7 @@ const Create: React.FC = () => {
                             <h5>Create New Listing</h5>
                         </div>
                         <div className="create-header-btns">
-                            <button className="btn-grey">Cancel</button>
+                            <button className="btn-grey" onClick={() => navigate('/listings')}>Cancel</button>
                             <button className="btn-primary" onClick={submit}>Submit</button>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BarLoader } from 'react-spinners'
-import { GlobalContext } from '../App'
+import { axiosGoogle, GlobalContext } from '../App'
 import Calendars from '../components/Calendars'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
@@ -50,7 +50,7 @@ function Settings() {
         e.preventDefault()
         setModalCategory('logout')
         setIsModal(true)
-        await axios.get("https://horizon-admin-panel.herokuapp.com/auth/google/logout", {
+        await axiosGoogle.get("https://horizon-admin-panel.herokuapp.com/auth/google/logout", {
             withCredentials: true
         }).then(() => {
             setIsGLoggedIn(false)

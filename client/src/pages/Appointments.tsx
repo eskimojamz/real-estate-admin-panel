@@ -6,7 +6,7 @@ import '../utils/fullCalendar/fullCalendar.css'
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { GlobalContext } from '../App';
+import { axiosGoogle, GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 import { MdAddCircle, MdDeleteOutline, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
 import { CgCalendarToday } from 'react-icons/cg'
@@ -100,7 +100,7 @@ function Appointments() {
             Object.assign(editFields, { description: client })
         }
         // patch to Google Api
-        await axios.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
+        await axiosGoogle.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
             editFields
         ).then(res => {
             const newAppointmentInfo = {
@@ -170,7 +170,7 @@ function Appointments() {
         setDeleteLoading(true)
         let calendarApi = calRef.current.getApi()
         // delete event on Google Calendar
-        await axios.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
+        await axiosGoogle.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
             .then(() => {
                 // remove event from FullCalendar events
                 calendarApi.getEventById(eventId).remove()
@@ -232,7 +232,7 @@ function Appointments() {
         }
         console.log(appointmentRef)
         // create new Event on Google Calendar
-        await axios.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
+        await axiosGoogle.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
             .then(res => {
                 console.log(res)
                 const newAppointmentInfo = {

@@ -19,6 +19,7 @@ interface GlobalStateTypes {
 }
 
 export const GlobalContext: React.Context<any> = createContext(null)
+export const axiosGoogle = axios.create()
 
 export const App: React.FC = () => {
 
@@ -62,12 +63,14 @@ export const App: React.FC = () => {
       const { gAccessToken } = res.data
       console.log(gAccessToken)
       if (gAccessToken) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+        axiosGoogle.defaults.headers.common = {
+          Authorization: `Bearer ${gAccessToken}`
+        }
         gLoginRef = true
       }
     }).then(() => {
       if (gLoginRef) {
-        axios.get('https://people.googleapis.com/v1/people/me', {
+        axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
           params: {
             personFields: 'emailAddresses,photos',
           }
@@ -106,7 +109,7 @@ export const App: React.FC = () => {
         const maxDate = new Date()
         maxDate.setDate(maxDate.getDate() + 180)
 
-        axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+        axiosGoogle.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
           params: {
             orderBy: 'startTime',
             singleEvents: true,
@@ -150,7 +153,7 @@ export const App: React.FC = () => {
   useMemo(() => {
     if (isGLoggedIn && contactGroupId) {
       const contactsRef: string[] = []
-      axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
+      axiosGoogle.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
         params: {
           maxMembers: 200
         }
@@ -172,7 +175,7 @@ export const App: React.FC = () => {
           })
           paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses,photos')
 
-          axios.get('https://people.googleapis.com/v1/people:batchGet', {
+          axiosGoogle.get('https://people.googleapis.com/v1/people:batchGet', {
             params: paramsRef
           }).then(res => {
             const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; photo: string | null; }[] = []
