@@ -16,6 +16,7 @@ import { google } from "googleapis"
 import "dotenv/config"
 import { getGToken } from "./utils/gTokens";
 import fetch from "node-fetch"
+import { clientURL, serverURL } from "./utils/urls";
 
 // lambda fn, calling itself
 (async() => {
@@ -25,7 +26,7 @@ import fetch from "node-fetch"
 
     app.use(
         cors({
-          origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
+          origin: [clientURL, 'https://studio.apollographql.com'],
           credentials: true
         })
     );
@@ -99,7 +100,7 @@ import fetch from "node-fetch"
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        "http://localhost:4000/auth/google/callback" // server redirect url handler
+        `${serverURL}/auth/google/callback` // server redirect url handler
     )
 
     app.post("/auth/google", (_req, res) => {
@@ -131,15 +132,8 @@ import fetch from "node-fetch"
                 httpOnly: true,
             })
             console.log("New token credentials granted: ", token)
-            res.redirect("http://localhost:3000/dashboard/")
+            res.redirect(`${clientURL}/dashboard/`)
         })
-        
-
-        // const accessToken = tokens?.access_token
-        //     const refreshToken = tokens?.refresh_token
-            
-
-            
     })
 
     app.get("/auth/google/logout", (_req, res) => {
@@ -154,7 +148,7 @@ import fetch from "node-fetch"
             httpOnly: true,
         })
         res.send('User logged out of G services, credentials cleared.')
-        res.redirect("http://localhost:3000/dashboard/")
+        res.redirect(`${clientURL}/dashboard/`)
     })
 
     app.post("/getValidToken", async(req, res) => {
@@ -193,7 +187,7 @@ import fetch from "node-fetch"
     await apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });
 
-    app.listen(4000, () => {
+    app.listen(process.env.PORT, () => {
         console.log("express server started")
     })
 })()
