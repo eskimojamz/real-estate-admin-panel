@@ -42,8 +42,6 @@ function RequireAuth({ children }: { children: any }) {
     return children
   } else if (isLoggedIn === false) {
     return <Navigate to='/login' replace />
-  } else {
-    return null
   }
 }
 
