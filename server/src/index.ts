@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import express from "express";
-import bodyParser from "body-parser";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/UserResolver";
@@ -20,8 +19,6 @@ import { clientURL, serverURL } from "./utils/urls";
 // lambda fn, calling itself
 (async() => {
     const app = express();
-
-    app.use(bodyParser.json())
 
     app.use(
         cors({

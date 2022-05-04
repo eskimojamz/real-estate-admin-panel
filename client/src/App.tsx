@@ -45,14 +45,12 @@ export const App: React.FC = () => {
   const url = 'https://horizon-admin-panel.herokuapp.com'
 
   useEffect(() => {
-    console.log(JSON.stringify({
-      refreshToken: localStorage.getItem('refresh_token')
-    }))
-    // const data = new FormData
-    // data.append('json', )
     fetch(`${url}/refresh_token`, {
       method: "POST",
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         refreshToken: localStorage.getItem('refresh_token')
       })
