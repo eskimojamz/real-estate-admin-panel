@@ -47,7 +47,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetch(`${url}/refresh_token`, {
       method: "POST",
-      credentials: "include"
+      credentials: "include",
+      body: JSON.stringify({
+        refreshToken: localStorage.getItem('refresh_token')
+      })
     }).then(async (res: any) => {
       const { authorized, accessToken, refreshToken } = await res.json();
       setAccessToken(accessToken);
