@@ -45,25 +45,21 @@ export const App: React.FC = () => {
   const url = 'https://horizon-admin-panel.herokuapp.com'
 
   useEffect(() => {
-    const fetchToken = () => {
-      fetch(`${url}/refresh_token`, {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          refreshToken: localStorage.getItem('refresh_token')
-        })
-      }).then(async (res: any) => {
-        const { authorized, accessToken, refreshToken } = await res.json();
-        setAccessToken(accessToken);
-        localStorage.setItem('refresh_token', refreshToken)
-        setIsLoggedIn(authorized)
-      }).catch(err => {
-        setIsLoggedIn(false)
-        console.log(err)
+    fetch(`${url}/refresh_token`, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        refreshToken: localStorage.getItem('refresh_token')
       })
-    }
-    window.addEventListener('storage', fetchToken)
-    return () => window.removeEventListener('storage', fetchToken)
+    }).then(async (res: any) => {
+      const { authorized, accessToken, refreshToken } = await res.json();
+      setAccessToken(accessToken);
+      localStorage.setItem('refresh_token', refreshToken)
+      setIsLoggedIn(authorized)
+    }).catch(err => {
+      setIsLoggedIn(false)
+      throw new Error(err)
+    })
   }, []);
 
   useEffect(() => {
