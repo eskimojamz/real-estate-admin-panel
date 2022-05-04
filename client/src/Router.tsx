@@ -20,27 +20,27 @@ function RequireAuth({ children }: { children: any }) {
   // global isLoggedIn state from first app render, server fetch
   const { isLoggedIn } = useContext(GlobalContext)
   // check auth app state, if token is expired
-  const isAuth = () => {
-    const token = getAccessToken()
-    try {
-      // decode the token, get its expiration
-      const { exp }: any = jwtDecode(token)
-      // compare to current date, if greater, then it's expired
-      if (Date.now() >= exp * 1000) {
-        localStorage.removeItem('refresh_token')
-        return false;
-      } else {
-        return true;
-      }
-    } catch {
-      localStorage.removeItem('refresh_token')
-      return false;
-    }
-  }
+  // const isAuth = () => {
+  //   const token = getAccessToken()
+  //   try {
+  //     // decode the token, get its expiration
+  //     const { exp }: any = jwtDecode(token)
+  //     // compare to current date, if greater, then it's expired
+  //     if (Date.now() >= exp * 1000) {
+  //       localStorage.removeItem('refresh_token')
+  //       return false;
+  //     } else {
+  //       return true;
+  //     }
+  //   } catch {
+  //     localStorage.removeItem('refresh_token')
+  //     return false;
+  //   }
+  // }
   // redirect to login if not authed
-  if (isLoggedIn || isAuth()) {
+  if (isLoggedIn) {
     return children
-  } else if (isLoggedIn === false && isAuth() === false) {
+  } else if (isLoggedIn === false) {
     return <Navigate to='/login' replace />
   } else {
     return null
