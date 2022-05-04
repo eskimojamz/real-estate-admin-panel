@@ -13,6 +13,8 @@ import { AuthenticationError } from "apollo-server-express";
 class LoginResponse {
     @Field()
     accessToken: string
+    @Field()
+    refreshToken: string
     @Field(() => User)
     user: User;
 }
@@ -154,7 +156,7 @@ export class UserResolver {
     async login(
       @Arg("username") username: string,
       @Arg("password") password: string,
-      @Ctx() { res }: MyContext
+      // @Ctx() { res }: MyContext
     ): Promise<LoginResponse> {
       const user = await User.findOne({ where: { username } });
   
@@ -170,10 +172,11 @@ export class UserResolver {
   
       // login successful
   
-      sendRefreshToken(res, createRefreshToken(user));
+      // sendRefreshToken(res, createRefreshToken(user));
   
       return {
         accessToken: createAccessToken(user),
+        refreshToken: createRefreshToken(user),
         user
       };
     }

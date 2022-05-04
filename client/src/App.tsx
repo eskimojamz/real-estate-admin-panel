@@ -49,9 +49,13 @@ export const App: React.FC = () => {
       method: "POST",
       credentials: "include"
     }).then(async (res: any) => {
-      const { authorized, accessToken } = await res.json();
+      const { authorized, accessToken, refreshToken } = await res.json();
       setAccessToken(accessToken);
+      localStorage.setItem('refresh_token', refreshToken)
       setIsLoggedIn(authorized)
+    }).catch(err => {
+      setIsLoggedIn(false)
+      throw new Error(err)
     })
   }, []);
 

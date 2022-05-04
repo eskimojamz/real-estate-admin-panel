@@ -9,7 +9,6 @@ import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser"
 import { verify } from "jsonwebtoken"
 import { User } from "./entity/User"
-import { sendRefreshToken } from "./sendRefreshToken";
 import { createAccessToken, createRefreshToken } from "./auth";
 import cors from "cors"
 import { google } from "googleapis"
@@ -35,10 +34,10 @@ import { clientURL, serverURL } from "./utils/urls";
     
     app.post("/refresh_token", async (req, res) => {
         // grab refresh token from cookies
-        const token = req.cookies.jid
+        const token = req.body.refreshToken
         console.log('cookie token:', token)
         if (!token) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         let payload: any = null;
@@ -47,7 +46,7 @@ import { clientURL, serverURL } from "./utils/urls";
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
         } catch(err) {
             console.log(err)
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // refresh token is valid 
@@ -56,20 +55,24 @@ import { clientURL, serverURL } from "./utils/urls";
         const user = await User.findOne({ id: payload.userId })
 
         if (!user) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // if tokenVersion doesn't match, don't send refresh or access token
         // used for blocking invalid logins
         if (user.tokenVersion !== payload.tokenVersion) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // create new refresh token and set to cookies
-        sendRefreshToken(res, createRefreshToken(user));
+        // sendRefreshToken(res, createRefreshToken(user));
         
         // create new access token and send to apollo client
-        return res.send({authorized: true, accessToken: createAccessToken(user)})
+        return res.send({
+            authorized: true,
+            accessToken: createAccessToken(user),
+            refreshToken: createRefreshToken(user)
+        })
     })
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{
@@ -188,7 +191,7 @@ import { clientURL, serverURL } from "./utils/urls";
     await apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });
 
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT || 4000, () => {
         console.log("express server started")
     })
 })()

@@ -27,13 +27,13 @@ function RequireAuth({ children }: { children: any }) {
       const { exp }: any = jwtDecode(token)
       // compare to current date, if greater, then it's expired
       if (Date.now() >= exp * 1000) {
-        document.cookie = "jid=; path=/refresh_token;"
+        localStorage.removeItem('refresh_token')
         return false;
       } else {
         return true;
       }
     } catch {
-      document.cookie = "jid=; path=/refresh_token;"
+      localStorage.removeItem('refresh_token')
       return false;
     }
   }

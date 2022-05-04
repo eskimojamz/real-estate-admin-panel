@@ -27,6 +27,7 @@ const Login: React.FC = () => {
                     return null
                 }
                 setAccessToken(data.login.accessToken)
+                localStorage.setItem('refresh_token', data.login.refreshToken)
                 store.writeQuery<DisplayUserQuery>({
                     query: DisplayUserDocument,
                     data: {

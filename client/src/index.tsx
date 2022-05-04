@@ -13,7 +13,7 @@ import { onError } from "@apollo/client/link/error";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
 
-const url = 'https://horizon-admin-panel.netlify.app/api'
+const url = 'https://horizon-admin-panel.herokuapp.com'
 
 // define cache
 const cache = new InMemoryCache({});
@@ -51,7 +51,7 @@ const requestLink = new ApolloLink(
 );
 
 // Check for expired tokens; link to get and set new refresh token and access token
-const tokenRefreshLink: any = new TokenRefreshLink({
+const tokenRefreshLink: any = new TokenRefreshLink<{ accessToken: string, refreshToken: string }>({
   accessTokenField: "accessToken",
   // check if token is valid or undefined
   isTokenValidOrUndefined: () => {
@@ -79,16 +79,21 @@ const tokenRefreshLink: any = new TokenRefreshLink({
   fetchAccessToken: () => {
     return fetch(`${url}/refresh_token`, {
       method: "POST",
-      credentials: "include"
+      credentials: "include",
+      body: JSON.stringify({
+        refreshToken: localStorage.getItem('refresh_token')
+      })
     });
   },
   // after fetch, set the accessToken
-  handleFetch: accessToken => {
+  handleFetch: tokens => {
+    const { accessToken, refreshToken } = tokens
     setAccessToken(accessToken);
+    localStorage.setItem('refresh_token', refreshToken)
   },
   // error handler
   handleError: err => {
-    console.warn("Your refresh token is invalid. Try to relogin");
+    console.warn("Refresh token is invalid.");
     console.error(err);
   }
 });
@@ -110,7 +115,7 @@ const client = new ApolloClient({
     }),
     requestLink,
     new HttpLink({
-      uri: 'https://horizon-admin-panel.herokuapp.com/graphql',
+      uri: `${url}/graphql`,
       credentials: "include"
     }),
   ]),
