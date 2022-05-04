@@ -38,11 +38,13 @@ function RequireAuth({ children }: { children: any }) {
   //   }
   // }
   // redirect to login if not authed
-  if (isLoggedIn) {
-    return children
-  } else if (isLoggedIn === false) {
-    return <Navigate to='/login' replace />
-  }
+  return (
+    isLoggedIn ?
+      children
+      : isLoggedIn === false ?
+        <Navigate to='/login' replace />
+        : null
+  )
 }
 
 export const Router: React.FC = () => {

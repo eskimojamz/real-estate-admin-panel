@@ -35,6 +35,7 @@ import { clientURL, serverURL } from "./utils/urls";
     app.post("/refresh_token", async (req, res) => {
         // grab refresh token from cookies
         const token = req.body.refreshToken
+        console.log(req)
         console.log('cookie token:', token)
         if (!token) {
             return res.send({ authorized: false, accessToken: "", refreshToken: "" })
