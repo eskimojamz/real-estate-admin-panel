@@ -110,7 +110,7 @@ const client = new ApolloClient({
     }),
     requestLink,
     new HttpLink({
-      uri: `${url}/graphql`,
+      uri: 'https://horizon-admin-panel.herokuapp.com/graphql',
       credentials: "include"
     }),
   ]),
