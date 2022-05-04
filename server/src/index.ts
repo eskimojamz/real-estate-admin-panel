@@ -25,11 +25,12 @@ import { clientURL, serverURL } from "./utils/urls";
 
     app.use(
         cors({
-          origin: [clientURL],
+          origin: [clientURL, 'http://localhost:3000'],
           credentials: true
         })
     );
     
+    app.use(express.json())
     app.use(cookieParser())
     
     app.post("/refresh_token", async (req, res) => {
