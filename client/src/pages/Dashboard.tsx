@@ -4,7 +4,7 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion"
 import { GetUserDefaultCalendarDocument, useAllListingsQuery, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery, useSetDefaultCalendarMutation } from "../generated/graphql"
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import listPlugin from '@fullcalendar/list';
@@ -148,56 +148,6 @@ const Dashboard: React.FC = () => {
     Geocode.setRegion("us");
 
     const [mapMarkers, setMapMarkers] = useState<any[]>([])
-    // console.log(mapMarkers)
-    // console.log(allListingsData?.allListings)
-
-    // const [contactGroups, setContactGroups] = useState<any[] | null>()
-
-    // const { data: getContactGroupData, loading: contactGroupIdLoading } = useGetUserDefaultContactGroupQuery({
-    //     onError: (error) => console.log(error)
-    // })
-    // const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
-    // const { contacts, setContacts } = useContext(GlobalContext)
-    // const [setDefaultContactGroup] = useSetDefaultContactGroupMutation({
-    //     onError: (error) => {
-    //         console.log(error)
-    //     }
-    // })
-    // const [contactsInput, setContactsInput] = useState<string>("Horizon Clients")
-
-    // const getGContactGroupsList = async () => {
-    //     await axios.get('https://people.googleapis.com/v1/contactGroups')
-    //         .then(res => {
-    //             // console.log(res.data.contactGroups)
-    //             const groupsRef: any[] = []
-    //             // get user contact groups
-    //             res.data.contactGroups.map((group: { groupType: string; formattedName: string; resourceName: string; }) => {
-    //                 if (group.groupType === 'USER_CONTACT_GROUP') {
-    //                     groupsRef.push({
-    //                         formattedName: group.formattedName,
-    //                         resourceName: group.resourceName
-    //                     })
-    //                 }
-    //             })
-    //             // set groups
-    //             groupsRef.length > 0 && (
-    //                 setContactGroups(groupsRef)
-    //             )
-    //         })
-    //         .catch(err => {
-    //             throw new Error(err)
-    //         })
-    // }
-    // console.log(userData)
-    // const chooseContactGroup = async (cGroupId: string) => {
-    //     await setDefaultContactGroup({
-    //         variables: {
-    //             contactGroupId: cGroupId,
-    //             userId: userData?.displayUser?.id!
-    //         },
-    //         refetchQueries: [{ query: GetUserDefaultContactGroupDocument }]
-    //     })
-    // }
 
     useEffect(() => {
         if (allListingsData) {

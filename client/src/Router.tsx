@@ -1,11 +1,9 @@
 import { AnimatePresence } from "framer-motion";
-import jwtDecode from "jwt-decode";
-import React, { useContext, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import { GlobalContext } from "./App";
 import Sidebar from "./components/Sidebar";
-import { useDisplayUserQuery } from "./generated/graphql";
 import Appointments from "./pages/Appointments";
 import Clients from "./pages/Clients";
 import Create from "./pages/Create";
@@ -14,29 +12,11 @@ import Listings from "./pages/Listings";
 import ListingView from "./pages/ListingView";
 import Login from "./pages/Login";
 import Settings from "./pages/Settings";
-import { getAccessToken } from "./utils/accessToken";
 
 function RequireAuth({ children }: { children: any }) {
   // global isLoggedIn state from first app render, server fetch
   const { isLoggedIn } = useContext(GlobalContext)
-  // check auth app state, if token is expired
-  // const isAuth = () => {
-  //   const token = getAccessToken()
-  //   try {
-  //     // decode the token, get its expiration
-  //     const { exp }: any = jwtDecode(token)
-  //     // compare to current date, if greater, then it's expired
-  //     if (Date.now() >= exp * 1000) {
-  //       localStorage.removeItem('refresh_token')
-  //       return false;
-  //     } else {
-  //       return true;
-  //     }
-  //   } catch {
-  //     localStorage.removeItem('refresh_token')
-  //     return false;
-  //   }
-  // }
+
   // redirect to login if not authed
   return (
     isLoggedIn ?
@@ -48,7 +28,6 @@ function RequireAuth({ children }: { children: any }) {
 }
 
 export const Router: React.FC = () => {
-
   return (
     <AnimatePresence exitBeforeEnter>
       <div className="container">

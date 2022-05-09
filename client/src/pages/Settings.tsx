@@ -50,27 +50,22 @@ function Settings() {
         e.preventDefault()
         setModalCategory('logout')
         setIsModal(true)
-        await axiosGoogle.get("https://horizon-admin-panel.herokuapp.com/auth/google/logout", {
-            withCredentials: true
+        localStorage.removeItem('gAccessToken')
+        localStorage.removeItem('gRefreshToken')
+        localStorage.removeItem('gExpirationDate')
+        setIsGLoggedIn(false)
+        logout({
+            refetchQueries: [{ query: DisplayUserDocument }],
+            awaitRefetchQueries: true,
+            onError: (err) => {
+                setModalCategory(undefined)
+                setIsModal(false)
+                throw new Error(err.message)
+            }
         }).then(() => {
-            setIsGLoggedIn(false)
-        }).then(() => {
-            logout({
-                refetchQueries: [{ query: DisplayUserDocument }],
-                awaitRefetchQueries: true,
-                onError: (err) => {
-                    setModalCategory(undefined)
-                    setIsModal(false)
-                    throw new Error(err.message)
-                }
-            }).then(() => {
-                setAccessToken('')
-                navigate('/login')
-            })
-        }).catch(err => {
-            setModalCategory(undefined)
-            setIsModal(false)
-            throw new Error(err)
+            setAccessToken('')
+            localStorage.removeItem('refresh_token')
+            navigate('/login')
         })
     }
 

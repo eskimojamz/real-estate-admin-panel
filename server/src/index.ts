@@ -76,7 +76,7 @@ import { clientURL, serverURL } from "./utils/urls";
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{
         const {gAccessToken, gRefreshToken, gExpirationDate} = req.body;
-        console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
+        // console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
         
         // Refresh token was cleared (on logout), so no credentials get sent to client
         if (!gRefreshToken) {

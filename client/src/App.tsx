@@ -22,7 +22,6 @@ export const GlobalContext: React.Context<any> = createContext(null)
 export const axiosGoogle = axios.create()
 
 export const App: React.FC = () => {
-
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>()
   const [isGLoggedIn, setIsGLoggedIn] = useState<boolean>()
   const [gAccountInfo, setGAccountInfo] = useState<any>()
@@ -65,22 +64,50 @@ export const App: React.FC = () => {
     })
   }, []);
 
+  const [gLoginReady, setGLoginReady] = useState<boolean>()
   useEffect(() => {
-    let gLoginRef = false
-    axios.post(`${url}/auth/google/silent-refresh`, {}, {
-      withCredentials: true
-    }).then((res) => {
-      const { gAccessToken } = res.data
-      console.log(gAccessToken)
-      if (gAccessToken) {
+    (async () => {
+      // get search params from google redirect
+      const params = new URL(window.location.href).searchParams
+      const gAccessToken = params.get('gAccessToken')
+      const gRefreshToken = params.get('gRefreshToken')
+      const gExpirationDate = params.get('gExpirationDate')
+      // if user was redirected from google auth, set tokens and axios auth header
+      if (gAccessToken && gRefreshToken && gExpirationDate) {
+        localStorage.setItem('gAccessToken', gAccessToken)
+        localStorage.setItem('gRefreshToken', gRefreshToken)
+        localStorage.setItem('gExpirationDate', gExpirationDate)
         axiosGoogle.defaults.headers.common = {
           Authorization: `Bearer ${gAccessToken}`
         }
-        gLoginRef = true
+        setGLoginReady(true)
+      } else {
+        // if no query search params, silent refresh call to server
+        await axios.post(`${url}/auth/google/silent-refresh`, {
+          gAccessToken: localStorage.getItem('gAccessToken'),
+          gRefreshToken: localStorage.getItem('gRefreshToken'),
+          gExpirationDate: localStorage.getItem('gExpirationDate')
+        }, {
+          withCredentials: true
+        }).then((res) => {
+          const { gAccessToken } = res.data
+
+          if (gAccessToken) {
+            axiosGoogle.defaults.headers.common = {
+              Authorization: `Bearer ${gAccessToken}`
+            }
+            setGLoginReady(true)
+          } else {
+            setIsGLoggedIn(false)
+          }
+        }).catch((err) => {
+          setIsGLoggedIn(false)
+          throw new Error(err)
+        })
       }
-    }).then(() => {
-      if (gLoginRef) {
-        axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
+      if (gLoginReady) {
+        // fetch Google User Info & set isGLoggedIn
+        await axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
           params: {
             personFields: 'emailAddresses,photos',
           }
@@ -89,16 +116,14 @@ export const App: React.FC = () => {
             email: res.data.emailAddresses[0].value,
             photo: res.data.photos[0].url
           })
+        }).then(() => {
+          setIsGLoggedIn(true)
+        }).catch((err) => {
+          setIsGLoggedIn(false)
+          throw new Error(err)
         })
       }
-
-    }).then(() => {
-      if (gLoginRef) {
-        setIsGLoggedIn(true)
-      } else {
-        setIsGLoggedIn(false)
-      }
-    })
+    })()
   }, [])
 
   const { data: getCalendarData } = useGetUserDefaultCalendarQuery({
