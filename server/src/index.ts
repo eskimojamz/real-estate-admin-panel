@@ -126,13 +126,7 @@ import { clientURL, serverURL } from "./utils/urls";
                 throw new Error(err.message)
             }
             let expiration = new Date();
-            res.json({
-                gAccessToken: token!.access_token,
-                gRefreshToken: token!.refresh_token,
-                gExpirationDate: expiration.setHours(expiration.getHours() + 1)
-            })
-            console.log("New token credentials granted: ", token)
-            res.redirect(clientURL)
+            res.redirect(`${clientURL}?gAccessToken=${token!.access_token}&gRefreshToken=${token!.refresh_token}&gExpirationDate=${expiration.setHours(expiration.getHours()+1)}`)
         })
     })
 
