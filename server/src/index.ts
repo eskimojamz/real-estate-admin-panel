@@ -75,7 +75,7 @@ import { clientURL, serverURL } from "./utils/urls";
     })
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{
-        const {gAccessToken, gRefreshToken, gExpirationDate} = req.cookies;
+        const {gAccessToken, gRefreshToken, gExpirationDate} = req.body;
         console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
         
         // Refresh token was cleared (on logout), so no credentials get sent to client
@@ -90,14 +90,15 @@ import { clientURL, serverURL } from "./utils/urls";
             const newGAccessToken = checkTokenExpired.access_token
             const newGExpirationDate = checkTokenExpired.newGExpirationDate
 
-            res.cookie('gExpirationDate', newGExpirationDate, {
-                httpOnly: true
+            res.send({
+                gExpirationDate: newGExpirationDate,
+                gAccessToken: newGAccessToken
             })
-
-            return res.json({gAccessToken: newGAccessToken})
         }
         console.log("Token is not yet expired")
-        return res.json({gAccessToken})
+        return res.send({
+            gAccessToken: gAccessToken
+        })
       });
 
     const oauth2Client = new google.auth.OAuth2(
@@ -124,15 +125,11 @@ import { clientURL, serverURL } from "./utils/urls";
                 console.log(err)
                 throw new Error(err.message)
             }
-            res.cookie('gAccessToken', token!.access_token, {
-                httpOnly: true,
-            })
-            res.cookie('gRefreshToken', token!.refresh_token, {
-                httpOnly: true,
-            })
             let expiration = new Date();
-            res.cookie('gExpirationDate', expiration.setHours(expiration.getHours() + 1), {
-                httpOnly: true,
+            res.send({
+                gAccessToken: token!.access_token,
+                gRefreshToken: token!.refresh_token,
+                gExpirationDate: expiration.setHours(expiration.getHours() + 1)
             })
             console.log("New token credentials granted: ", token)
             res.redirect(clientURL)
@@ -140,17 +137,6 @@ import { clientURL, serverURL } from "./utils/urls";
     })
 
     app.get("/auth/google/logout", (_req, res) => {
-        // clear token credential cookies
-        res.clearCookie('gAccessToken', {
-            httpOnly: true,
-        })
-        res.clearCookie('gRefreshToken', {
-            httpOnly: true,
-        })
-        res.clearCookie('gExpirationDate', {
-            httpOnly: true,
-        })
-        res.send('User logged out of G services, credentials cleared.')
         res.redirect(`${clientURL}/dashboard/`)
     })
 
