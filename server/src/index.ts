@@ -90,7 +90,7 @@ import { clientURL, serverURL } from "./utils/urls";
             const newGAccessToken = checkTokenExpired.access_token
             const newGExpirationDate = checkTokenExpired.newGExpirationDate
 
-            res.send({
+            return res.send({
                 gExpirationDate: newGExpirationDate,
                 gAccessToken: newGAccessToken
             })
@@ -126,7 +126,7 @@ import { clientURL, serverURL } from "./utils/urls";
                 throw new Error(err.message)
             }
             let expiration = new Date();
-            res.send({
+            res.json({
                 gAccessToken: token!.access_token,
                 gRefreshToken: token!.refresh_token,
                 gExpirationDate: expiration.setHours(expiration.getHours() + 1)
