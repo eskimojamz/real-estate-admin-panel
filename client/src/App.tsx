@@ -3,7 +3,7 @@ import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
-import { useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
+import { useGetUserDefaultCalendarLazyQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupLazyQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 
 interface GlobalStateTypes {
   isLoggedIn: boolean | undefined;
@@ -43,30 +43,43 @@ export const App: React.FC = () => {
 
   const url = 'https://horizon-admin-panel.herokuapp.com'
 
-  useEffect(() => {
-    fetch(`${url}/refresh_token`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        refreshToken: localStorage.getItem('refresh_token')
-      })
-    }).then(async (res: any) => {
-      const { authorized, accessToken, refreshToken } = await res.json();
-      setAccessToken(accessToken);
-      localStorage.setItem('refresh_token', refreshToken)
-      setIsLoggedIn(authorized)
-    }).catch(err => {
-      setIsLoggedIn(false)
-      throw new Error(err)
-    })
-  }, []);
+  const [calendarId, setCalendarId] = useState<string | null>()
+  const [contactGroupId, setContactGroupId] = useState<string | null>()
+  const [getCalendar] = useGetUserDefaultCalendarLazyQuery({
+    onError: (error) => console.log(error),
+    onCompleted: (data) => setCalendarId(data.getUserDefaultCalendar.defaultCalendarId)
+  })
+  const [getContactGroup] = useGetUserDefaultContactGroupLazyQuery({
+    onError: (error) => console.log(error),
+    onCompleted: (data) => setContactGroupId(data.getUserDefaultContactGroup.defaultContactGroupId)
+  })
 
-  const [gLoginReady, setGLoginReady] = useState<boolean>()
   useEffect(() => {
-    (async () => {
+    // ref variable for gLogin
+    let gLoginReady = false
+    // refresh token for user
+    const getRefreshToken = async () => {
+      await fetch(`${url}/refresh_token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem('refresh_token')
+        })
+      }).then(async (res: any) => {
+        const { authorized, accessToken, refreshToken } = await res.json();
+        setAccessToken(accessToken);
+        localStorage.setItem('refresh_token', refreshToken)
+        setIsLoggedIn(authorized)
+      }).catch(err => {
+        setIsLoggedIn(false)
+        throw new Error(err)
+      })
+    }
+    // handle Google Auth Token via search params redirect or silent refresh to server
+    const handleGToken = async () => {
       // get search params from google redirect
       const params = new URL(window.location.href).searchParams
       const gAccessToken = params.get('gAccessToken')
@@ -80,7 +93,7 @@ export const App: React.FC = () => {
         axiosGoogle.defaults.headers.common = {
           Authorization: `Bearer ${gAccessToken}`
         }
-        setGLoginReady(true)
+        gLoginReady = true
       } else {
         // if no query search params, silent refresh call to server
         await axios.post(`${url}/auth/google/silent-refresh`, {
@@ -89,14 +102,13 @@ export const App: React.FC = () => {
           gExpirationDate: localStorage.getItem('gExpirationDate')
         }, {
           withCredentials: true
-        }).then((res) => {
-          const { gAccessToken } = res.data
-
+        }).then(async (res) => {
+          const { gAccessToken } = await res.data
           if (gAccessToken) {
             axiosGoogle.defaults.headers.common = {
               Authorization: `Bearer ${gAccessToken}`
             }
-            setGLoginReady(true)
+            gLoginReady = true
           } else {
             setIsGLoggedIn(false)
           }
@@ -105,31 +117,33 @@ export const App: React.FC = () => {
           throw new Error(err)
         })
       }
-      if (gLoginReady) {
-        // fetch Google User Info & set isGLoggedIn
-        await axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
-          params: {
-            personFields: 'emailAddresses,photos',
-          }
-        }).then((res) => {
-          setGAccountInfo({
-            email: res.data.emailAddresses[0].value,
-            photo: res.data.photos[0].url
-          })
-        }).then(() => {
-          setIsGLoggedIn(true)
-        }).catch((err) => {
-          setIsGLoggedIn(false)
-          throw new Error(err)
-        })
-      }
-    })()
-  }, [])
+    }
 
-  const { data: getCalendarData } = useGetUserDefaultCalendarQuery({
-    onError: (error) => console.log(error)
-  })
-  const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
+    getRefreshToken().then(() => {
+      handleGToken().then(async () => {
+        if (gLoginReady) {
+          // fetch Google User Info & set isGLoggedIn
+          await axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
+            params: {
+              personFields: 'emailAddresses,photos',
+            }
+          }).then((res) => {
+            setGAccountInfo({
+              email: res.data.emailAddresses[0].value,
+              photo: res.data.photos[0].url
+            })
+          }).then(() => {
+            setIsGLoggedIn(true)
+            getCalendar().then((data) => console.log(data))
+            getContactGroup().then((data) => console.log(data))
+          }).catch((err) => {
+            setIsGLoggedIn(false)
+            throw new Error(err)
+          })
+        }
+      })
+    })
+  }, []);
 
   // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
   useMemo(() => {
@@ -180,10 +194,10 @@ export const App: React.FC = () => {
     }
   }, [isGLoggedIn, calendarId])
 
-  const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
-    onError: (error: any) => console.log(error)
-  })
-  const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+  // const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
+  //   onError: (error: any) => console.log(error)
+  // })
+  // const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
 
   useMemo(() => {
     if (isGLoggedIn && contactGroupId) {

@@ -23,7 +23,11 @@ function RequireAuth({ children }: { children: any }) {
       children
       : isLoggedIn === false ?
         <Navigate to='/login' replace />
-        : null
+        : (
+          <div className="page-loading">
+            <ScaleLoader color='#2c5990' />
+          </div>
+        )
   )
 }
 
