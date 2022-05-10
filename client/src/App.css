@@ -28,7 +28,7 @@ p {
 }
 
 p {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
 }
 
@@ -1942,7 +1942,7 @@ td {
 
 label {
   color: var(--grey-dark);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -2076,6 +2076,13 @@ label {
   font-size: 12px;
   font-weight: 500;
   border-radius: 10px;
+}
+
+.listing-view-loading {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  place-items: center;
 }
 
 .listing-view-wrapper {
@@ -2353,15 +2360,25 @@ em {
 
 .listing-view {
   display: flex;
-  flex-direction: column;
-  place-items: center;
-  gap: 2rem;
-  padding: 1rem 0 5rem 0;
+  gap: 0.5rem;
+  padding: 1rem;
   margin-top: 60px;
+  background-color: ;
+}
+
+.listing-view-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: calc(100vh - 92px);
+  min-width: 573px;
+  overflow-y: scroll;
+  padding-right: 1.5rem;
 }
 
 .listing-view-images {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -2614,7 +2631,6 @@ em {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
 }
 
 .listing-view-text input {
@@ -2643,12 +2659,15 @@ em {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .listing-view-text-head span:first-child {
   display: flex;
   flex-direction: column;
   width: 50%;
+  gap: 8px;
 }
 
 .listing-view-text-head h3 {
@@ -2724,6 +2743,7 @@ em {
   margin: 0;
   color: var(--grey-dark);
   font-weight: 500;
+  font-size: 13px;
 }
 
 .listing-view-text p {
@@ -2735,12 +2755,14 @@ em {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .listing-view-text-body span {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 8px;
 }
 
 .listing-view-text-details {
@@ -2783,6 +2805,7 @@ em {
 
 .listing-view-text-details-col p {
   font-weight: 500;
+  font-size: 15px;
 }
 
 .edit-squareFt {
@@ -2798,7 +2821,7 @@ em {
 }
 
 .listing-view-text-desc p {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .listing-view-text-desc textarea {
@@ -2815,21 +2838,22 @@ em {
 .listing-view-text-foot {
   width: 100%;
   display: flex;
+  padding-top: 1rem;
 }
 
 .listing-view-text-foot span {
   width: 50%;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 8px;
 }
 
 .listing-view-text-foot p {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .listing-view-map {
-  height: 300px;
+  height: calc(100vh - 92px);
   width: 100%;
   background: rgb(199, 199, 199);
   border-radius: 10px;

@@ -23,7 +23,7 @@ const editVariants = {
 const ListingEditView: React.FC<EditProps> = ({ allImages, setAllImages, handleImg, listingData, editStateSetters, onDrop, s3UploadData, setS3UploadData }) => (
 
 
-    <div className="listing-view">
+    <div className="listing-view-card">
         <div className="listing-view-images">
             {/* images carousel */}
             <div className="listing-view-images-main">
