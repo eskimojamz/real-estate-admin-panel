@@ -1950,7 +1950,7 @@ label {
 .form-col-2 input {
   border-radius: 5px;
   border: 1px solid var(--grey-light);
-  background: var(--grey-superlight);
+  background-color: var(--grey-superlight);
   padding: 0.5rem;
 }
 
@@ -1964,7 +1964,7 @@ label {
 
 .dollar-placeholder {
   position: absolute;
-  top: 32px;
+  top: 36px;
   left: 10px;
   font-family: inherit;
   font-weight: 400;
@@ -2024,6 +2024,23 @@ label {
 .error-div {
   margin-top: 1rem;
   color: var(--red-primary);
+  background-color: var(--red-light);
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.red {
+  color: var(--red-primary);
+}
+
+.red em {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.outline-red {
+  border: 1px solid var(--red-primary) !important;
+  background-color: rgb(255, 240, 240) !important;
 }
 
 .create-wrapper .error-div {
