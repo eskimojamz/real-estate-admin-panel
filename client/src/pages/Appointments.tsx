@@ -605,7 +605,7 @@ function Appointments() {
                                                                 <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
                                                                 <label>Client</label>
                                                                 <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                                                <p>* Required Fields</p>
+                                                                <p className='required'>* Required Fields</p>
                                                                 {!fnLoading && title && startDate && endDate
                                                                     ? (
                                                                         <button className='btn-primary' disabled={fnLoading} onClick={(e) => editAppointment(e, appointmentInfo?.id)}>Submit</button>
@@ -786,7 +786,7 @@ function Appointments() {
                                                     <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
                                                     <label>Client</label>
                                                     <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                                    <p>* Required Fields</p>
+                                                    <p className='required'>* Required Fields</p>
                                                     {title && startDate && endDate
                                                         ? (
                                                             <button className='btn-primary' onClick={(e) => createAppointment(e)}>Submit</button>
