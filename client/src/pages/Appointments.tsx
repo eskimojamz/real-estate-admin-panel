@@ -83,11 +83,11 @@ function Appointments() {
         } else if (!allDay && startTime && endTime) {
             Object.assign(editFields, {
                 "start": {
-                    "date": null,
+                    // "date": null,
                     "dateTime": new Date(startDate + " " + startTime).toISOString()
                 },
                 "end": {
-                    "date": null,
+                    // "date": null,
                     "dateTime": new Date(endDate + " " + endTime).toISOString()
                 }
             })
@@ -100,7 +100,7 @@ function Appointments() {
             Object.assign(editFields, { description: client })
         }
         // patch to Google Api
-        await axiosGoogle.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
+        await axiosGoogle.put(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
             editFields
         ).then(res => {
             const newAppointmentInfo = {
