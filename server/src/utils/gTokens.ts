@@ -1,4 +1,5 @@
 import fetch from "node-fetch"
+import { serverURL } from "./urls";
 
 const tokenExpired = (gExpirationDate: string | number | Date) => {
     const now = Date.now();
@@ -19,7 +20,7 @@ const newExpirationDate = () => {
 const getValidTokenFromServer = async (gRefreshToken: string | null) => {
     // get new token from server with refresh token
     try {
-        const request = await fetch("http://localhost:4000/getValidToken", {
+        const request = await fetch(`${serverURL}/getValidToken`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

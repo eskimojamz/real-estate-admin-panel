@@ -6,7 +6,7 @@ import '../utils/fullCalendar/fullCalendar.css'
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import React, { createRef, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { GlobalContext } from '../App';
+import { axiosGoogle, GlobalContext } from '../App';
 import { GetUserDefaultCalendarDocument, useDisplayUserQuery, useGetUserDefaultCalendarQuery, useSetDefaultCalendarMutation } from '../generated/graphql';
 import { MdAddCircle, MdDeleteOutline, MdEdit, MdLocationPin, MdOutlineAccessTime, MdPerson } from 'react-icons/md';
 import { CgCalendarToday } from 'react-icons/cg'
@@ -41,11 +41,10 @@ function Appointments() {
         animate: { x: 0, opacity: 1 }
     }
 
-    const { isGLoggedIn, setIsGLoggedIn } = useContext(GlobalContext)
-    const [loginModal, setLoginModal] = useState<boolean>(true)
+    const { isGLoggedIn } = useContext(GlobalContext)
 
     const calRef = createRef<any>()
-    const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
+    const { data: getCalendarData } = useGetUserDefaultCalendarQuery({
         onError: (error) => console.log(error)
     })
     const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
@@ -84,11 +83,11 @@ function Appointments() {
         } else if (!allDay && startTime && endTime) {
             Object.assign(editFields, {
                 "start": {
-                    "date": null,
+                    // "date": null,
                     "dateTime": new Date(startDate + " " + startTime).toISOString()
                 },
                 "end": {
-                    "date": null,
+                    // "date": null,
                     "dateTime": new Date(endDate + " " + endTime).toISOString()
                 }
             })
@@ -101,7 +100,7 @@ function Appointments() {
             Object.assign(editFields, { description: client })
         }
         // patch to Google Api
-        await axios.patch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
+        await axiosGoogle.put(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`,
             editFields
         ).then(res => {
             const newAppointmentInfo = {
@@ -171,7 +170,7 @@ function Appointments() {
         setDeleteLoading(true)
         let calendarApi = calRef.current.getApi()
         // delete event on Google Calendar
-        await axios.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
+        await axiosGoogle.delete(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${eventId}`)
             .then(() => {
                 // remove event from FullCalendar events
                 calendarApi.getEventById(eventId).remove()
@@ -233,7 +232,7 @@ function Appointments() {
         }
         console.log(appointmentRef)
         // create new Event on Google Calendar
-        await axios.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
+        await axiosGoogle.post(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, appointmentRef)
             .then(res => {
                 console.log(res)
                 const newAppointmentInfo = {
@@ -296,11 +295,7 @@ function Appointments() {
     const [allDay, setAllDay] = useState<boolean>(true)
     const [location, setLocation] = useState<string>()
     const [client, setClient] = useState<string>()
-    // console.log(appointmentInfo, startDate, endDate, startTime, endTime)
-    // const [descriptionToggle, setDescriptionToggle] = useState<boolean>(false)
-    // const [descriptionInput, setDescriptionInput] = useState<string>()
-    // const [locationToggle, setLocationToggle] = useState<boolean>(false)
-    // const [locationInput, setLocationInput] = useState<string>()
+
     const resetForm = () => {
         setTitle(undefined)
         setAllDay(true)
@@ -610,7 +605,7 @@ function Appointments() {
                                                                 <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
                                                                 <label>Client</label>
                                                                 <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                                                <p>* Required Fields</p>
+                                                                <p className='required'>* Required Fields</p>
                                                                 {!fnLoading && title && startDate && endDate
                                                                     ? (
                                                                         <button className='btn-primary' disabled={fnLoading} onClick={(e) => editAppointment(e, appointmentInfo?.id)}>Submit</button>
@@ -791,7 +786,7 @@ function Appointments() {
                                                     <input value={location} onChange={(e) => setLocation(e.target.value)}></input>
                                                     <label>Client</label>
                                                     <input value={client} onChange={(e) => setClient(e.target.value)}></input>
-                                                    <p>* Required Fields</p>
+                                                    <p className='required'>* Required Fields</p>
                                                     {title && startDate && endDate
                                                         ? (
                                                             <button className='btn-primary' onClick={(e) => createAppointment(e)}>Submit</button>

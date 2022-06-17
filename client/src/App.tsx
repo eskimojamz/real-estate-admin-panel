@@ -3,9 +3,7 @@ import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
-import { useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
-import Login from "./pages/Login";
-import { Navigate } from "react-router-dom";
+import { useGetUserDefaultCalendarLazyQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupLazyQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 
 interface GlobalStateTypes {
   isLoggedIn: boolean | undefined;
@@ -21,10 +19,9 @@ interface GlobalStateTypes {
 }
 
 export const GlobalContext: React.Context<any> = createContext(null)
+export const axiosGoogle = axios.create()
 
 export const App: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>()
   const [isGLoggedIn, setIsGLoggedIn] = useState<boolean>()
   const [gAccountInfo, setGAccountInfo] = useState<any>()
@@ -44,55 +41,109 @@ export const App: React.FC = () => {
     setContacts,
   }
 
-  useEffect(() => {
-    fetch("http://localhost:4000/refresh_token", {
-      method: "POST",
-      credentials: "include"
-    }).then(async (res: any) => {
-      const { authorized, accessToken } = await res.json();
-      setAccessToken(accessToken);
-      setIsLoggedIn(authorized)
-    })
-  }, []);
+  const url = 'https://horizon-admin-panel.herokuapp.com'
+
+  const [calendarId, setCalendarId] = useState<string | null>()
+  const [contactGroupId, setContactGroupId] = useState<string | null>()
+  const [getCalendar] = useGetUserDefaultCalendarLazyQuery({
+    onError: (error) => console.log(error),
+    onCompleted: (data) => setCalendarId(data.getUserDefaultCalendar.defaultCalendarId)
+  })
+  const [getContactGroup] = useGetUserDefaultContactGroupLazyQuery({
+    onError: (error) => console.log(error),
+    onCompleted: (data) => setContactGroupId(data.getUserDefaultContactGroup.defaultContactGroupId)
+  })
 
   useEffect(() => {
-    let gLoginRef = false
-    axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
-      withCredentials: true
-    }).then((res) => {
-      const { gAccessToken } = res.data
-      console.log(gAccessToken)
-      if (gAccessToken) {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
-        gLoginRef = true
-      }
-    }).then(() => {
-      if (gLoginRef) {
-        axios.get('https://people.googleapis.com/v1/people/me', {
-          params: {
-            personFields: 'emailAddresses,photos',
+    // ref variable for gLogin
+    let gLoginReady = false
+    // refresh token for user
+    const getRefreshToken = async () => {
+      await fetch(`${url}/refresh_token`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          refreshToken: localStorage.getItem('refresh_token')
+        })
+      }).then(async (res: any) => {
+        const { authorized, accessToken, refreshToken } = await res.json();
+        setAccessToken(accessToken);
+        localStorage.setItem('refresh_token', refreshToken)
+        setIsLoggedIn(authorized)
+      }).catch(err => {
+        setIsLoggedIn(false)
+        throw new Error(err)
+      })
+    }
+    // handle Google Auth Token via search params redirect or silent refresh to server
+    const handleGToken = async () => {
+      // get search params from google redirect
+      const params = new URL(window.location.href).searchParams
+      const gAccessToken = params.get('gAccessToken')
+      const gRefreshToken = params.get('gRefreshToken')
+      const gExpirationDate = params.get('gExpirationDate')
+      // if user was redirected from google auth, set tokens and axios auth header
+      if (gAccessToken && gRefreshToken && gExpirationDate) {
+        localStorage.setItem('gAccessToken', gAccessToken)
+        localStorage.setItem('gRefreshToken', gRefreshToken)
+        localStorage.setItem('gExpirationDate', gExpirationDate)
+        axiosGoogle.defaults.headers.common = {
+          Authorization: `Bearer ${gAccessToken}`
+        }
+        gLoginReady = true
+      } else {
+        // if no query search params, silent refresh call to server
+        await axios.post(`${url}/auth/google/silent-refresh`, {
+          gAccessToken: localStorage.getItem('gAccessToken'),
+          gRefreshToken: localStorage.getItem('gRefreshToken'),
+          gExpirationDate: localStorage.getItem('gExpirationDate')
+        }, {
+          withCredentials: true
+        }).then(async (res) => {
+          const { gAccessToken } = await res.data
+          if (gAccessToken) {
+            axiosGoogle.defaults.headers.common = {
+              Authorization: `Bearer ${gAccessToken}`
+            }
+            gLoginReady = true
+          } else {
+            setIsGLoggedIn(false)
           }
-        }).then((res) => {
-          setGAccountInfo({
-            email: res.data.emailAddresses[0].value,
-            photo: res.data.photos[0].url
-          })
+        }).catch((err) => {
+          setIsGLoggedIn(false)
+          throw new Error(err)
         })
       }
+    }
 
-    }).then(() => {
-      if (gLoginRef) {
-        setIsGLoggedIn(true)
-      } else {
-        setIsGLoggedIn(false)
-      }
+    getRefreshToken().then(() => {
+      handleGToken().then(async () => {
+        if (gLoginReady) {
+          // fetch Google User Info & set isGLoggedIn
+          await axiosGoogle.get('https://people.googleapis.com/v1/people/me', {
+            params: {
+              personFields: 'emailAddresses,photos',
+            }
+          }).then((res) => {
+            setGAccountInfo({
+              email: res.data.emailAddresses[0].value,
+              photo: res.data.photos[0].url
+            })
+          }).then(() => {
+            setIsGLoggedIn(true)
+            getCalendar().then((data) => console.log(data))
+            getContactGroup().then((data) => console.log(data))
+          }).catch((err) => {
+            setIsGLoggedIn(false)
+            throw new Error(err)
+          })
+        }
+      })
     })
-  }, [])
-
-  const { data: getCalendarData, loading: calendarIdLoading } = useGetUserDefaultCalendarQuery({
-    onError: (error) => console.log(error)
-  })
-  const calendarId = getCalendarData?.getUserDefaultCalendar.defaultCalendarId
+  }, []);
 
   // onload, onGlogin & onCalIdSet, get calendar events if no calendars events
   useMemo(() => {
@@ -107,7 +158,7 @@ export const App: React.FC = () => {
         const maxDate = new Date()
         maxDate.setDate(maxDate.getDate() + 180)
 
-        axios.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+        axiosGoogle.get(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
           params: {
             orderBy: 'startTime',
             singleEvents: true,
@@ -143,15 +194,15 @@ export const App: React.FC = () => {
     }
   }, [isGLoggedIn, calendarId])
 
-  const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
-    onError: (error: any) => console.log(error)
-  })
-  const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
+  // const { data: getContactGroupData } = useGetUserDefaultContactGroupQuery({
+  //   onError: (error: any) => console.log(error)
+  // })
+  // const contactGroupId = getContactGroupData?.getUserDefaultContactGroup.defaultContactGroupId
 
   useMemo(() => {
     if (isGLoggedIn && contactGroupId) {
       const contactsRef: string[] = []
-      axios.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
+      axiosGoogle.get(`https://people.googleapis.com/v1/${contactGroupId}`, {
         params: {
           maxMembers: 200
         }
@@ -173,7 +224,7 @@ export const App: React.FC = () => {
           })
           paramsRef.append("personFields", 'names,phoneNumbers,emailAddresses,photos')
 
-          axios.get('https://people.googleapis.com/v1/people:batchGet', {
+          axiosGoogle.get('https://people.googleapis.com/v1/people:batchGet', {
             params: paramsRef
           }).then(res => {
             const contactItemsRef: { id: string | null; lastName: string | null; firstName: string | null; phoneNumber: string | null; photo: string | null; }[] = []

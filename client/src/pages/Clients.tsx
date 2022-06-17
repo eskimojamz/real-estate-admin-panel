@@ -5,7 +5,7 @@ import { FaGoogle } from 'react-icons/fa'
 import { MdAddCircle, MdDeleteOutline, MdEdit } from 'react-icons/md'
 import Skeleton from 'react-loading-skeleton'
 import { ScaleLoader } from 'react-spinners'
-import { GlobalContext } from '../App'
+import { axiosGoogle, GlobalContext } from '../App'
 import ContactGroups from '../components/ContactGroups'
 import GoogleConnected from '../components/GoogleConnected'
 import { useGetUserDefaultContactGroupQuery } from '../generated/graphql'
@@ -52,7 +52,7 @@ function Clients() {
             Object.assign(bodyRef.names, { "familyName": clientLastname })
         }
         let createdContact = {}
-        axios.post('https://people.googleapis.com/v1/people:createContact',
+        axiosGoogle.post('https://people.googleapis.com/v1/people:createContact',
             bodyRef,
             {
                 params: {

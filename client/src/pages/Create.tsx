@@ -173,7 +173,7 @@ const Create: React.FC = () => {
     const imagePreviews = images.map((image: { src: string }, i: number) => (
         <motion.img className="image-preview-img"
             src={image.src}
-            whileHover={{ scale: 1.1, boxShadow: '-5px 5px 10px rgb(131, 130, 130, 0.2)', transition: { duration: 0.25 } }}
+            whileHover={{ filter: 'brightness(1.1)', boxShadow: '-5px 5px 10px rgb(131, 130, 130, 0.2)', transition: { duration: 0.25 } }}
             onClick={() => handleImg(i)}
         />
     ))
@@ -217,7 +217,7 @@ const Create: React.FC = () => {
                             <h5>Create New Listing</h5>
                         </div>
                         <div className="create-header-btns">
-                            <button className="btn-grey">Cancel</button>
+                            <button className="btn-grey" onClick={() => navigate('/listings')}>Cancel</button>
                             <button className="btn-primary" onClick={submit}>Submit</button>
                         </div>
                     </div>
@@ -231,23 +231,23 @@ const Create: React.FC = () => {
                                         <p>Drag and drop up to five (5) image files here, or click to select files</p>
                                         <em>(Only *.jpeg/jpg and *.png images will be accepted)</em>
                                     </div>
-                                    {/* {imagePreviews || fileRejections && ( */}
-                                    <motion.aside className="image-preview-aside"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                    >
-                                        {imagePreviews}
-                                        {fileRejections && fileRejectionItems}
-                                    </motion.aside>
-                                    {/* )} */}
+                                    {(images.length > 0 || fileRejections.length > 0) && (
+                                        <motion.aside className="image-preview-aside"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                        >
+                                            {imagePreviews}
+                                            {fileRejections && fileRejectionItems}
+                                        </motion.aside>
+                                    )}
                                 </div>
                             </section>
 
                             <section className="form-col-2">
                                 <div className="label-group">
-                                    <label>Address *</label>
-                                    <input className="input-mb" required={true} placeholder="123 Street" onChange={e => setAddress1(e.target.value)}></input>
-                                    <input required={true} placeholder="Bayside, NY 11364" onChange={e => setAddress2(e.target.value)}></input>
+                                    <label className={`${error && 'red'}`}>Address *{error && <em>Required Field</em>}</label>
+                                    <input className={`input-mb ${error && !address1 && 'outline-red'}`} required={true} placeholder="123 Street" onChange={e => setAddress1(e.target.value)}></input>
+                                    <input className={`${error && !address2 && 'outline-red'}`} required={true} placeholder="Bayside, NY 11364" onChange={e => setAddress2(e.target.value)}></input>
                                 </div>
 
                                 <div className="label-group-row">
@@ -324,7 +324,7 @@ const Create: React.FC = () => {
                         </div>
                         {error ?
                             <div className="error-div">
-                                <em>There was an error. Please input all required fields and try again.</em>
+                                <p>There was an error. Please input all required fields and try again.</p>
                             </div>
                             : null}
                     </div>

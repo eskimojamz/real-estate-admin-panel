@@ -28,7 +28,7 @@ p {
 }
 
 p {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
 }
 
@@ -37,6 +37,7 @@ a {
 }
 
 button {
+  font-family: "Inter", sans-serif;
   font-size: 13px;
   font-weight: 500;
   height: 30px;
@@ -99,6 +100,13 @@ svg {
 
 .display-none {
   display: none !important;
+}
+
+.page-loading {
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
 }
 
 ::selection {
@@ -300,7 +308,7 @@ textarea:focus {
 
 .sidebar-grid .navlink {
   color: var(--primary-superlight);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   height: 30px;
   width: 90%;
@@ -318,7 +326,7 @@ textarea:focus {
 .sidebar-grid .active-navlink {
   color: var(--primary-superlight);
   background: var(--primary-dark);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   height: 30px;
   width: 90%;
@@ -447,7 +455,7 @@ h6 {
 }
 
 .page-header h3 {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   margin: 0;
   color: black;
@@ -992,11 +1000,13 @@ h6 {
 .calendar-info-header {
   display: flex;
   justify-content: space-between;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .calendar-info-header h5 {
   color: var(--grey-dark);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -1009,8 +1019,8 @@ h6 {
 
 .calendar-info p {
   margin: 0 !important;
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .calendar-info div {
@@ -1022,8 +1032,8 @@ h6 {
 }
 
 .calendar-info-title h3 {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 500;
 }
 
 .calendar-info-title {
@@ -1049,8 +1059,8 @@ h6 {
 }
 
 .calendar-info-date h5 {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .calendar-info-time {
@@ -1060,8 +1070,8 @@ h6 {
 }
 
 .calendar-info-time h5 {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 #time-text {
@@ -1431,7 +1441,7 @@ h6 {
 
 .listings-header-text h5 {
   /* color: var(--grey-dark); */
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   margin: 0;
 }
@@ -1935,7 +1945,7 @@ td {
 
 label {
   color: var(--grey-dark);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -1943,7 +1953,7 @@ label {
 .form-col-2 input {
   border-radius: 5px;
   border: 1px solid var(--grey-light);
-  background: var(--grey-superlight);
+  background-color: var(--grey-superlight);
   padding: 0.5rem;
 }
 
@@ -1957,7 +1967,7 @@ label {
 
 .dollar-placeholder {
   position: absolute;
-  top: 32px;
+  top: 36px;
   left: 10px;
   font-family: inherit;
   font-weight: 400;
@@ -2017,6 +2027,23 @@ label {
 .error-div {
   margin-top: 1rem;
   color: var(--red-primary);
+  background-color: var(--red-light);
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.red {
+  color: var(--red-primary);
+}
+
+.red em {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.outline-red {
+  border: 1px solid var(--red-primary) !important;
+  background-color: rgb(255, 240, 240) !important;
 }
 
 .create-wrapper .error-div {
@@ -2069,6 +2096,13 @@ label {
   font-size: 12px;
   font-weight: 500;
   border-radius: 10px;
+}
+
+.listing-view-loading {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  place-items: center;
 }
 
 .listing-view-wrapper {
@@ -2300,7 +2334,7 @@ em {
   border-radius: 5px;
 }
 .carousel-thumb-active {
-  border: 3px solid var(--primary);
+  border: 3px solid var(--primary-superlight);
 }
 .carousel-thumb-inactive {
   filter: brightness(0.5);
@@ -2323,7 +2357,7 @@ em {
   transition: background-color 0.5s;
 }
 .carousel-pagin-button-active {
-  background: var(--primary);
+  background: var(--highlight);
   /* border: 5px solid var(--primary-light); */
   border: none;
 }
@@ -2346,15 +2380,22 @@ em {
 
 .listing-view {
   display: flex;
+  margin-top: 61px;
+}
+
+.listing-view-card {
+  display: flex;
   flex-direction: column;
-  place-items: center;
   gap: 2rem;
-  padding: 1rem 0 5rem 0;
-  margin-top: 60px;
+  height: calc(100vh - 61px);
+  min-width: 573px;
+  overflow-y: scroll;
+  padding: 1rem 1.5rem 1rem 1rem;
 }
 
 .listing-view-images {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -2607,7 +2648,6 @@ em {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
 }
 
 .listing-view-text input {
@@ -2636,12 +2676,15 @@ em {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .listing-view-text-head span:first-child {
   display: flex;
   flex-direction: column;
   width: 50%;
+  gap: 8px;
 }
 
 .listing-view-text-head h3 {
@@ -2717,6 +2760,7 @@ em {
   margin: 0;
   color: var(--grey-dark);
   font-weight: 500;
+  font-size: 13px;
 }
 
 .listing-view-text p {
@@ -2728,12 +2772,14 @@ em {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .listing-view-text-body span {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 8px;
 }
 
 .listing-view-text-details {
@@ -2776,6 +2822,7 @@ em {
 
 .listing-view-text-details-col p {
   font-weight: 500;
+  font-size: 15px;
 }
 
 .edit-squareFt {
@@ -2791,7 +2838,7 @@ em {
 }
 
 .listing-view-text-desc p {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .listing-view-text-desc textarea {
@@ -2808,28 +2855,23 @@ em {
 .listing-view-text-foot {
   width: 100%;
   display: flex;
+  padding-top: 1rem;
 }
 
 .listing-view-text-foot span {
   width: 50%;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 8px;
 }
 
 .listing-view-text-foot p {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .listing-view-map {
-  height: 300px;
+  height: calc(100vh - 61px);
   width: 100%;
-  background: rgb(199, 199, 199);
-  border-radius: 10px;
-}
-
-.listing-view-map div {
-  border-radius: 10px;
 }
 
 .map-marker {
@@ -3006,7 +3048,6 @@ em {
 .appointments-side {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   background-color: white;
   max-width: 350px;
   border-bottom: 1px solid var(--grey-light);
@@ -3099,6 +3140,9 @@ em {
 .appointments-side-header {
   display: flex;
   justify-content: space-between;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--grey-light);
 }
 
 .appointments-side-header span {
@@ -3108,7 +3152,7 @@ em {
 }
 
 .appointments-side-header h4 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }
 
@@ -3119,6 +3163,10 @@ em {
 
 .appointments-side-header svg:hover {
   fill: var(--primary-superlight);
+}
+
+.appointments-side-body label {
+  font-size: 13px;
 }
 
 .appointments-side-body form {
@@ -3254,7 +3302,13 @@ em {
 
 .appointments-side-body p {
   margin: 0 0 0.5rem 0;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.appointments-side-body .required {
+  color: var(--grey-dark);
+  font-weight: 400;
 }
 
 .appointments-side-body .calendar-info-map {

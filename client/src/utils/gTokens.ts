@@ -17,11 +17,11 @@ const tokenExpired = () => {
   
     return false; // valid token
 };
-  
+
 const getValidTokenFromServer = async (refreshToken: string | null) => {
     // get new token from server with refresh token
     try {
-        const request = await fetch("http://localhost:4000/getValidToken", {
+        const request = await fetch("https://horizon-admin-panel.herokuapp.com/getValidToken", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

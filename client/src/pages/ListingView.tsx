@@ -1,15 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom";
 import { AllListingsDocument, GetListingDocument, useDeleteMutation, useEditMutation, useGetListingQuery, useSignS3Mutation } from "../generated/graphql";
 import GoogleMap from "google-map-react"
 import Geocode from "react-geocode"
-import { AnimatePresence, motion, MotionConfig } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import ImageCarousel from "../components/ImageCarousel"
 import ListingEditView from "../components/ListingEditView"
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
-import { Img } from "react-image";
-import s3Upload from "../utils/s3Upload";
 import axios from "axios";
 import { MdOutlineChevronRight } from "react-icons/md";
 import { ScaleLoader } from "react-spinners";
@@ -404,146 +400,153 @@ function ListingView() {
                                 : <button className="btn-primary edit-btn"
                                     onClick={() => {
                                         setEditMode(true)
-                                    }
-                                    }
+                                    }}
                                 >
                                     Edit
                                 </button>
                             }
                         </div>
                     </div>
-                    {editMode
-                        ? <ListingEditView
-                            allImages={allImages}
-                            setAllImages={setAllImages}
-                            handleImg={handleImg}
-                            listingData={editListingData}
-                            editStateSetters={editStateSetters}
-                            onDrop={onDrop}
-                            s3UploadData={s3UploadData}
-                            setS3UploadData={setS3UploadData}
-                        />
-                        : (
-                            <div className="listing-view">
-                                <div className="listing-view-images">
-                                    {/* images mosaic */}
-                                    <motion.div className="listing-view-images-main"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                    >
-                                        {listingImages[0] ?
-                                            <motion.img src={listingImages[0]!} onClick={() => handleImg(0)}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                whileHover={{ scale: 1.05, transition: { duration: 0.25 } }}
-                                            />
-                                            : <p>No images for this listing!</p>}
-                                    </motion.div>
-                                    <div className={`listing-view-images-side 
-                            ${imagesCount < 2 ? "display-none"
-                                            : imagesCount == 2 ? "listing-view-images-side-2"
-                                                : imagesCount == 3 ? "listing-view-images-side-3"
-                                                    : ""
-                                        }
-                        `}>
-                                        {Object.values(listingImages).slice(1).filter(val => val !== null).map((imageUrl, i) => {
-                                            return (
-                                                <motion.img
-                                                    src={imageUrl!}
-                                                    onClick={() => handleImg(i + 1)}
+                    <div className="listing-view">
+                        {editMode
+                            ? <ListingEditView
+                                allImages={allImages}
+                                setAllImages={setAllImages}
+                                handleImg={handleImg}
+                                listingData={editListingData}
+                                editStateSetters={editStateSetters}
+                                onDrop={onDrop}
+                                s3UploadData={s3UploadData}
+                                setS3UploadData={setS3UploadData}
+                            />
+                            : (
+
+                                <div className="listing-view-card">
+                                    <div className="listing-view-images">
+                                        {/* images mosaic */}
+                                        <motion.div className="listing-view-images-main"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                        >
+                                            {listingImages[0] ?
+                                                <motion.img src={listingImages[0]!} onClick={() => handleImg(0)}
                                                     initial={{ opacity: 0, y: 10 }}
                                                     animate={{ opacity: 1, y: 0 }}
-                                                    whileHover={{ scale: 1.05, transition: { duration: 0.25 } }}
+                                                    whileHover={{ filter: 'brightness(1.1)', transition: { duration: 0.25 } }}
                                                 />
-                                            )
-                                        })}
-                                        {imagesCount == 4 &&
-                                            <div className="listing-view-images-side-placeholder"
-                                                onClick={() => handleImg(0)}
-                                            >
-                                                <span>View all</span>
-                                                <span>➟</span>
-                                            </div>
-                                        }
+                                                : <p>No images for this listing!</p>}
+                                        </motion.div>
+                                        <div className={`listing-view-images-side 
+                                            ${imagesCount < 2 ? "display-none"
+                                                : imagesCount == 2 ? "listing-view-images-side-2"
+                                                    : imagesCount == 3 ? "listing-view-images-side-3"
+                                                        : ""
+                                            }`}>
+                                            {Object.values(listingImages).slice(1).filter(val => val !== null).map((imageUrl, i) => {
+                                                return (
+                                                    <motion.img
+                                                        src={imageUrl!}
+                                                        onClick={() => handleImg(i + 1)}
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        whileHover={{ filter: 'brightness(1.1)', transition: { duration: 0.25 } }}
+                                                    />
+                                                )
+                                            })}
+                                            {imagesCount == 4 &&
+                                                <div className="listing-view-images-side-placeholder"
+                                                    onClick={() => handleImg(0)}
+                                                >
+                                                    <span>View all</span>
+                                                    <span>➟</span>
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="listing-view-text">
-                                    {/* listing view text */}
-                                    <div className="listing-view-text-head">
-                                        <span>
-                                            <h3>{listingData?.getListing?.address1}</h3>
-                                            <h4>{listingData?.getListing?.address2}</h4>
-                                        </span>
-                                        <span>
-                                            <h3>$ {listingData?.getListing?.price.toLocaleString()}</h3>
-                                        </span>
-                                    </div>
-                                    <div className="listing-view-text-body">
-                                        <div className="listing-view-text-details">
-                                            <div className="listing-view-text-details-col">
-                                                <span>
-                                                    <h5>Beds</h5>
-                                                    <p>{listingData?.getListing?.beds}</p>
-                                                </span>
-                                                <span>
-                                                    <h5>Baths</h5>
-                                                    <p>{listingData?.getListing?.baths}</p>
-                                                </span>
-                                                <span>
-                                                    <h5>Square Ft.</h5>
-                                                    <p>{listingData?.getListing?.squareFt}</p>
-                                                </span>
+                                    <div className="listing-view-text">
+                                        {/* listing view text */}
+                                        <div className="listing-view-text-head">
+                                            <span>
+                                                <h3>{listingData?.getListing?.address1}</h3>
+                                                <h4>{listingData?.getListing?.address2}</h4>
+                                            </span>
+                                            <span>
+                                                <h3>$ {listingData?.getListing?.price.toLocaleString()}</h3>
+                                            </span>
+                                        </div>
+                                        <div className="listing-view-text-body">
+                                            <div className="listing-view-text-details">
+                                                <div className="listing-view-text-details-col">
+                                                    <span>
+                                                        <h5>Beds</h5>
+                                                        <p>{listingData?.getListing?.beds}</p>
+                                                    </span>
+                                                    <span>
+                                                        <h5>Baths</h5>
+                                                        <p>{listingData?.getListing?.baths}</p>
+                                                    </span>
+                                                    <span>
+                                                        <h5>Square Ft.</h5>
+                                                        <p>{listingData?.getListing?.squareFt}</p>
+                                                    </span>
+                                                </div>
+                                                <div className="listing-view-text-details-col">
+                                                    <span>
+                                                        <h5>Area</h5>
+                                                        <p>{listingData?.getListing?.area}</p>
+                                                    </span>
+                                                    <span>
+                                                        <h5>Status</h5>
+                                                        <p>{listingData?.getListing?.status}</p>
+                                                    </span>
+                                                    <span>
+                                                        <h5>Type</h5>
+                                                        <p>For Sale</p>
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="listing-view-text-details-col">
+                                            <div className="listing-view-text-desc">
                                                 <span>
-                                                    <h5>Area</h5>
-                                                    <p>{listingData?.getListing?.area}</p>
-                                                </span>
-                                                <span>
-                                                    <h5>Status</h5>
-                                                    <p>{listingData?.getListing?.status}</p>
-                                                </span>
-                                                <span>
-                                                    <h5>Type</h5>
-                                                    <p>For Sale</p>
+                                                    <h5>Description</h5>
+                                                    <p>{listingData?.getListing?.description}</p>
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="listing-view-text-desc">
+                                        <div className="listing-view-text-foot">
                                             <span>
-                                                <h5>Description</h5>
-                                                <p>{listingData?.getListing?.description}</p>
+                                                <h5>Date Created:</h5>
+                                                <p>{new Date(listingData?.getListing?.dateCreated!).toLocaleString()}</p>
+                                            </span>
+                                            <span>
+                                                <h5>Last Edited</h5>
+                                                <p>{listingData?.getListing?.lastEdited == null ? "N/A" : new Date(listingData?.getListing?.lastEdited).toLocaleString()}</p>
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="listing-view-text-foot">
-                                        <span>
-                                            <h5>Date Created:</h5>
-                                            <p>{new Date(listingData?.getListing?.dateCreated!).toLocaleString()}</p>
-                                        </span>
-                                        <span>
-                                            <h5>Last Edited</h5>
-                                            <p>{listingData?.getListing?.lastEdited == null ? "N/A" : new Date(listingData?.getListing?.lastEdited).toLocaleString()}</p>
-                                        </span>
-                                    </div>
-                                    <div className="listing-view-map">
-                                        <GoogleMap
-                                            bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
-                                            center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
-                                            defaultZoom={14}
-                                        >
-                                            <MapMarker lat={mapCenter.lat} lng={mapCenter.lng} address={(listingData?.getListing?.address1 + " " + listingData?.getListing?.address2)} />
-                                        </GoogleMap>
-                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        <div className="listing-view-map">
+                            <GoogleMap
+                                bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY! }}
+                                center={{ lat: mapCenter.lat, lng: mapCenter.lng }}
+                                defaultZoom={14}
+                            >
+                                <MapMarker lat={mapCenter.lat} lng={mapCenter.lng} address={(listingData?.getListing?.address1 + " " + listingData?.getListing?.address2)} />
+                            </GoogleMap>
+                        </div>
+                    </div>
                     {/* ----- Listing View ----- */}
                 </motion.div>
             </div>
         </>
-    ) : null
+    ) : (
+        <div className="wrapper">
+            <div className="listing-view-loading">
+                <ScaleLoader color='#2c5990' />
+            </div>
+        </div>
+    )
 }
 
 export default ListingView

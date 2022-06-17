@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import express from "express";
-import bodyParser from "body-parser";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/UserResolver";
@@ -9,34 +8,35 @@ import { createConnection } from "typeorm";
 import cookieParser from "cookie-parser"
 import { verify } from "jsonwebtoken"
 import { User } from "./entity/User"
-import { sendRefreshToken } from "./sendRefreshToken";
 import { createAccessToken, createRefreshToken } from "./auth";
 import cors from "cors"
 import { google } from "googleapis"
 import "dotenv/config"
 import { getGToken } from "./utils/gTokens";
 import fetch from "node-fetch"
+import { clientURL, serverURL } from "./utils/urls";
 
 // lambda fn, calling itself
 (async() => {
     const app = express();
 
-    app.use(bodyParser.json())
-
     app.use(
         cors({
-          origin: ['http://localhost:3000', 'https://studio.apollographql.com'],
+          origin: [clientURL, 'http://localhost:3000'],
           credentials: true
         })
     );
     
+    app.use(express.json())
     app.use(cookieParser())
     
     app.post("/refresh_token", async (req, res) => {
         // grab refresh token from cookies
-        const token = req.cookies.jid
+        const token = req.body.refreshToken
+        console.log(req)
+        console.log('cookie token:', token)
         if (!token) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         let payload: any = null;
@@ -45,7 +45,7 @@ import fetch from "node-fetch"
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
         } catch(err) {
             console.log(err)
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // refresh token is valid 
@@ -54,25 +54,29 @@ import fetch from "node-fetch"
         const user = await User.findOne({ id: payload.userId })
 
         if (!user) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // if tokenVersion doesn't match, don't send refresh or access token
         // used for blocking invalid logins
         if (user.tokenVersion !== payload.tokenVersion) {
-            return res.send({ authorized: false, accessToken: "" })
+            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
         // create new refresh token and set to cookies
-        sendRefreshToken(res, createRefreshToken(user));
+        // sendRefreshToken(res, createRefreshToken(user));
         
         // create new access token and send to apollo client
-        return res.send({authorized: true, accessToken: createAccessToken(user)})
+        return res.send({
+            authorized: true,
+            accessToken: createAccessToken(user),
+            refreshToken: createRefreshToken(user)
+        })
     })
 
     app.post("/auth/google/silent-refresh", async (req, res) =>{
-        const {gAccessToken, gRefreshToken, gExpirationDate} = req.cookies;
-        console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
+        const {gAccessToken, gRefreshToken, gExpirationDate} = req.body;
+        // console.log(gAccessToken, gRefreshToken, gExpirationDate, "credentials")
         
         // Refresh token was cleared (on logout), so no credentials get sent to client
         if (!gRefreshToken) {
@@ -86,20 +90,21 @@ import fetch from "node-fetch"
             const newGAccessToken = checkTokenExpired.access_token
             const newGExpirationDate = checkTokenExpired.newGExpirationDate
 
-            res.cookie('gExpirationDate', newGExpirationDate, {
-                httpOnly: true
+            return res.send({
+                gExpirationDate: newGExpirationDate,
+                gAccessToken: newGAccessToken
             })
-
-            return res.json({gAccessToken: newGAccessToken})
         }
         console.log("Token is not yet expired")
-        return res.json({gAccessToken})
+        return res.send({
+            gAccessToken: gAccessToken
+        })
       });
 
     const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        "http://localhost:4000/auth/google/callback" // server redirect url handler
+        `${serverURL}/auth/google/callback` // server redirect url handler
     )
 
     app.post("/auth/google", (_req, res) => {
@@ -120,41 +125,13 @@ import fetch from "node-fetch"
                 console.log(err)
                 throw new Error(err.message)
             }
-            res.cookie('gAccessToken', token!.access_token, {
-                httpOnly: true,
-            })
-            res.cookie('gRefreshToken', token!.refresh_token, {
-                httpOnly: true,
-            })
             let expiration = new Date();
-            res.cookie('gExpirationDate', expiration.setHours(expiration.getHours() + 1), {
-                httpOnly: true,
-            })
-            console.log("New token credentials granted: ", token)
-            res.redirect("http://localhost:3000/dashboard/")
+            res.redirect(`${clientURL}/dashboard?gAccessToken=${token!.access_token}&gRefreshToken=${token!.refresh_token}&gExpirationDate=${expiration.setHours(expiration.getHours()+1)}`)
         })
-        
-
-        // const accessToken = tokens?.access_token
-        //     const refreshToken = tokens?.refresh_token
-            
-
-            
     })
 
     app.get("/auth/google/logout", (_req, res) => {
-        // clear token credential cookies
-        res.clearCookie('gAccessToken', {
-            httpOnly: true,
-        })
-        res.clearCookie('gRefreshToken', {
-            httpOnly: true,
-        })
-        res.clearCookie('gExpirationDate', {
-            httpOnly: true,
-        })
-        res.send('User logged out of G services, credentials cleared.')
-        res.redirect("http://localhost:3000/dashboard/")
+        res.redirect(`${clientURL}/dashboard/`)
     })
 
     app.post("/getValidToken", async(req, res) => {
@@ -193,7 +170,7 @@ import fetch from "node-fetch"
     await apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });
 
-    app.listen(4000, () => {
+    app.listen(process.env.PORT || 4000, () => {
         console.log("express server started")
     })
 })()

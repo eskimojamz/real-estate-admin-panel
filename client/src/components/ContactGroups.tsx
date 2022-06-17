@@ -2,7 +2,7 @@ import axios from 'axios'
 import { motion } from 'framer-motion'
 import React, { useContext, useEffect, useState } from 'react'
 import { ScaleLoader } from 'react-spinners'
-import { GlobalContext } from '../App'
+import { axiosGoogle, GlobalContext } from '../App'
 import { GetUserDefaultContactGroupDocument, useDisplayUserQuery, useGetUserDefaultContactGroupQuery, useSetDefaultContactGroupMutation } from '../generated/graphql'
 
 function ContactGroups() {
@@ -25,10 +25,8 @@ function ContactGroups() {
         }
     })
 
-    const axiosInstance = axios.create()
-
     const getGContactGroupsList = async () => {
-        await axiosInstance.get('https://people.googleapis.com/v1/contactGroups')
+        await axiosGoogle.get('https://people.googleapis.com/v1/contactGroups')
             .then(res => {
                 if (res.status === 200) {
                     const groupsRef: any[] = []
@@ -56,20 +54,20 @@ function ContactGroups() {
     }
 
     // if Calendar fetch fails, get new gAccessToken and retry
-    axiosInstance.interceptors.response.use((response) => {
+    axiosGoogle.interceptors.response.use((response) => {
         return response
     }, async function (error) {
         const originalRequest = error.config;
         if (error.response.status === 401 && !originalRequest._retry) {
             // originalRequest._retry = true;
-            axios.post('http://localhost:4000/auth/google/silent-refresh', {}, {
+            axiosGoogle.post('https://horizon-admin-panel.herokuapp.com/auth/google/silent-refresh', {}, {
                 withCredentials: true
             }).then((res) => {
                 const { gAccessToken } = res.data
                 console.log(gAccessToken)
                 if (gAccessToken) {
-                    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
-                    return axiosInstance.request(originalRequest);
+                    axiosGoogle.defaults.headers.common['Authorization'] = `Bearer ${gAccessToken}`
+                    return axiosGoogle.request(originalRequest);
                 } else {
                     setIsGLoggedIn(false)
                 }
@@ -99,7 +97,7 @@ function ContactGroups() {
     const createGContactGroup = (e: { preventDefault: () => void }) => {
         e.preventDefault()
         setLoadingCreate(true)
-        axiosInstance.post('https://people.googleapis.com/v1/contactGroups', {
+        axiosGoogle.post('https://people.googleapis.com/v1/contactGroups', {
             contactGroup: {
                 name: newContactGroup,
             }

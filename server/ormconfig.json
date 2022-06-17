@@ -1,24 +1,24 @@
 {
    "type": "mysql",
-   "host": "127.0.0.1",
+   "host": "horizon-admin.cawkgcuw0vhr.us-west-1.rds.amazonaws.com",
    "port": 3306,
-   "username": "root",
-   "password": "password",
-   "database": "horizon",
+   "username": "admin",
+   "password": "z5OnJwftnkITogZHjy5K",
+   "database": "horizon_admin",
    "synchronize": true,
    "logging": true,
    "entities": [
-      "src/entity/**/*.ts"
+      "entity/*.js"
    ],
    "migrations": [
-      "src/migration/**/*.ts"
+      "dist/migration/*.js"
    ],
    "subscribers": [
-      "src/subscriber/**/*.ts"
+      "dist/subscriber/*.js"
    ],
    "cli": {
-      "entitiesDir": "src/entity",
-      "migrationsDir": "src/migration",
-      "subscribersDir": "src/subscriber"
+      "entitiesDir": "dist/entity",
+      "migrationsDir": "dist/migration",
+      "subscribersDir": "dist/subscriber"
    }
 }
