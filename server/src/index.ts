@@ -22,7 +22,7 @@ import { clientURL, serverURL } from "./utils/urls";
 
     app.use(
         cors({
-          origin: [clientURL, 'http://localhost:3000'],
+          origin: [clientURL],
           credentials: true
         })
     );
@@ -51,15 +51,10 @@ import { clientURL, serverURL } from "./utils/urls";
         // refresh token is valid 
         
         // get user and send back new refresh & access tokens
+        // @ts-ignore
         const user = await User.findOne({ id: payload.userId })
 
         if (!user) {
-            return res.send({ authorized: false, accessToken: "", refreshToken: "" })
-        }
-
-        // if tokenVersion doesn't match, don't send refresh or access token
-        // used for blocking invalid logins
-        if (user.tokenVersion !== payload.tokenVersion) {
             return res.send({ authorized: false, accessToken: "", refreshToken: "" })
         }
 
@@ -170,7 +165,7 @@ import { clientURL, serverURL } from "./utils/urls";
     await apolloServer.start();
     apolloServer.applyMiddleware({ app, cors: false });
 
-    app.listen(process.env.PORT || 4000, () => {
+    app.listen(4000, () => {
         console.log("express server started")
     })
 })()

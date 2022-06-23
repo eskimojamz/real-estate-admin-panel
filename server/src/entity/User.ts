@@ -15,9 +15,6 @@ export class User extends BaseEntity {
     @Column("text")
     password: string;
 
-    @Column("int", { default: 0 })
-    tokenVersion: number;
-
     @Field({nullable: true})
     @Column("text", { default: null})
     defaultCalendarId: string

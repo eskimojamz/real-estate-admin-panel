@@ -13,7 +13,7 @@ import { onError } from "@apollo/client/link/error";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import jwtDecode from "jwt-decode";
 
-const url = 'https://horizon-admin-panel.herokuapp.com'
+const url = 'http://localhost:4000'
 
 // define cache
 const cache = new InMemoryCache({});

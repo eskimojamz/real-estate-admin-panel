@@ -86,7 +86,7 @@ export class UserResolver {
           defaultCalendarName: calendarName
         })
         // return User
-        return await User.findOne(userId)
+          return await User.findOne(userId)
       } catch (error) {
         console.log(error)
         return null
@@ -128,7 +128,7 @@ export class UserResolver {
         // update defaultCalendarId
         await User.update(userId, {defaultContactGroupId: contactGroupId, defaultContactGroupName: contactGroupName})
         // return User
-        return await User.findOne(userId)
+          return await User.findOne(userId)
       } catch (error) {
         console.log(error)
         return null
@@ -165,7 +165,9 @@ export class UserResolver {
       }
   
       const valid = await compare(password, user.password);
-  
+        console.log(password)
+        console.log(user.password)
+        console.log(valid)
       if (!valid) {
         throw new AuthenticationError("bad password");
       }

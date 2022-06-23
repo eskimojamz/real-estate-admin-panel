@@ -1,14 +1,13 @@
 {
    "type": "mysql",
-   "host": "horizon-admin.cawkgcuw0vhr.us-west-1.rds.amazonaws.com",
+   "host": "127.0.0.1",
    "port": 3306,
-   "username": "admin",
-   "password": "z5OnJwftnkITogZHjy5K",
-   "database": "horizon_admin",
-   "synchronize": true,
+   "username": "root",
+   "password": "admin",
+   "database": "admin_panel",
    "logging": true,
    "entities": [
-      "entity/*.js"
+      "src/entity/**/*.{ts,js}"
    ],
    "migrations": [
       "dist/migration/*.js"
