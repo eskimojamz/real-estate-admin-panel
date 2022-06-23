@@ -1,5 +1,5 @@
 export const googleAuth = async () => {
-    const url = 'https://horizon-admin-panel.herokuapp.com'
+    const url = 'http://localhost:3000';
 
     try {
         const request = await fetch(`${url}/auth/google`, {
