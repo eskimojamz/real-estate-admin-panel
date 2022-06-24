@@ -3,6 +3,7 @@ import { Router } from "./Router";
 import { setAccessToken } from "./utils/accessToken";
 import "./App.css"
 import axios from "axios";
+import {url} from "./utils/url";
 import { useGetUserDefaultCalendarLazyQuery, useGetUserDefaultCalendarQuery, useGetUserDefaultContactGroupLazyQuery, useGetUserDefaultContactGroupQuery } from "./generated/graphql";
 
 interface GlobalStateTypes {
@@ -40,8 +41,6 @@ export const App: React.FC = () => {
     contacts,
     setContacts,
   }
-
-  const url = 'https://horizon-admin-panel.herokuapp.com'
 
   const [calendarId, setCalendarId] = useState<string | null>()
   const [contactGroupId, setContactGroupId] = useState<string | null>()

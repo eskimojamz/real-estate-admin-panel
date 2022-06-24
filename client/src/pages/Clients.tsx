@@ -69,7 +69,7 @@ function Clients() {
                     phoneNumber: res.data.phoneNumbers[0].value,
                     photo: res.data.photos[0].url
                 })
-                axios.post(`https://people.googleapis.com/v1/${contactGroupId}/members:modify`,
+                axiosGoogle.post(`https://people.googleapis.com/v1/${contactGroupId}/members:modify`,
                     {
                         "resourceNamesToAdd": res.data.resourceName
                     }

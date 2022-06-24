@@ -1,5 +1,6 @@
+import {url} from './url'
+
 export const googleAuth = async () => {
-    const url = 'http://localhost:3000';
 
     try {
         const request = await fetch(`${url}/auth/google`, {
