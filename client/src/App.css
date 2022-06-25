@@ -91,6 +91,7 @@ svg {
   --blue-light: rgba(237, 242, 255, 1);
   --red-primary: rgba(255, 85, 85, 1);
   --red-light: rgba(255, 215, 215, 1);
+  --red-superlight: rgb(255, 234, 234);
   --box-shadow: 0 0px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -2877,15 +2878,15 @@ em {
 .map-marker {
   height: 20px;
   width: 20px;
-  background-color: var(--blue-primary);
-  border: 5px solid var(--blue-light);
+  background-color: var(--red-primary);
+  border: 5px solid var(--red-light);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .map-marker:hover {
-  border-color: var(--primary-superlight);
+  border-color: var(--red-superlight);
 }
 
 .map-marker-listing {
@@ -2926,7 +2927,7 @@ em {
   right: -8px;
   height: 24px;
   width: 24px;
-  background: var(--secondary);
+  background: var(--grey);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -2935,7 +2936,7 @@ em {
 .map-marker-listing-close:after {
   content: "\00d7"; /* This will render the 'X' */
   font-size: 18px;
-  color: white;
+  color: var(--grey-dark);
   margin: 0 0 1px 0;
 }
 
